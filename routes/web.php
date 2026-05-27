@@ -105,7 +105,7 @@ Route::middleware('auth')->group(function () {
         
         Route::resource('eventos.premios', \App\Http\Controllers\PremioController::class)->shallow();
         Route::resource('eventos.agenda', \App\Http\Controllers\AgendaController::class)->shallow();
-        Route::resource('eventos.proveedores', \App\Http\Controllers\ProveedorEventoController::class)->only(['store', 'destroy'])->shallow();
+        Route::resource('eventos.proveedores', \App\Http\Controllers\ProveedorEventoController::class)->only(['store', 'update', 'destroy'])->shallow();
 
         /* Canjes de Premios */
         Route::get('eventos/{evento}/canjes', [\App\Http\Controllers\CanjeController::class, 'index'])->name('eventos.canjes.index');

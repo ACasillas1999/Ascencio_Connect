@@ -50,8 +50,8 @@
                 @error('rol') <small style="color:#ef4444; font-size:12px;">Selecciona un rol.</small> @enderror
             </div>
 
-            <div class="form-group" id="evento-selector" style="display: {{ \App\Helpers\Permisos::normalizar(old('rol', $usuario->Rol)) === 'Evento' ? 'block' : 'none' }}; margin-top:15px;">
-                <label class="form-label" for="ID_Evento">Evento Asignado (Solo para Rol Evento)</label>
+            <div class="form-group" id="evento-selector" style="display: {{ in_array(\App\Helpers\Permisos::normalizar(old('rol', $usuario->Rol)), ['Evento', 'Proveedor']) ? 'block' : 'none' }}; margin-top:15px;">
+                <label class="form-label" for="ID_Evento">Evento Asignado (Para Rol Evento y Proveedor)</label>
                 <select name="ID_Evento" id="ID_Evento" class="form-control">
                     <option value="">Selecciona un evento...</option>
                     @foreach($eventos as $ev)
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function checkEventoRequired() {
         let isEvento = false;
         radios.forEach(r => {
-            if (r.checked && r.value === 'Evento') isEvento = true;
+            if (r.checked && (r.value === 'Evento' || r.value === 'Proveedor')) isEvento = true;
         });
         
         if (isEvento) {

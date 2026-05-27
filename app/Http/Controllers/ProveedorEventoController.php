@@ -48,4 +48,20 @@ class ProveedorEventoController extends Controller
 
         return redirect()->route('eventos.show', $evento)->with('success', 'Proveedor eliminado del evento.');
     }
+
+    /**
+     * Actualiza los puntos de un proveedor.
+     */
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'Puntos' => 'required|integer|min:0',
+        ]);
+
+        DB::table('proveedor_evento')
+            ->where('ID', $id)
+            ->update(['Puntos' => $request->Puntos]);
+
+        return redirect()->back()->with('success', 'Puntos del proveedor actualizados.');
+    }
 }

@@ -389,7 +389,6 @@
         <div class="card" style="align-self:start;">
             <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
                 <span class="card-title"><i class="bi bi-briefcase" style="color:var(--accent-gold);margin-right:8px"></i>Proveedores del Evento</span>
-                <button type="button" class="btn btn-sm btn-primary" onclick="openModal('modal-proveedor')"><i class="bi bi-plus-lg"></i> Asignar Proveedor</button>
             </div>
             <div class="table-wrapper">
                 <table>
@@ -405,7 +404,16 @@
                         @forelse($proveedores as $prov)
                         <tr>
                             <td style="font-weight:500">{{ $prov->NombreProveedor }}</td>
-                            <td><span class="badge badge-gold">{{ $prov->Puntos }}</span></td>
+                            <td>
+                                <form action="{{ route('proveedores.update', $prov->ID) }}" method="POST" style="display:flex; gap:8px; align-items:center; margin:0;">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="number" name="Puntos" value="{{ $prov->Puntos }}" min="0" required class="form-control" style="width: 80px; padding: 4px; font-size: 13px; background:var(--bg-primary); border:1px solid var(--border); color:var(--text-primary); border-radius: 4px;">
+                                    <button type="submit" class="btn btn-sm btn-secondary" style="padding: 4px 8px; border-radius: 4px;" title="Guardar Puntos">
+                                        <i class="bi bi-save"></i>
+                                    </button>
+                                </form>
+                            </td>
                             <td>
                                 <span class="badge {{ $prov->Activo ? 'badge-success' : 'badge-secondary' }}">
                                     {{ $prov->Activo ? 'Activo' : 'Inactivo' }}

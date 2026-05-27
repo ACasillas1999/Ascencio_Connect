@@ -36,8 +36,24 @@ class UsuarioController extends Controller
             'password'         => Hash::make($request->password),
             'password_visible' => $request->password,
             'Rol'              => $request->rol,
-            'ID_Evento'        => $request->rol === 'Evento' ? $request->ID_Evento : null,
+            'ID_Evento'        => in_array($request->rol, ['Evento', 'Proveedor']) ? $request->ID_Evento : null,
         ]);
+
+        if ($request->rol === 'Proveedor' && $request->filled('ID_Evento')) {
+            $exists = \Illuminate\Support\Facades\DB::table('proveedor_evento')
+                ->where('NombreProveedor', $request->username)
+                ->where('ID_Evento', $request->ID_Evento)
+                ->exists();
+            
+            if (!$exists) {
+                \Illuminate\Support\Facades\DB::table('proveedor_evento')->insert([
+                    'NombreProveedor' => $request->username,
+                    'ID_Evento' => $request->ID_Evento,
+                    'Puntos' => 0,
+                    'Activo' => 1
+                ]);
+            }
+        }
 
         return redirect()->route('usuarios.index')->with('success', 'Usuario creado exitosamente.');
     }
@@ -63,7 +79,7 @@ class UsuarioController extends Controller
         $data = [
             'username' => $request->username,
             'Rol'      => $request->rol,
-            'ID_Evento'=> $request->rol === 'Evento' ? $request->ID_Evento : null,
+            'ID_Evento'=> in_array($request->rol, ['Evento', 'Proveedor']) ? $request->ID_Evento : null,
         ];
 
         if ($request->filled('password')) {
@@ -72,6 +88,22 @@ class UsuarioController extends Controller
         }
 
         $usuario->update($data);
+
+        if ($request->rol === 'Proveedor' && $request->filled('ID_Evento')) {
+            $exists = \Illuminate\Support\Facades\DB::table('proveedor_evento')
+                ->where('NombreProveedor', $request->username)
+                ->where('ID_Evento', $request->ID_Evento)
+                ->exists();
+            
+            if (!$exists) {
+                \Illuminate\Support\Facades\DB::table('proveedor_evento')->insert([
+                    'NombreProveedor' => $request->username,
+                    'ID_Evento' => $request->ID_Evento,
+                    'Puntos' => 0,
+                    'Activo' => 1
+                ]);
+            }
+        }
 
         return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado exitosamente.');
     }

@@ -43,8 +43,8 @@
                 @error('rol') <small style="color:#ef4444; font-size:12px;">Selecciona un rol.</small> @enderror
             </div>
 
-            <div class="form-group" id="evento-selector" style="display: {{ old('rol') === 'Evento' ? 'block' : 'none' }}; margin-top:15px;">
-                <label class="form-label" for="ID_Evento">Evento Asignado (Solo para Rol Evento)</label>
+            <div class="form-group" id="evento-selector" style="display: {{ in_array(old('rol'), ['Evento', 'Proveedor']) ? 'block' : 'none' }}; margin-top:15px;">
+                <label class="form-label" for="ID_Evento">Evento Asignado (Para Rol Evento y Proveedor)</label>
                 <select name="ID_Evento" id="ID_Evento" class="form-control">
                     <option value="">Selecciona un evento...</option>
                     @foreach($eventos as $ev)
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     radios.forEach(radio => {
         radio.addEventListener('change', function() {
-            if (this.value === 'Evento') {
+            if (this.value === 'Evento' || this.value === 'Proveedor') {
                 eventoSelector.style.display = 'block';
                 idEventoSelect.setAttribute('required', 'required');
             } else {
