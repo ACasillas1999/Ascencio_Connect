@@ -62,6 +62,7 @@
 </style>
 @endpush
 
+@if(auth()->check() && auth()->user()->Rol !== 'Evento')
 <!-- INFO CARDS -->
 @php
     $capacidad = $evento->capacidad > 0 ? $evento->capacidad : 1;
@@ -120,14 +121,16 @@
     @endif
 
     {{-- Link directo al módulo de canjes --}}
-    <a href="{{ route('eventos.canjes.index', $evento) }}" style="margin-left:auto; display:inline-flex; align-items:center; gap:6px; padding:8px 16px; background:linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); border:1px solid rgba(212,175,55,0.3); border-radius:8px; color:var(--accent-gold); font-size:13px; font-weight:700; text-decoration:none; transition:all 0.2s; white-space:nowrap;" onmouseover="this.style.background='linear-gradient(135deg, rgba(212,175,55,0.25), rgba(212,175,55,0.1))'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05))'; this.style.transform='translateY(0)'">
+    <a href="{{ route('eventos.canjes.index', $evento) }}" style="margin-left:auto; display:inline-flex; align-items:center; gap:6px; padding:8px 16px; background:linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); border:1px solid rgba(212,175,55,0.3); border-radius:8px; color:var(--accent-gold); font-size:13px; font-weight:700; text-decoration:none; transition:all 0.2s; white-space:nowrap;" onmouseover="this.style.background='linear-gradient(135deg, rgba(212,175,55,0.25), rgba(212,175,55,0.1))'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='linear-gradient(135deg, rgba(212,175,55,0.05))'; this.style.transform='translateY(0)'">
         <i class="bi bi-gift-fill"></i> Canjear Premios
     </a>
 </div>
+@endif
 
 <!-- TAB 1: GENERAL Y AGENDA -->
 <div id="tab-general" class="tab-pane" style="display:block;">
-    <div style="display:grid;grid-template-columns:320px 1fr;gap:20px">
+    <div style="display:grid;grid-template-columns:{{ (auth()->check() && auth()->user()->Rol === 'Evento') ? '1fr' : '320px 1fr' }};gap:20px">
+        @if(auth()->check() && auth()->user()->Rol !== 'Evento')
         <!-- DETALLES -->
         <div class="card" style="align-self:start">
             <div class="card-header">
@@ -155,12 +158,15 @@
                 @endforeach
             </div>
         </div>
+        @endif
 
         <!-- AGENDA -->
         <div class="card" style="align-self:start;">
             <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
                 <span class="card-title"><i class="bi bi-calendar-event" style="color:var(--accent-gold);margin-right:8px"></i>Horarios (Agenda)</span>
+                @if(auth()->check() && auth()->user()->Rol !== 'Evento')
                 <button type="button" class="btn btn-sm btn-primary" onclick="openModal('modal-agenda')"><i class="bi bi-plus-lg"></i> Agregar</button>
+                @endif
             </div>
             
             @php
@@ -233,6 +239,7 @@
                                                             @endphp
                                                             <div class="time-box-card" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:15px; position:relative; transition:all 0.2s ease; {{ $actividadObj ? 'cursor:pointer;' : '' }}"
                                                                  @if($actividadObj) onclick="window.location.href='{{ route('actividades.show', $actividadObj->ID) }}?horario={{ $slot->ID }}'" @endif>
+                                                                @if(auth()->check() && auth()->user()->Rol !== 'Evento')
                                                                 <!-- BOTONES ACCION -->
                                                                 <div style="position:absolute; top:10px; right:10px; display:flex; gap:4px; z-index:2;" onclick="event.stopPropagation()">
                                                                     <!-- BOTON EDITAR -->
@@ -249,6 +256,7 @@
                                                                         <button type="button" class="btn btn-sm btn-delete" style="color:#ef4444; background:none; border:none; padding:4px;"><i class="bi bi-x-lg"></i></button>
                                                                     </form>
                                                                 </div>
+                                                                @endif
 
                                                                 <h4 style="margin:0 0 8px; font-size:14px; font-weight:600; color:var(--text-primary); padding-right:50px; line-height:1.3;">
                                                                     {{ $slot->Actividad }}
@@ -282,6 +290,7 @@
     </div>
 </div>
 
+@if(auth()->check() && auth()->user()->Rol !== 'Evento')
 <!-- TAB 2: PARTICIPANTES -->
 <div id="tab-participantes" class="tab-pane" style="display:none;">
     <div class="card">
@@ -572,6 +581,8 @@
         </div>
     </div>
 </div>
+@endif
+
 @endif
 
 <!-- Modales (Nuevos) -->

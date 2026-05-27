@@ -50,6 +50,19 @@
                 @error('rol') <small style="color:#ef4444; font-size:12px;">Selecciona un rol.</small> @enderror
             </div>
 
+            <div class="form-group" id="evento-selector" style="display: {{ \App\Helpers\Permisos::normalizar(old('rol', $usuario->Rol)) === 'Evento' ? 'block' : 'none' }}; margin-top:15px;">
+                <label class="form-label" for="ID_Evento">Evento Asignado (Solo para Rol Evento)</label>
+                <select name="ID_Evento" id="ID_Evento" class="form-control">
+                    <option value="">Selecciona un evento...</option>
+                    @foreach($eventos as $ev)
+                        <option value="{{ $ev->ID }}" {{ old('ID_Evento', $usuario->ID_Evento) == $ev->ID ? 'selected' : '' }}>
+                            {{ $ev->name_evento }} ({{ $ev->fecha_inicio->format('d/m/Y') }})
+                        </option>
+                    @endforeach
+                </select>
+                @error('ID_Evento') <small style="color:#ef4444; font-size:12px;">{{ $message }}</small> @enderror
+            </div>
+
             <div style="text-align: right; margin-top: 30px;">
                 <button type="submit" class="btn btn-primary">
                     <i class="bi bi-save"></i> Guardar Cambios
@@ -58,4 +71,35 @@
         </form>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const radios = document.querySelectorAll('input[name="rol"]');
+    const eventoSelector = document.getElementById('evento-selector');
+    const idEventoSelect = document.getElementById('ID_Evento');
+
+    function checkEventoRequired() {
+        let isEvento = false;
+        radios.forEach(r => {
+            if (r.checked && r.value === 'Evento') isEvento = true;
+        });
+        
+        if (isEvento) {
+            eventoSelector.style.display = 'block';
+            idEventoSelect.setAttribute('required', 'required');
+        } else {
+            eventoSelector.style.display = 'none';
+            idEventoSelect.removeAttribute('required');
+            idEventoSelect.value = '';
+        }
+    }
+
+    radios.forEach(radio => {
+        radio.addEventListener('change', checkEventoRequired);
+    });
+    
+    // Initial check on load
+    checkEventoRequired();
+});
+</script>
 @endsection

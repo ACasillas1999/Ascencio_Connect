@@ -28,12 +28,12 @@ Route::get('/clear-cache', function() {
 
 Route::get('/migrate', function() {
     try {
-        \DB::statement("ALTER TABLE `evento` ADD COLUMN `gafete_qr_x` INT DEFAULT 1755");
-        \DB::statement("ALTER TABLE `evento` ADD COLUMN `gafete_qr_y` INT DEFAULT 280");
-        \DB::statement("ALTER TABLE `evento` ADD COLUMN `gafete_nombre_x` INT DEFAULT 202");
-        \DB::statement("ALTER TABLE `evento` ADD COLUMN `gafete_nombre_y` INT DEFAULT 1050");
-        \DB::statement("ALTER TABLE `evento` ADD COLUMN `gafete_font_size` INT DEFAULT 60");
-        return "Columnas agregadas con éxito.";
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('usuarios', 'ID_Evento')) {
+            \DB::statement("ALTER TABLE `usuarios` ADD COLUMN `ID_Evento` BIGINT UNSIGNED NULL");
+            \DB::statement("ALTER TABLE `usuarios` ADD CONSTRAINT `fk_evento_usuario` FOREIGN KEY (`ID_Evento`) REFERENCES `evento`(`ID`) ON DELETE SET NULL");
+            return "Columna ID_Evento agregada y FK establecida.";
+        }
+        return "La columna ID_Evento ya existe.";
     } catch (\Exception $e) {
         return "Error: " . $e->getMessage();
     }
@@ -81,8 +81,8 @@ Route::middleware('auth')->group(function () {
         /* Dashboard */
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        /* Eventos */
-        Route::resource('eventos', EventoController::class);
+        /* Eventos (excepto show) */
+        Route::resource('eventos', EventoController::class)->except(['show']);
 
         /* Usuarios y Roles */
         Route::resource('usuarios', \App\Http\Controllers\UsuarioController::class)->except(['show']);
@@ -103,12 +103,6 @@ Route::middleware('auth')->group(function () {
             'actividades' => 'actividad'
         ])->shallow();
         
-        /* AJAX Asistencia y Scanner QR */
-        Route::post('actividades/{actividad}/buscar', [\App\Http\Controllers\ActividadController::class, 'buscarParticipantes'])->name('actividades.buscar');
-        Route::post('actividades/{actividad}/asistencia', [\App\Http\Controllers\ActividadController::class, 'marcarAsistencia'])->name('actividades.asistencia');
-        Route::post('actividades/{actividad}/inscribir', [\App\Http\Controllers\ActividadController::class, 'inscribirParticipante'])->name('actividades.inscribir');
-        Route::post('actividades/{actividad}/registro-rapido', [\App\Http\Controllers\ActividadController::class, 'registroRapido'])->name('actividades.registro-rapido');
-
         Route::resource('eventos.premios', \App\Http\Controllers\PremioController::class)->shallow();
         Route::resource('eventos.agenda', \App\Http\Controllers\AgendaController::class)->shallow();
         Route::resource('eventos.proveedores', \App\Http\Controllers\ProveedorEventoController::class)->only(['store', 'destroy'])->shallow();
@@ -129,6 +123,17 @@ Route::middleware('auth')->group(function () {
         /* Participantes (Ver y registrar) */
         Route::resource('participantes', ParticipanteController::class)->only(['index', 'show', 'create', 'store']);
         Route::get('eventos/{evento}/agenda-json', [ParticipanteController::class, 'getAgenda'])->name('eventos.agenda.json');
+    });
+
+    /* === RUTAS COMPARTIDAS (ADMIN Y EVENTO) === */
+    Route::middleware('role:Administrador,Evento')->group(function () {
+        Route::get('eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
+        
+        /* AJAX Asistencia y Scanner QR */
+        Route::post('actividades/{actividad}/buscar', [\App\Http\Controllers\ActividadController::class, 'buscarParticipantes'])->name('actividades.buscar');
+        Route::post('actividades/{actividad}/asistencia', [\App\Http\Controllers\ActividadController::class, 'marcarAsistencia'])->name('actividades.asistencia');
+        Route::post('actividades/{actividad}/inscribir', [\App\Http\Controllers\ActividadController::class, 'inscribirParticipante'])->name('actividades.inscribir');
+        Route::post('actividades/{actividad}/registro-rapido', [\App\Http\Controllers\ActividadController::class, 'registroRapido'])->name('actividades.registro-rapido');
     });
 
     /* === RUTAS DE PROVEEDOR === */

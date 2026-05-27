@@ -146,6 +146,17 @@
         
         const actividadesContainer = document.getElementById('actividades-container');
 
+        // Filtrar títulos en tiempo real
+        const nombreInput = document.getElementById('Nombre');
+        if (nombreInput) {
+            nombreInput.addEventListener('input', function() {
+                const regex = /\b(lic|ing|ingeniero|licenciad[oa]|arq|arquitect[oa]|dr|doctor[a]?|mtra|mtro|maestr[oa])\b\.?\s*/gi;
+                if (regex.test(this.value)) {
+                    this.value = this.value.replace(regex, '');
+                }
+            });
+        }
+
         function updateUI() {
             const selectedOpt = eventoSelect.options[eventoSelect.selectedIndex];
             if (!selectedOpt.value) {

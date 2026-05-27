@@ -43,6 +43,14 @@ class AuthController extends Controller
             if (Auth::user()->Rol === 'Vendedor') {
                 return redirect()->intended(route('participantes.index'));
             }
+            if (Auth::user()->Rol === 'Evento') {
+                if (Auth::user()->ID_Evento) {
+                    return redirect()->intended(route('eventos.show', Auth::user()->ID_Evento));
+                }
+                // Si no tiene evento asignado, cerrarle sesión por seguridad
+                Auth::logout();
+                return back()->withErrors(['username' => 'Este usuario Evento no tiene ningún evento asignado. Contacta al administrador.']);
+            }
             return redirect()->intended(route('dashboard'));
         }
 

@@ -18,7 +18,13 @@ class Usuario extends Authenticatable
         'password',
         'Rol',
         'password_visible',
+        'ID_Evento'
     ];
+
+    public function evento()
+    {
+        return $this->belongsTo(Evento::class, 'ID_Evento', 'ID');
+    }
 
     protected $hidden = [
         'password',

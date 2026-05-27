@@ -358,6 +358,14 @@
 
     <nav class="sidebar-nav">
         <ul style="list-style:none">
+            @if(auth()->check() && auth()->user()->Rol === 'Evento')
+            <li class="nav-section-title">Asistencia</li>
+            <li class="nav-item">
+                <a href="{{ route('eventos.show', auth()->user()->ID_Evento ?? 0) }}" class="nav-link active">
+                    <i class="bi bi-calendar-event"></i> Mi Evento
+                </a>
+            </li>
+            @else
             @if(auth()->check() && auth()->user()->Rol !== 'Vendedor')
             <li class="nav-section-title">Principal</li>
             <li class="nav-item">
@@ -381,8 +389,6 @@
                 </a>
             </li>
 
-
-
             @if(auth()->check() && auth()->user()->Rol !== 'Vendedor')
             <li class="nav-section-title" style="margin-top:8px">Comercial</li>
             <li class="nav-item">
@@ -391,7 +397,6 @@
                 </a>
             </li>
             @endif
-
 
             @if(auth()->check() && auth()->user()->Rol !== 'Vendedor')
             <li class="nav-section-title" style="margin-top:8px">Configuración</li>
@@ -415,6 +420,7 @@
                     <i class="bi bi-palette"></i> Apariencia CSS
                 </a>
             </li>
+            @endif
             @endif
         </ul>
     </nav>

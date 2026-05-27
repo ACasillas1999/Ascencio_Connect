@@ -11,14 +11,15 @@ class UsuarioController extends Controller
 {
     public function index()
     {
-        $usuarios = Usuario::all();
+        $usuarios = Usuario::with('evento')->get();
         return view('usuarios.index', compact('usuarios'));
     }
 
     public function create()
     {
         $roles = Permisos::ROLES;
-        return view('usuarios.create', compact('roles'));
+        $eventos = \App\Models\Evento::orderByDesc('fecha_inicio')->get();
+        return view('usuarios.create', compact('roles', 'eventos'));
     }
 
     public function store(Request $request)
@@ -27,6 +28,7 @@ class UsuarioController extends Controller
             'username' => 'required|unique:usuarios,username',
             'password' => 'required|min:4',
             'rol'      => 'required|in:' . implode(',', Permisos::ROLES),
+            'ID_Evento'=> 'nullable|exists:evento,ID',
         ]);
 
         Usuario::create([
@@ -34,6 +36,7 @@ class UsuarioController extends Controller
             'password'         => Hash::make($request->password),
             'password_visible' => $request->password,
             'Rol'              => $request->rol,
+            'ID_Evento'        => $request->rol === 'Evento' ? $request->ID_Evento : null,
         ]);
 
         return redirect()->route('usuarios.index')->with('success', 'Usuario creado exitosamente.');
@@ -43,7 +46,8 @@ class UsuarioController extends Controller
     {
         $usuario = Usuario::findOrFail($id);
         $roles = Permisos::ROLES;
-        return view('usuarios.edit', compact('usuario', 'roles'));
+        $eventos = \App\Models\Evento::orderByDesc('fecha_inicio')->get();
+        return view('usuarios.edit', compact('usuario', 'roles', 'eventos'));
     }
 
     public function update(Request $request, $id)
@@ -53,11 +57,13 @@ class UsuarioController extends Controller
         $request->validate([
             'username' => 'required|unique:usuarios,username,' . $usuario->ID . ',ID',
             'rol'      => 'required|in:' . implode(',', Permisos::ROLES),
+            'ID_Evento'=> 'nullable|exists:evento,ID',
         ]);
 
         $data = [
             'username' => $request->username,
             'Rol'      => $request->rol,
+            'ID_Evento'=> $request->rol === 'Evento' ? $request->ID_Evento : null,
         ];
 
         if ($request->filled('password')) {
