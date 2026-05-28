@@ -27,6 +27,23 @@ class EventoController extends Controller
                 \DB::statement("ALTER TABLE `evento` ADD COLUMN `gafete_color_id` VARCHAR(7) DEFAULT '#000000'");
                 \DB::statement("ALTER TABLE `evento` ADD COLUMN `gafete_font_family` VARCHAR(50) DEFAULT 'Arial'");
             }
+            if (!\Schema::hasColumn('evento', 'horario_nombre_x')) {
+                \DB::statement("ALTER TABLE `evento` ADD COLUMN `horario_nombre_x` INT DEFAULT 202");
+                \DB::statement("ALTER TABLE `evento` ADD COLUMN `horario_nombre_y` INT DEFAULT 150");
+                \DB::statement("ALTER TABLE `evento` ADD COLUMN `horario_font_size` INT DEFAULT 40");
+                \DB::statement("ALTER TABLE `evento` ADD COLUMN `horario_color_nombre` VARCHAR(7) DEFAULT '#000000'");
+                \DB::statement("ALTER TABLE `evento` ADD COLUMN `horario_id_x` INT DEFAULT 202");
+                \DB::statement("ALTER TABLE `evento` ADD COLUMN `horario_id_y` INT DEFAULT 250");
+                \DB::statement("ALTER TABLE `evento` ADD COLUMN `horario_id_font_size` INT DEFAULT 30");
+                \DB::statement("ALTER TABLE `evento` ADD COLUMN `horario_color_id` VARCHAR(7) DEFAULT '#000000'");
+                \DB::statement("ALTER TABLE `evento` ADD COLUMN `horario_lista_x` INT DEFAULT 100");
+                \DB::statement("ALTER TABLE `evento` ADD COLUMN `horario_lista_y` INT DEFAULT 350");
+                \DB::statement("ALTER TABLE `evento` ADD COLUMN `horario_lista_w` INT DEFAULT 800");
+                \DB::statement("ALTER TABLE `evento` ADD COLUMN `horario_lista_h` INT DEFAULT 1000");
+                \DB::statement("ALTER TABLE `evento` ADD COLUMN `horario_lista_font_size` INT DEFAULT 24");
+                \DB::statement("ALTER TABLE `evento` ADD COLUMN `horario_color_lista` VARCHAR(7) DEFAULT '#000000'");
+                \DB::statement("ALTER TABLE `evento` ADD COLUMN `horario_font_family` VARCHAR(50) DEFAULT 'Arial'");
+            }
         } catch (\Exception $e) {
             \Log::error("Error en migración temporal: " . $e->getMessage());
         }
@@ -91,16 +108,17 @@ class EventoController extends Controller
             ->where('ID_Evento', $evento->ID)
             ->get();
         
-        // Generar previsualización del gafete
+        // Generar previsualización del gafete y horario
         $imageService = new \App\Services\ImageService();
         $mockGafete = $imageService->generarMockGafete($evento);
+        $mockHorario = $imageService->generarMockHorario($evento);
         
         $ubicacionModel = \App\Models\Ubicacion::where('Nombre', $evento->ubicacion)->first();
         $numSalones = $ubicacionModel ? $ubicacionModel->Salones : 1;
         
         $premios = \App\Models\PremioEvento::where('ID_Evento', $evento->ID)->get();
         
-        return view('eventos.show', compact('evento', 'participantes', 'actividades', 'agenda', 'proveedores', 'mockGafete', 'numSalones', 'premios'));
+        return view('eventos.show', compact('evento', 'participantes', 'actividades', 'agenda', 'proveedores', 'mockGafete', 'mockHorario', 'numSalones', 'premios'));
     }
 
     public function edit(Evento $evento)
@@ -136,6 +154,21 @@ class EventoController extends Controller
             'gafete_color_nombre'  => 'nullable|string|max:7',
             'gafete_color_id'      => 'nullable|string|max:7',
             'gafete_font_family'   => 'nullable|string|max:50',
+            'horario_nombre_x'     => 'nullable|integer',
+            'horario_nombre_y'     => 'nullable|integer',
+            'horario_font_size'    => 'nullable|integer',
+            'horario_id_x'         => 'nullable|integer',
+            'horario_id_y'         => 'nullable|integer',
+            'horario_id_font_size' => 'nullable|integer',
+            'horario_lista_x'      => 'nullable|integer',
+            'horario_lista_y'      => 'nullable|integer',
+            'horario_lista_w'      => 'nullable|integer',
+            'horario_lista_h'      => 'nullable|integer',
+            'horario_lista_font_size' => 'nullable|integer',
+            'horario_color_nombre' => 'nullable|string|max:7',
+            'horario_color_id'     => 'nullable|string|max:7',
+            'horario_color_lista'  => 'nullable|string|max:7',
+            'horario_font_family'  => 'nullable|string|max:50',
         ];
 
         $data = $request->validate($rules);

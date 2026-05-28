@@ -357,4 +357,103 @@ class ImageService
 
         return 'machotes/mock_gafete_' . $evento->ID . '.jpg';
     }
+
+    /**
+     * Genera un Horario de Prueba para el Evento
+     */
+    public function generarMockHorario(Evento $evento): ?string
+    {
+        if (!$evento->machote_horario) {
+            return null;
+        }
+
+        $templatePath = storage_path('app/public/' . $evento->machote_horario);
+        if (!file_exists($templatePath)) {
+            return null;
+        }
+
+        $outputPath = storage_path('app/public/machotes/mock_horario_' . $evento->ID . '.jpg');
+        if (!is_dir(dirname($outputPath))) {
+            mkdir(dirname($outputPath), 0777, true);
+        }
+
+        // Cargar imagen de fondo
+        $image = @imagecreatefromstring(file_get_contents($templatePath));
+        if (!$image) return null;
+
+        $hexColorNombre = $evento->horario_color_nombre ?? '#000000';
+        list($r, $g, $b) = sscanf(str_pad($hexColorNombre, 7, '0'), "#%02x%02x%02x");
+        $colorNombre = imagecolorallocate($image, $r ?? 0, $g ?? 0, $b ?? 0);
+
+        $hexColorId = $evento->horario_color_id ?? '#000000';
+        list($r, $g, $b) = sscanf(str_pad($hexColorId, 7, '0'), "#%02x%02x%02x");
+        $colorId = imagecolorallocate($image, $r ?? 0, $g ?? 0, $b ?? 0);
+        
+        $hexColorLista = $evento->horario_color_lista ?? '#000000';
+        list($rLista, $gLista, $bLista) = sscanf(str_pad($hexColorLista, 7, '0'), "#%02x%02x%02x");
+        $colorLista = imagecolorallocate($image, $rLista ?? 0, $gLista ?? 0, $bLista ?? 0);
+
+        // Selección de Fuente
+        $fontName = $evento->horario_font_family ?? 'Arial';
+        if ($fontName === 'Arial') {
+            $fontPath = 'C:\Windows\Fonts\arial.ttf';
+        } elseif ($fontName === 'Times New Roman') {
+            $fontPath = 'C:\Windows\Fonts\times.ttf';
+        } elseif ($fontName === 'Courier') {
+            $fontPath = 'C:\Windows\Fonts\cour.ttf';
+        } else {
+            $fontPath = __DIR__ . '/../../public/fonts/nexa-book.ttf';
+        }
+        
+        $nombrePrueba = "Participante de Prueba";
+        $idPrueba = "ID: 12345";
+
+        if (!file_exists($fontPath)) {
+            $fontSystem = 'C:\Windows\Fonts\arial.ttf';
+            if (file_exists($fontSystem)) {
+                $fontPath = $fontSystem;
+            }
+        }
+
+        if (file_exists($fontPath)) {
+            $fontSize = $evento->horario_font_size ?? 40;
+            $nombreX = $evento->horario_nombre_x ?? 202;
+            $nombreY = $evento->horario_nombre_y ?? 150;
+            imagettftext($image, $fontSize, 0, $nombreX, $nombreY, $colorNombre, $fontPath, $nombrePrueba);
+            
+            $idFontSize = $evento->horario_id_font_size ?? 30;
+            $idX = $evento->horario_id_x ?? 202;
+            $idY = $evento->horario_id_y ?? 250;
+            imagettftext($image, $idFontSize, 0, $idX, $idY, $colorId, $fontPath, $idPrueba);
+            
+            // Dibujar Lista de Actividades
+            $listaX = $evento->horario_lista_x ?? 100;
+            $listaY = $evento->horario_lista_y ?? 350;
+            $listaW = $evento->horario_lista_w ?? 800;
+            $listaH = $evento->horario_lista_h ?? 1000;
+            $listaFontSize = $evento->horario_lista_font_size ?? 24;
+            
+            imagerectangle($image, $listaX, $listaY, $listaX + $listaW, $listaY + $listaH, $colorLista);
+            
+            $textoLista = "09:00 - Registro\n10:00 - Conferencia 1\n11:30 - Break\n12:00 - Taller\n14:00 - Fin";
+            $lineas = explode("\n", $textoLista);
+            $currY = $listaY + $listaFontSize + 10;
+            foreach($lineas as $linea) {
+                if ($currY > $listaY + $listaH) break;
+                imagettftext($image, $listaFontSize, 0, $listaX + 10, $currY, $colorLista, $fontPath, $linea);
+                $currY += $listaFontSize + 20;
+            }
+            
+        } else {
+            // Fallback extremo
+            $fontSize = 5;
+            imagestring($image, $fontSize, $evento->horario_nombre_x ?? 202, $evento->horario_nombre_y ?? 150, $nombrePrueba, $colorNombre);
+            imagestring($image, $fontSize, $evento->horario_id_x ?? 202, $evento->horario_id_y ?? 250, $idPrueba, $colorId);
+        }
+
+        imagejpeg($image, $outputPath, 100);
+        imagedestroy($image);
+
+        return 'machotes/mock_horario_' . $evento->ID . '.jpg';
+    }
 }

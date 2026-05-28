@@ -119,6 +119,9 @@
     @if($mockGafete)
     <button class="tab-btn" onclick="switchTab(this, 'tab-gafete')"><i class="bi bi-person-vcard" style="margin-right:4px;"></i> Diseño de Gafete</button>
     @endif
+    @if($mockHorario)
+    <button class="tab-btn" onclick="switchTab(this, 'tab-horario')"><i class="bi bi-clock" style="margin-right:4px;"></i> Diseño de Horario</button>
+    @endif
 
     {{-- Link directo al módulo de canjes --}}
     <a href="{{ route('eventos.canjes.index', $evento) }}" style="margin-left:auto; display:inline-flex; align-items:center; gap:6px; padding:8px 16px; background:linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); border:1px solid rgba(212,175,55,0.3); border-radius:8px; color:var(--accent-gold); font-size:13px; font-weight:700; text-decoration:none; transition:all 0.2s; white-space:nowrap;" onmouseover="this.style.background='linear-gradient(135deg, rgba(212,175,55,0.25), rgba(212,175,55,0.1))'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='linear-gradient(135deg, rgba(212,175,55,0.05))'; this.style.transform='translateY(0)'">
@@ -591,6 +594,125 @@
 </div>
 @endif
 
+@if($mockHorario)
+<!-- TAB 6: HORARIO -->
+<div id="tab-horario" class="tab-pane" style="display:none;">
+    <div class="card" style="align-self:start; max-width:1000px; margin:0 auto;">
+        <div class="card-header">
+            <span class="card-title"><i class="bi bi-clock" style="color:var(--accent-gold);margin-right:8px"></i>Diseño y Configuración de Horario</span>
+        </div>
+        <div class="card-body">
+            <div style="display:flex; flex-wrap:wrap; gap:24px; justify-content:center; align-items:flex-start;">
+                
+                <!-- Columna Izquierda: Configuración -->
+                <div style="flex:1; min-width:300px; max-width:450px; text-align:center;">
+                    <h4 style="font-size:14px; margin-bottom:12px; color:var(--text-primary);">1. Ajuste de Posiciones</h4>
+                    <div id="horario-editor-container" style="position:relative; display:inline-block; max-width:260px; border-radius:8px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.3);">
+                        <img id="horario-template-img" src="{{ asset('storage/' . $evento->machote_horario) }}" style="width:100%; display:block;">
+                        
+                        <!-- Draggable Name -->
+                        <div id="draggable-horario-name" style="position:absolute; width:50%; height:30px; border:2px solid #00bc8c; background:rgba(0,188,140,0.2); cursor:move; display:flex; align-items:center; justify-content:center; top:0; left:0;">
+                            <span id="preview-horario-nombre" style="color:{{ $evento->horario_color_nombre ?? '#000000' }}; font-family:{{ $evento->horario_font_family === 'Nexa' ? 'sans-serif' : ($evento->horario_font_family === 'Courier' ? 'monospace' : ($evento->horario_font_family === 'Times New Roman' ? 'serif' : 'Arial')) }}; font-size:11px; font-weight:bold;">Nombre</span>
+                        </div>
+
+                        <!-- Draggable ID -->
+                        <div id="draggable-horario-id" style="position:absolute; width:30%; height:20px; border:2px solid #3b82f6; background:rgba(59,130,246,0.2); cursor:move; display:flex; align-items:center; justify-content:center; top:0; left:0;">
+                            <span id="preview-horario-id" style="color:{{ $evento->horario_color_id ?? '#000000' }}; font-family:{{ $evento->horario_font_family === 'Nexa' ? 'sans-serif' : ($evento->horario_font_family === 'Courier' ? 'monospace' : ($evento->horario_font_family === 'Times New Roman' ? 'serif' : 'Arial')) }}; font-size:9px; font-weight:bold;">ID: 1234</span>
+                        </div>
+                        
+                        <!-- Draggable Lista -->
+                        <div id="draggable-horario-lista" style="position:absolute; width:60%; height:100px; border:2px dashed #f59e0b; background:rgba(245,158,11,0.2); cursor:move; display:flex; flex-direction:column; align-items:flex-start; padding:4px; top:0; left:0;">
+                            <span style="color:{{ $evento->horario_color_lista ?? '#000000' }}; font-family:{{ $evento->horario_font_family === 'Nexa' ? 'sans-serif' : ($evento->horario_font_family === 'Courier' ? 'monospace' : ($evento->horario_font_family === 'Times New Roman' ? 'serif' : 'Arial')) }}; font-size:8px; font-weight:bold;">09:00 - Registro</span>
+                            <span style="color:{{ $evento->horario_color_lista ?? '#000000' }}; font-family:{{ $evento->horario_font_family === 'Nexa' ? 'sans-serif' : ($evento->horario_font_family === 'Courier' ? 'monospace' : ($evento->horario_font_family === 'Times New Roman' ? 'serif' : 'Arial')) }}; font-size:8px; font-weight:bold;">10:00 - Conferencia 1</span>
+                        </div>
+                    </div>
+                    <small style="color:var(--text-muted); display:block; margin-top:8px;">Arrastra verde (Nombre), azul (ID) y naranja (Lista de Horarios) para ubicarlos.</small>
+                    
+                    <form action="{{ route('eventos.update', $evento) }}" method="POST" enctype="multipart/form-data" style="margin-top:15px; text-align:left; max-width:500px; margin-left:auto; margin-right:auto; background:var(--bg-secondary); padding:15px; border-radius:8px; border:1px solid var(--border);">
+                        @csrf @method('PUT')
+                        <!-- Campos ocultos requeridos por la validación -->
+                        <input type="hidden" name="name_evento" value="{{ $evento->name_evento }}">
+                        <input type="hidden" name="duracion" value="{{ $evento->duracion }}">
+                        <input type="hidden" name="estado" value="{{ $evento->estado }}">
+                        <input type="hidden" name="fecha_inicio" value="{{ $evento->fecha_inicio->format('Y-m-d') }}">
+                        <input type="hidden" name="fecha_fin" value="{{ $evento->fecha_fin->format('Y-m-d') }}">
+                        <input type="hidden" name="ubicacion" value="{{ $evento->ubicacion }}">
+                        <input type="hidden" name="capacidad" value="{{ $evento->capacidad }}">
+                        <input type="hidden" name="tipo_puntos" value="{{ $evento->tipo_puntos }}">
+
+                        <div style="margin-bottom:12px;">
+                            <label style="font-size:11px; font-weight:bold; color:var(--text-primary);">Cambiar Machote Horario</label>
+                            <input type="file" name="machote_horario" accept="image/*" class="form-control" style="font-size:12px; background:var(--bg-primary); border:1px solid var(--border); color:var(--text-primary);">
+                        </div>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                            <div class="form-group">
+                                <label style="font-size:11px; color:var(--text-primary);">Color de Nombre</label>
+                                <input type="color" name="horario_color_nombre" id="input-horario-color-nombre" value="{{ $evento->horario_color_nombre ?? '#000000' }}" class="form-control" style="padding:0; height:30px; border:none; background:transparent;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size:11px; color:var(--text-primary);">Color de ID</label>
+                                <input type="color" name="horario_color_id" id="input-horario-color-id" value="{{ $evento->horario_color_id ?? '#000000' }}" class="form-control" style="padding:0; height:30px; border:none; background:transparent;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size:11px; color:var(--text-primary);">Color de Lista</label>
+                                <input type="color" name="horario_color_lista" id="input-horario-color-lista" value="{{ $evento->horario_color_lista ?? '#000000' }}" class="form-control" style="padding:0; height:30px; border:none; background:transparent;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size:11px; color:var(--text-primary);">Fuente</label>
+                                <select name="horario_font_family" id="input-horario-font-family" class="form-control" style="padding:4px 8px; font-size:12px; background:var(--bg-primary); color:var(--text-primary); border:1px solid var(--border);">
+                                    <option value="Nexa" {{ ($evento->horario_font_family ?? '') == 'Nexa' ? 'selected' : '' }}>Nexa</option>
+                                    <option value="Arial" {{ ($evento->horario_font_family ?? '') == 'Arial' ? 'selected' : '' }}>Arial</option>
+                                    <option value="Courier" {{ ($evento->horario_font_family ?? '') == 'Courier' ? 'selected' : '' }}>Courier</option>
+                                    <option value="Times New Roman" {{ ($evento->horario_font_family ?? '') == 'Times New Roman' ? 'selected' : '' }}>Times New Roman</option>
+                                </select>
+                            </div>
+                            <div class="form-group"><label style="font-size:11px; color:var(--text-primary);">Tamaño Nombre</label><input type="number" name="horario_font_size" value="{{ $evento->horario_font_size ?? 40 }}" class="form-control" style="padding:4px 8px; font-size:12px;"></div>
+                            <div class="form-group"><label style="font-size:11px; color:var(--text-primary);">Tamaño ID</label><input type="number" name="horario_id_font_size" value="{{ $evento->horario_id_font_size ?? 30 }}" class="form-control" style="padding:4px 8px; font-size:12px;"></div>
+                            <div class="form-group"><label style="font-size:11px; color:var(--text-primary);">Tam. Lista</label><input type="number" name="horario_lista_font_size" value="{{ $evento->horario_lista_font_size ?? 24 }}" class="form-control" style="padding:4px 8px; font-size:12px;"></div>
+                        </div>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+                            <div class="form-group"><label style="font-size:11px; color:var(--text-primary);">Nombre X</label><input type="number" name="horario_nombre_x" value="{{ $evento->horario_nombre_x ?? 202 }}" class="form-control" style="padding:4px 8px; font-size:12px;"></div>
+                            <div class="form-group"><label style="font-size:11px; color:var(--text-primary);">Nombre Y</label><input type="number" name="horario_nombre_y" value="{{ $evento->horario_nombre_y ?? 150 }}" class="form-control" style="padding:4px 8px; font-size:12px;"></div>
+                            <div class="form-group"><label style="font-size:11px; color:var(--text-primary);">ID X</label><input type="number" name="horario_id_x" value="{{ $evento->horario_id_x ?? 202 }}" class="form-control" style="padding:4px 8px; font-size:12px;"></div>
+                            <div class="form-group"><label style="font-size:11px; color:var(--text-primary);">ID Y</label><input type="number" name="horario_id_y" value="{{ $evento->horario_id_y ?? 250 }}" class="form-control" style="padding:4px 8px; font-size:12px;"></div>
+                            <div class="form-group"><label style="font-size:11px; color:var(--text-primary);">Lista X</label><input type="number" name="horario_lista_x" value="{{ $evento->horario_lista_x ?? 100 }}" class="form-control" style="padding:4px 8px; font-size:12px;"></div>
+                            <div class="form-group"><label style="font-size:11px; color:var(--text-primary);">Lista Y</label><input type="number" name="horario_lista_y" value="{{ $evento->horario_lista_y ?? 350 }}" class="form-control" style="padding:4px 8px; font-size:12px;"></div>
+                            <div class="form-group"><label style="font-size:11px; color:var(--text-primary);">Lista Ancho</label><input type="number" name="horario_lista_w" value="{{ $evento->horario_lista_w ?? 800 }}" class="form-control" style="padding:4px 8px; font-size:12px;"></div>
+                            <div class="form-group"><label style="font-size:11px; color:var(--text-primary);">Lista Alto</label><input type="number" name="horario_lista_h" value="{{ $evento->horario_lista_h ?? 1000 }}" class="form-control" style="padding:4px 8px; font-size:12px;"></div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-sm btn-primary" style="width:100%; margin-top:10px; font-size:13px; font-weight:bold; letter-spacing:0.5px;">Actualizar Horario</button>
+                    </form>
+                </div>
+
+                <!-- Columna Derecha: Vista Previa Real -->
+                <div style="flex:1; min-width:300px; max-width:450px; text-align:center;">
+                    <h4 style="font-size:14px; margin-bottom:12px; color:var(--text-primary);">2. Vista Previa Real (Resultado Final)</h4>
+                    <div style="position:relative; border-radius:8px; overflow:hidden; box-shadow:0 4px 15px rgba(0,0,0,0.4); border:2px solid var(--border); background:var(--bg-secondary); padding:4px;">
+                        <img id="real-preview-horario-image" src="{{ asset('storage/' . $mockHorario) }}?t={{ time() }}" style="width:100%; display:block; border-radius:4px;" alt="Vista previa real del horario generado">
+                        <!-- Spinner superpuesto -->
+                        <div id="preview-horario-spinner" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+                            <div class="spinner-border" style="color:var(--accent-gold);" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top:16px; padding:12px; background:rgba(59, 130, 246, 0.1); border-left:4px solid #3b82f6; border-radius:4px; text-align:left;">
+                        <p style="margin:0; font-size:12px; color:var(--text-secondary); line-height:1.5;">
+                            <i class="bi bi-info-circle-fill" style="color:#3b82f6; margin-right:4px;"></i>
+                            <strong>Nota:</strong> Esta vista se actualiza automáticamente al arrastrar los componentes o cambiar colores/fuentes. Para guardar permanentemente, haz clic en <strong>Actualizar Horario</strong>. El ancho y alto de la lista deben ajustarse manualmente.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
 @endif
 
 <!-- Modales (Nuevos) -->
@@ -989,6 +1111,202 @@
                 idXInput.value = Math.round(left * scale);
                 idYInput.value = Math.round(top * scale);
             });
+        }
+    }
+
+    // --- Drag and Drop Editor Horario ---
+    const hContainer = document.getElementById('horario-editor-container');
+    const hImg = document.getElementById('horario-template-img');
+    const hNameLabel = document.getElementById('draggable-horario-name');
+    const hIdLabel = document.getElementById('draggable-horario-id');
+    const hListaLabel = document.getElementById('draggable-horario-lista');
+
+    const hNameXInput = document.getElementsByName('horario_nombre_x')[0];
+    const hNameYInput = document.getElementsByName('horario_nombre_y')[0];
+    const hIdXInput = document.getElementsByName('horario_id_x')[0];
+    const hIdYInput = document.getElementsByName('horario_id_y')[0];
+    const hListaXInput = document.getElementsByName('horario_lista_x')[0];
+    const hListaYInput = document.getElementsByName('horario_lista_y')[0];
+    const hListaWInput = document.getElementsByName('horario_lista_w')[0];
+    const hListaHInput = document.getElementsByName('horario_lista_h')[0];
+
+    const hColorNombreInput = document.getElementById('input-horario-color-nombre');
+    const hColorIdInput = document.getElementById('input-horario-color-id');
+    const hColorListaInput = document.getElementById('input-horario-color-lista');
+    const hFontSelector = document.getElementById('input-horario-font-family');
+    const hPreviewNombre = document.getElementById('preview-horario-nombre');
+    const hPreviewId = document.getElementById('preview-horario-id');
+    const hPreviewLista = document.getElementById('draggable-horario-lista');
+    const hPreviewSpinner = document.getElementById('preview-horario-spinner');
+
+    let hUpdateTimeout;
+    function updateRealPreviewHorario() {
+        const form = document.querySelector('#tab-horario form');
+        const formData = new FormData(form);
+        formData.delete('machote_horario');
+        
+        if(hPreviewSpinner) hPreviewSpinner.style.display = 'flex';
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        }).then(response => {
+            const realPreviewImg = document.getElementById('real-preview-horario-image');
+            if(realPreviewImg) {
+                const currentSrc = realPreviewImg.src.split('?')[0];
+                const newImg = new Image();
+                newImg.onload = function() {
+                    realPreviewImg.src = newImg.src;
+                    if(hPreviewSpinner) hPreviewSpinner.style.display = 'none';
+                };
+                newImg.src = currentSrc + '?t=' + new Date().getTime();
+            } else {
+                if(hPreviewSpinner) hPreviewSpinner.style.display = 'none';
+            }
+        }).catch(() => {
+            if(hPreviewSpinner) hPreviewSpinner.style.display = 'none';
+        });
+    }
+
+    if (hColorNombreInput && hPreviewNombre) {
+        hColorNombreInput.addEventListener('input', (e) => {
+            hPreviewNombre.style.color = e.target.value;
+            clearTimeout(hUpdateTimeout);
+            hUpdateTimeout = setTimeout(updateRealPreviewHorario, 500);
+        });
+        hColorIdInput.addEventListener('input', (e) => {
+            hPreviewId.style.color = e.target.value;
+            clearTimeout(hUpdateTimeout);
+            hUpdateTimeout = setTimeout(updateRealPreviewHorario, 500);
+        });
+        hColorListaInput.addEventListener('input', (e) => {
+            // Actualizar spans hijos
+            hPreviewLista.querySelectorAll('span').forEach(span => {
+                span.style.color = e.target.value;
+            });
+            clearTimeout(hUpdateTimeout);
+            hUpdateTimeout = setTimeout(updateRealPreviewHorario, 500);
+        });
+        hFontSelector.addEventListener('change', (e) => {
+            let font = e.target.value === 'Nexa' ? 'sans-serif' : (e.target.value === 'Courier' ? 'monospace' : (e.target.value === 'Times New Roman' ? 'serif' : 'Arial'));
+            hPreviewNombre.style.fontFamily = font;
+            hPreviewId.style.fontFamily = font;
+            hPreviewLista.querySelectorAll('span').forEach(span => {
+                span.style.fontFamily = font;
+            });
+            updateRealPreviewHorario();
+        });
+        
+        // Listeners manuales para los inputs de W y H para recargar preview
+        hListaWInput.addEventListener('input', () => {
+            clearTimeout(hUpdateTimeout);
+            hUpdateTimeout = setTimeout(updateRealPreviewHorario, 800);
+        });
+        hListaHInput.addEventListener('input', () => {
+            clearTimeout(hUpdateTimeout);
+            hUpdateTimeout = setTimeout(updateRealPreviewHorario, 800);
+        });
+    }
+
+    if (hImg) {
+        function setupEditorHorario() {
+            const originalWidth = hImg.naturalWidth || 2000;
+            const displayWidth = hImg.clientWidth;
+            const scale = displayWidth / originalWidth;
+
+            const nameX = parseFloat(hNameXInput.value) || 0;
+            const nameY = parseFloat(hNameYInput.value) || 0;
+            const idX = parseFloat(hIdXInput.value) || 0;
+            const idY = parseFloat(hIdYInput.value) || 0;
+            const listaX = parseFloat(hListaXInput.value) || 0;
+            const listaY = parseFloat(hListaYInput.value) || 0;
+            const listaW = parseFloat(hListaWInput.value) || 800;
+            const listaH = parseFloat(hListaHInput.value) || 1000;
+
+            hNameLabel.style.left = (nameX * scale) + 'px';
+            hNameLabel.style.top = (nameY * scale) + 'px';
+
+            if (hIdLabel) {
+                hIdLabel.style.left = (idX * scale) + 'px';
+                hIdLabel.style.top = (idY * scale) + 'px';
+            }
+            if (hListaLabel) {
+                hListaLabel.style.left = (listaX * scale) + 'px';
+                hListaLabel.style.top = (listaY * scale) + 'px';
+                hListaLabel.style.width = (listaW * scale) + 'px';
+                hListaLabel.style.height = (listaH * scale) + 'px';
+            }
+        }
+
+        if (hImg.complete) {
+            setupEditorHorario();
+        } else {
+            hImg.onload = setupEditorHorario;
+        }
+
+        function makeDraggableH(element, onDrag, containerRef) {
+            let isDragging = false;
+            let startX, startY;
+
+            element.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                startX = e.clientX - element.offsetLeft;
+                startY = e.clientY - element.offsetTop;
+                element.style.cursor = 'grabbing';
+            });
+
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                
+                let left = e.clientX - startX;
+                let top = e.clientY - startY;
+
+                const containerRect = containerRef.getBoundingClientRect();
+                const elementRect = element.getBoundingClientRect();
+
+                if (left < 0) left = 0;
+                if (top < 0) top = 0;
+                if (left + elementRect.width > containerRect.width) left = containerRect.width - elementRect.width;
+                if (top + elementRect.height > containerRect.height) top = containerRect.height - elementRect.height;
+
+                element.style.left = left + 'px';
+                element.style.top = top + 'px';
+
+                onDrag(left, top);
+            });
+
+            document.addEventListener('mouseup', function() {
+                if (isDragging) {
+                    isDragging = false;
+                    element.style.cursor = 'move';
+                    updateRealPreviewHorario();
+                }
+            });
+        }
+
+        makeDraggableH(hNameLabel, function(left, top) {
+            const scale = hImg.naturalWidth / hImg.clientWidth;
+            hNameXInput.value = Math.round(left * scale);
+            hNameYInput.value = Math.round(top * scale);
+        }, hContainer);
+
+        if (hIdLabel) {
+            makeDraggableH(hIdLabel, function(left, top) {
+                const scale = hImg.naturalWidth / hImg.clientWidth;
+                hIdXInput.value = Math.round(left * scale);
+                hIdYInput.value = Math.round(top * scale);
+            }, hContainer);
+        }
+        
+        if (hListaLabel) {
+            makeDraggableH(hListaLabel, function(left, top) {
+                const scale = hImg.naturalWidth / hImg.clientWidth;
+                hListaXInput.value = Math.round(left * scale);
+                hListaYInput.value = Math.round(top * scale);
+            }, hContainer);
         }
     }
 
