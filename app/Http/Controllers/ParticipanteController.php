@@ -95,6 +95,12 @@ class ParticipanteController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->filled('Nombre_P') && $request->filled('Apellido_P')) {
+            $request->merge([
+                'Nombre' => trim($request->input('Nombre_P') . ' ' . $request->input('Apellido_P'))
+            ]);
+        }
+
         $data = $request->validate([
             'ID_Evento' => 'required|integer|exists:evento,ID',
             'Nombre'    => [
@@ -231,5 +237,65 @@ class ParticipanteController extends Controller
         }
 
         return response()->json($agenda);
+    }
+
+    public function searchByPhone($telefono)
+    {
+        $participante = Participante::where('Telefono', $telefono)
+            ->orderBy('ID', 'desc')
+            ->first();
+
+        if ($participante) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'Nombre' => $participante->Nombre,
+                    'RFC' => $participante->RFC,
+                    'Sucursal' => $participante->Sucursal,
+                    'Vendedor' => $participante->Vendedor,
+                    'Proveedor' => $participante->Proveedor,
+                    'Puesto' => $participante->Puesto,
+                ]
+            ]);
+        }
+
+        return response()->json(['success' => false]);
+    }
+
+    public function searchPhonesList(Request $request)
+    {
+        $q = $request->query('q');
+        if (!$q || strlen($q) < 3) {
+            return response()->json([]);
+        }
+
+        // Obtener los participantes únicos por teléfono
+        $participantes = Participante::where('Telefono', 'like', "%{$q}%")
+            ->select('Telefono', 'Nombre', 'RFC', 'Sucursal', 'Vendedor', 'Proveedor', 'Puesto')
+            ->orderBy('ID', 'desc')
+            ->get()
+            ->unique('Telefono')
+            ->values()
+            ->take(10); // Límite de 10 resultados para el dropdown
+
+        return response()->json($participantes);
+    }
+
+    public function globalProfile($telefono)
+    {
+        $participantes = Participante::where('Telefono', $telefono)
+            ->with(['evento', 'clases.agenda', 'canjes.premio'])
+            ->orderBy('ID', 'desc')
+            ->get();
+
+        if ($participantes->isEmpty()) {
+            return redirect()->route('participantes.index')->with('error', 'No se encontró perfil para ese teléfono.');
+        }
+
+        $cliente = $participantes->first(); // Datos más recientes
+        $totalPuntos = $participantes->sum('Puntos');
+        $eventosAsistidos = $participantes->count();
+
+        return view('clientes.perfil', compact('participantes', 'cliente', 'totalPuntos', 'eventosAsistidos', 'telefono'));
     }
 }

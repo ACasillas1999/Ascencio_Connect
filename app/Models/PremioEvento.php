@@ -11,7 +11,7 @@ class PremioEvento extends Model
     public $timestamps    = false;
 
     protected $fillable = [
-        'ID_Evento', 'NombrePremio', 'PuntosNecesarios', 'Disponible',
+        'ID_Evento', 'NombrePremio', 'PuntosNecesarios', 'Disponible', 'TipoPremio',
     ];
 
     public function evento()

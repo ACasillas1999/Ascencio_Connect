@@ -55,10 +55,17 @@
                     <div>
                         <h5 style="color:var(--accent-gold); margin-bottom:16px; border-bottom:1px solid #334155; padding-bottom:8px;"><i class="bi bi-person-lines-fill"></i> Datos del Participante</h5>
                         <div style="display:grid;grid-template-columns:1fr;gap:16px">
-                            <div class="form-group">
-                                <label class="form-label" for="Nombre">Nombre Completo *</label>
-                                <input id="Nombre" name="Nombre" type="text" class="form-control"
-                                       value="{{ old('Nombre') }}" placeholder="Ej: Juan Pérez" required>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                                <div class="form-group">
+                                    <label class="form-label" for="Nombre_P">Nombre(s) *</label>
+                                    <input id="Nombre_P" name="Nombre_P" type="text" class="form-control"
+                                           value="{{ old('Nombre_P') }}" placeholder="Ej: Juan" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="Apellido_P">Apellidos *</label>
+                                    <input id="Apellido_P" name="Apellido_P" type="text" class="form-control"
+                                           value="{{ old('Apellido_P') }}" placeholder="Ej: Pérez" required>
+                                </div>
                             </div>
 
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
@@ -68,10 +75,12 @@
                                            value="{{ old('RFC') }}" required>
                                 </div>
 
-                                <div class="form-group">
+                                <div class="form-group" style="position:relative;">
                                     <label class="form-label" for="Telefono">Teléfono (WhatsApp) *</label>
                                     <input id="Telefono" name="Telefono" type="text" class="form-control"
-                                           value="{{ old('Telefono') }}" placeholder="10 dígitos" required>
+                                           value="{{ old('Telefono') }}" placeholder="10 dígitos" required autocomplete="off">
+                                    <div id="telefono-dropdown" style="display:none; position:absolute; top:100%; left:0; width:100%; background:var(--bg-card, #1e293b); border:1px solid var(--border-subtle, #334155); border-radius:4px; max-height:200px; overflow-y:auto; z-index:100; box-shadow:0 4px 6px rgba(0,0,0,0.3);">
+                                    </div>
                                 </div>
                             </div>
 
@@ -147,12 +156,108 @@
         const actividadesContainer = document.getElementById('actividades-container');
 
         // Filtrar títulos en tiempo real
-        const nombreInput = document.getElementById('Nombre');
-        if (nombreInput) {
-            nombreInput.addEventListener('input', function() {
-                const regex = /\b(lic|ing|ingeniero|licenciad[oa]|arq|arquitect[oa]|dr|doctor[a]?|mtra|mtro|maestr[oa])\b\.?\s*/gi;
-                if (regex.test(this.value)) {
-                    this.value = this.value.replace(regex, '');
+        const nombreInput = document.getElementById('Nombre_P');
+        const apellidoInput = document.getElementById('Apellido_P');
+        const filterTitle = function() {
+            const regex = /\b(lic|ing|ingeniero|licenciad[oa]|arq|arquitect[oa]|dr|doctor[a]?|mtra|mtro|maestr[oa])\b\.?\s*/gi;
+            if (regex.test(this.value)) {
+                this.value = this.value.replace(regex, '');
+            }
+        };
+        if (nombreInput) nombreInput.addEventListener('input', filterTitle);
+        if (apellidoInput) apellidoInput.addEventListener('input', filterTitle);
+
+        // Autocompletado tipo Typeahead por teléfono
+        const telefonoInput = document.getElementById('Telefono');
+        const telefonoDropdown = document.getElementById('telefono-dropdown');
+        
+        if (telefonoInput && telefonoDropdown) {
+            let timeoutId;
+            
+            telefonoInput.addEventListener('input', function() {
+                clearTimeout(timeoutId);
+                let val = this.value.replace(/\D/g, '');
+                
+                if (val.length < 3) {
+                    telefonoDropdown.style.display = 'none';
+                    return;
+                }
+                
+                // Fetch de autocompletado en tiempo real
+                timeoutId = setTimeout(() => {
+                    fetch(`{{ url('participantes/buscar-lista-telefonos') }}?q=${val}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.length > 0) {
+                                let html = '<ul style="list-style:none; margin:0; padding:0;">';
+                                data.forEach(item => {
+                                    // Guardamos la info del participante en el atributo data
+                                    let jsonStr = JSON.stringify(item).replace(/"/g, '&quot;');
+                                    html += `
+                                        <li class="telefono-item" data-info="${jsonStr}" style="padding:10px 12px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.05); color:var(--text-primary); transition:background 0.2s;">
+                                            <div style="font-weight:600;">${item.Telefono}</div>
+                                            <div style="font-size:12px; color:var(--text-muted);">${item.Nombre}</div>
+                                        </li>
+                                    `;
+                                });
+                                html += '</ul>';
+                                telefonoDropdown.innerHTML = html;
+                                telefonoDropdown.style.display = 'block';
+                                
+                                // Eventos click en las opciones
+                                document.querySelectorAll('.telefono-item').forEach(li => {
+                                    // Efecto hover
+                                    li.addEventListener('mouseenter', function() { this.style.background = 'rgba(255,255,255,0.1)'; });
+                                    li.addEventListener('mouseleave', function() { this.style.background = 'transparent'; });
+                                    
+                                    li.addEventListener('click', function() {
+                                        let info = JSON.parse(this.getAttribute('data-info'));
+                                        
+                                        // Rellenar formulario
+                                        telefonoInput.value = info.Telefono;
+                                        
+                                        let nameParts = (info.Nombre || '').split(' ');
+                                        let nom = nameParts.length > 0 ? nameParts[0] : '';
+                                        let ape = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+                                        
+                                        if (!document.getElementById('Nombre_P').value) document.getElementById('Nombre_P').value = nom;
+                                        if (!document.getElementById('Apellido_P').value) document.getElementById('Apellido_P').value = ape;
+                                        
+                                        if (!document.getElementById('RFC').value) document.getElementById('RFC').value = info.RFC || '';
+                                        if (!document.getElementById('Sucursal').value) document.getElementById('Sucursal').value = info.Sucursal || '';
+                                        if (!document.getElementById('Vendedor').value) document.getElementById('Vendedor').value = info.Vendedor || '';
+                                        if (!document.getElementById('Proveedor').value) document.getElementById('Proveedor').value = info.Proveedor || '';
+                                        if (!document.getElementById('Puesto').value && info.Puesto) document.getElementById('Puesto').value = info.Puesto;
+                                        
+                                        telefonoDropdown.style.display = 'none';
+                                        
+                                        if (typeof Swal !== 'undefined') {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'Datos Autocompletados',
+                                                text: 'Formulario rellenado con los datos de ' + info.Nombre,
+                                                toast: true,
+                                                position: 'top-end',
+                                                showConfirmButton: false,
+                                                timer: 3500,
+                                                background: '#1e293b',
+                                                color: '#f8fafc'
+                                            });
+                                        }
+                                    });
+                                });
+                            } else {
+                                telefonoDropdown.style.display = 'none';
+                            }
+                        })
+                        .catch(err => console.error('Error buscando teléfonos:', err));
+                }, 300); // 300ms de debounce
+            });
+            
+            // Cerrar dropdown si hace clic fuera
+            document.addEventListener('click', function(e) {
+                if (e.target !== telefonoInput && e.target !== telefonoDropdown && !telefonoDropdown.contains(e.target)) {
+                    telefonoDropdown.style.display = 'none';
                 }
             });
         }

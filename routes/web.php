@@ -104,6 +104,7 @@ Route::middleware('auth')->group(function () {
         ])->shallow();
         
         Route::resource('eventos.premios', \App\Http\Controllers\PremioController::class)->shallow();
+        Route::post('premios/{premio}/stock', [\App\Http\Controllers\PremioController::class, 'updateStock'])->name('premios.stock');
         Route::resource('eventos.agenda', \App\Http\Controllers\AgendaController::class)->shallow();
         Route::resource('eventos.proveedores', \App\Http\Controllers\ProveedorEventoController::class)->only(['store', 'update', 'destroy'])->shallow();
 
@@ -120,14 +121,19 @@ Route::middleware('auth')->group(function () {
 
     /* === RUTAS COMPARTIDAS (ADMIN Y VENDEDOR) === */
     Route::middleware('role:Administrador,Vendedor')->group(function () {
-        /* Participantes (Ver y registrar) */
+        /* Rutas explícitas antes de resource para evitar solapamientos con {participante} */
+        Route::get('participantes/buscar-por-telefono/{telefono}', [ParticipanteController::class, 'searchByPhone'])->name('participantes.searchPhone');
+        Route::get('participantes/buscar-lista-telefonos', [ParticipanteController::class, 'searchPhonesList'])->name('participantes.searchPhonesList');
+        
         Route::resource('participantes', ParticipanteController::class)->only(['index', 'show', 'create', 'store']);
         Route::get('eventos/{evento}/agenda-json', [ParticipanteController::class, 'getAgenda'])->name('eventos.agenda.json');
+        Route::get('clientes/perfil/{telefono}', [ParticipanteController::class, 'globalProfile'])->name('clientes.perfil');
     });
 
     /* === RUTAS COMPARTIDAS (ADMIN Y EVENTO) === */
     Route::middleware('role:Administrador,Evento')->group(function () {
         Route::get('eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
+        Route::get('eventos/{evento}/sorteo', [EventoController::class, 'sorteo'])->name('eventos.sorteo');
         
         /* AJAX Asistencia y Scanner QR */
         Route::post('actividades/{actividad}/buscar', [\App\Http\Controllers\ActividadController::class, 'buscarParticipantes'])->name('actividades.buscar');

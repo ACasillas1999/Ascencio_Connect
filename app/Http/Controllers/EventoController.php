@@ -194,4 +194,54 @@ class EventoController extends Controller
         $evento->delete();
         return redirect()->route('eventos.index')->with('success', 'Evento eliminado.');
     }
+
+    public function sorteo(Evento $evento)
+    {
+        $evento->load(['participantes.canjes.premio']);
+        
+        $participantes = collect();
+        
+        foreach ($evento->participantes as $p) {
+            $colors = ['#00a0e9', '#ff9500', '#76c336', '#e60012', '#e91e63', '#9c27b0', '#ffeb3b'];
+            $faces = ['happy', 'cool', 'excited', 'surprised'];
+            
+            $color = $colors[array_rand($colors)];
+            $face = $faces[array_rand($faces)];
+            
+            $boletosExtras = 0;
+            foreach ($p->canjes as $canje) {
+                if ($canje->premio && str_contains(strtolower($canje->premio->NombrePremio), 'boleto')) {
+                    $boletosExtras += $canje->Cantidad;
+                }
+            }
+            
+            $totalEntries = 1 + $boletosExtras;
+            
+            for ($i = 0; $i < $totalEntries; $i++) {
+                $participantes->push([
+                    'id' => 'p_' . $p->ID . '_' . $i,
+                    'display_id' => $p->ID,
+                    'name' => $p->Nombre,
+                    'color' => $color,
+                    'face' => $face,
+                    'boletos' => $totalEntries
+                ]);
+            }
+        }
+        
+        $participantes = $participantes->values();
+
+        $premiosRaw = \App\Models\PremioEvento::where('ID_Evento', $evento->ID)->get();
+        $premios = $premiosRaw->map(function($pr) {
+            $colors = ['#ffeb3b', '#00a0e9', '#ff9500', '#76c336', '#e60012'];
+            return [
+                'id' => 'pr_' . $pr->ID,
+                'name' => $pr->NombrePremio,
+                'color' => $colors[array_rand($colors)],
+                'type' => $pr->TipoPremio ?? 'sorteo'
+            ];
+        })->values();
+
+        return view('eventos.sorteo', compact('evento', 'participantes', 'premios'));
+    }
 }

@@ -104,7 +104,12 @@
                     </td>
                     <td>
                         <div style="display:flex;gap:6px">
-                            <a href="{{ route('participantes.show', $p) }}" class="btn btn-sm btn-secondary" title="Ver">
+                            @if($p->Telefono)
+                            <a href="{{ route('clientes.perfil', $p->Telefono) }}" class="btn btn-sm btn-secondary" title="Ver Perfil Global">
+                                <i class="bi bi-person-badge" style="color:var(--accent-gold);"></i>
+                            </a>
+                            @endif
+                            <a href="{{ route('participantes.show', $p) }}" class="btn btn-sm btn-secondary" title="Ver Detalles en Evento">
                                 <i class="bi bi-eye"></i>
                             </a>
                             <a href="{{ route('participantes.edit', $p) }}" class="btn btn-sm btn-secondary" title="Editar">

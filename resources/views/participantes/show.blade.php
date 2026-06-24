@@ -4,6 +4,11 @@
 @section('page-title', 'Perfil de Participante')
 
 @section('topbar-actions')
+    @if($participante->Telefono)
+    <a href="{{ route('clientes.perfil', $participante->Telefono) }}" class="btn btn-primary" style="margin-right:8px;">
+        <i class="bi bi-person-badge"></i> Ver Perfil Global
+    </a>
+    @endif
     <a href="{{ route('participantes.edit', $participante) }}" class="btn btn-secondary">
         <i class="bi bi-pencil"></i> Editar
     </a>

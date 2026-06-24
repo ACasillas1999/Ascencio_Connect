@@ -123,10 +123,15 @@
     <button class="tab-btn" onclick="switchTab(this, 'tab-horario')"><i class="bi bi-clock" style="margin-right:4px;"></i> Diseño de Horario</button>
     @endif
 
-    {{-- Link directo al módulo de canjes --}}
-    <a href="{{ route('eventos.canjes.index', $evento) }}" style="margin-left:auto; display:inline-flex; align-items:center; gap:6px; padding:8px 16px; background:linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); border:1px solid rgba(212,175,55,0.3); border-radius:8px; color:var(--accent-gold); font-size:13px; font-weight:700; text-decoration:none; transition:all 0.2s; white-space:nowrap;" onmouseover="this.style.background='linear-gradient(135deg, rgba(212,175,55,0.25), rgba(212,175,55,0.1))'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='linear-gradient(135deg, rgba(212,175,55,0.05))'; this.style.transform='translateY(0)'">
-        <i class="bi bi-gift-fill"></i> Canjear Premios
-    </a>
+    {{-- Link directo al módulo de canjes y sorteo --}}
+    <div style="margin-left:auto; display:flex; gap:12px; align-items:center;">
+        <a href="{{ route('eventos.sorteo', $evento) }}" style="display:inline-flex; align-items:center; gap:6px; padding:8px 16px; background:linear-gradient(135deg, rgba(0,160,233,0.15), rgba(0,160,233,0.05)); border:1px solid rgba(0,160,233,0.3); border-radius:8px; color:#00a0e9; font-size:13px; font-weight:700; text-decoration:none; transition:all 0.2s; white-space:nowrap;" onmouseover="this.style.background='linear-gradient(135deg, rgba(0,160,233,0.25), rgba(0,160,233,0.1))'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='linear-gradient(135deg, rgba(0,160,233,0.05))'; this.style.transform='translateY(0)'">
+            <i class="bi bi-play-circle-fill"></i> Abrir Tómbola
+        </a>
+        <a href="{{ route('eventos.canjes.index', $evento) }}" style="display:inline-flex; align-items:center; gap:6px; padding:8px 16px; background:linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05)); border:1px solid rgba(212,175,55,0.3); border-radius:8px; color:var(--accent-gold); font-size:13px; font-weight:700; text-decoration:none; transition:all 0.2s; white-space:nowrap;" onmouseover="this.style.background='linear-gradient(135deg, rgba(212,175,55,0.25), rgba(212,175,55,0.1))'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='linear-gradient(135deg, rgba(212,175,55,0.05))'; this.style.transform='translateY(0)'">
+            <i class="bi bi-gift-fill"></i> Canjear Premios
+        </a>
+    </div>
 </div>
 @endif
 
@@ -441,13 +446,14 @@
         <div class="card" style="align-self:start;">
             <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
                 <span class="card-title"><i class="bi bi-gift" style="color:var(--accent-gold);margin-right:8px"></i>Premios del Evento</span>
-                <button type="button" class="btn btn-sm btn-primary" onclick="openModal('modal-premio')"><i class="bi bi-plus-lg"></i> Agregar Premio</button>
+                <button type="button" class="btn btn-sm btn-primary" onclick="openAddPremioModal()"><i class="bi bi-plus-lg"></i> Agregar Premio</button>
             </div>
             <div class="table-responsive">
                 <table class="table" style="margin-bottom:0">
                     <thead>
                         <tr>
                             <th>Premio</th>
+                            <th>Tipo</th>
                             <th>Puntos</th>
                             <th>Disponible</th>
                             <th>Acciones</th>
@@ -457,9 +463,17 @@
                         @forelse($premios as $premio)
                         <tr>
                             <td style="font-weight:500">{{ $premio->NombrePremio }}</td>
+                            <td>
+                                @if(($premio->TipoPremio ?? 'sorteo') === 'puntos')
+                                    <span class="badge badge-secondary" style="color:#a855f7; border-color:#d8b4fe; background:#f3e8ff;">🎟️ Canje</span>
+                                @else
+                                    <span class="badge badge-secondary" style="color:#ea580c; border-color:#fdba74; background:#ffedd5;">🎯 Ruleta</span>
+                                @endif
+                            </td>
                             <td><span class="badge badge-gold">{{ $premio->PuntosNecesarios }}</span></td>
                             <td>{{ $premio->Disponible }}</td>
                             <td>
+                                <button type="button" class="btn btn-sm btn-secondary" style="color:var(--text-primary);" onclick="editPremio({{ $premio->ID }}, '{{ addslashes($premio->NombrePremio) }}', '{{ $premio->TipoPremio ?? 'sorteo' }}', {{ $premio->PuntosNecesarios }}, {{ $premio->Disponible }})"><i class="bi bi-pencil"></i></button>
                                 <form action="{{ route('premios.destroy', $premio) }}" method="POST" style="display:inline;" class="delete-form" data-message="¿Eliminar el premio '{{ $premio->NombrePremio }}'?">
                                     @csrf @method('DELETE')
                                     <button type="button" class="btn btn-sm btn-secondary btn-delete" style="color:#ef4444;"><i class="bi bi-trash"></i></button>
@@ -881,24 +895,32 @@
 <div id="modal-premio" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 class="modal-title">Agregar Premio</h3>
+            <h3 class="modal-title" id="modal-premio-title">Agregar Premio</h3>
             <button class="modal-close" onclick="closeModal('modal-premio')">&times;</button>
         </div>
-        <form method="POST" action="{{ route('eventos.premios.store', $evento) }}">
+        <form id="form-premio" method="POST" action="{{ route('eventos.premios.store', $evento) }}">
             @csrf
+            <input type="hidden" name="_method" id="form-premio-method" value="POST">
             <div style="display:grid;gap:12px;">
                 <div>
                     <label class="form-label" style="font-size:12px">Nombre del Premio *</label>
-                    <input name="NombrePremio" type="text" class="form-control" required placeholder="Ej: Gorra Conmemorativa">
+                    <input name="NombrePremio" id="premio-nombre" type="text" class="form-control" required placeholder="Ej: Gorra Conmemorativa">
+                </div>
+                <div>
+                    <label class="form-label" style="font-size:12px">Modo de Entrega *</label>
+                    <select name="TipoPremio" id="premio-tipo" class="form-control" required style="color:#fff;">
+                        <option value="sorteo" style="color:#000;">🎯 Sorteo en Ruleta</option>
+                        <option value="puntos" style="color:#000;">🎟️ Canje por Puntos</option>
+                    </select>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div>
                         <label class="form-label" style="font-size:12px">Puntos Necesarios *</label>
-                        <input name="PuntosNecesarios" type="number" class="form-control" required min="1" value="100">
+                        <input name="PuntosNecesarios" id="premio-puntos" type="number" class="form-control" required min="1" value="100">
                     </div>
                     <div>
                         <label class="form-label" style="font-size:12px">Stock Disponible *</label>
-                        <input name="Disponible" type="number" class="form-control" required min="0" value="10">
+                        <input name="Disponible" id="premio-stock" type="number" class="form-control" required min="0" value="10">
                     </div>
                 </div>
             </div>
@@ -938,6 +960,70 @@
             closePreview();
         }
     }
+
+    document.querySelectorAll('.delete-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const msg = this.dataset.message || '¿Seguro que deseas eliminar esto?';
+            if (confirm(msg)) {
+                this.submit();
+            }
+        });
+    });
+
+    function editPremio(id, nombre, tipo, puntos, stock) {
+        document.getElementById('modal-premio-title').innerText = 'Editar Premio';
+        const form = document.getElementById('form-premio');
+        form.action = `{{ url('premios') }}/${id}`;
+        document.getElementById('form-premio-method').value = 'PUT';
+        
+        document.getElementById('premio-nombre').value = nombre;
+        document.getElementById('premio-tipo').value = tipo;
+        document.getElementById('premio-puntos').value = puntos;
+        document.getElementById('premio-stock').value = stock;
+        
+        openModal('modal-premio');
+    }
+
+    // Resetear form al abrir modal para agregar
+    function openAddPremioModal() {
+        document.getElementById('modal-premio-title').innerText = 'Agregar Premio';
+        const form = document.getElementById('form-premio');
+        form.action = `{{ route('eventos.premios.store', $evento) }}`;
+        document.getElementById('form-premio-method').value = 'POST';
+        
+        document.getElementById('premio-nombre').value = '';
+        document.getElementById('premio-tipo').value = 'sorteo';
+        document.getElementById('premio-puntos').value = '100';
+        document.getElementById('premio-stock').value = '10';
+        
+        openModal('modal-premio');
+    }
+
+    @if(auth()->check())
+    function updateStock(id, delta) {
+        fetch(`{{ url('premios') }}/${id}/stock`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ delta: delta })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.ok) {
+                document.getElementById('stock-val-' + id).innerText = data.nuevoStock;
+            } else {
+                alert(data.msg || 'Error al actualizar stock');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Error de conexión');
+        });
+    }
+    @endif
 
     // --- Control de Pestañas (Tabs) ---
     function switchTab(btn, tabId) {

@@ -17,6 +17,7 @@ class PremioController extends Controller
             'NombrePremio'     => 'required|string|max:255',
             'PuntosNecesarios' => 'required|integer|min:1',
             'Disponible'       => 'required|integer|min:0',
+            'TipoPremio'       => 'required|in:sorteo,puntos',
         ]);
 
         $data['ID_Evento'] = $evento->ID;
@@ -35,6 +36,7 @@ class PremioController extends Controller
             'NombrePremio'     => 'required|string|max:255',
             'PuntosNecesarios' => 'required|integer|min:1',
             'Disponible'       => 'required|integer|min:0',
+            'TipoPremio'       => 'required|in:sorteo,puntos',
         ]);
 
         $premio->update($data);
@@ -51,5 +53,27 @@ class PremioController extends Controller
         $premio->delete();
 
         return redirect()->route('eventos.show', $evento_id)->with('success', 'Premio eliminado.');
+    }
+
+    /**
+     * Actualiza el stock (Solo Admin).
+     */
+    public function updateStock(Request $request, PremioEvento $premio)
+    {
+        if (auth()->check() && auth()->user()->Rol !== 'Admin') {
+            return response()->json(['ok' => false, 'msg' => 'No autorizado'], 403);
+        }
+
+        $data = $request->validate([
+            'delta' => 'required|integer',
+        ]);
+
+        $nuevoStock = $premio->Disponible + $data['delta'];
+        if ($nuevoStock < 0) $nuevoStock = 0;
+
+        $premio->Disponible = $nuevoStock;
+        $premio->save();
+
+        return response()->json(['ok' => true, 'nuevoStock' => $nuevoStock]);
     }
 }
