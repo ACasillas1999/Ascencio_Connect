@@ -15,7 +15,7 @@ class CanjeController extends Controller
      */
     public function index(Evento $evento)
     {
-        $premios = PremioEvento::where('ID_Evento', $evento->ID)->get();
+        $premios = PremioEvento::where('ID_Evento', $evento->ID)->where('TipoPremio', 'puntos')->get();
 
         // Estadísticas
         $totalCanjes = Canje::where('ID_Evento', $evento->ID)->count();
@@ -117,7 +117,7 @@ class CanjeController extends Controller
         $puntosDisponibles = $participante->Puntos - $puntosGastados;
 
         // Calcular premios disponibles y cuántos puede canjear
-        $premiosEvento = PremioEvento::where('ID_Evento', $evento->ID)->get();
+        $premiosEvento = PremioEvento::where('ID_Evento', $evento->ID)->where('TipoPremio', 'puntos')->get();
         $premiosDisponibles = $premiosEvento->map(function ($premio) use ($puntosDisponibles) {
             $maxPorPuntos = $premio->PuntosNecesarios > 0
                 ? floor($puntosDisponibles / $premio->PuntosNecesarios)
@@ -154,6 +154,7 @@ class CanjeController extends Controller
                     'cantidad' => $c->Cantidad,
                     'puntos'   => $c->premio->PuntosNecesarios ?? 0,
                     'fecha'    => $c->Fecha ? $c->Fecha->format('d/m/Y H:i') : '',
+                    'tipo'     => $c->premio->TipoPremio ?? 'sorteo',
                 ];
             }),
         ]);

@@ -15,9 +15,9 @@ class PremioController extends Controller
     {
         $data = $request->validate([
             'NombrePremio'     => 'required|string|max:255',
-            'PuntosNecesarios' => 'required|integer|min:1',
-            'Disponible'       => 'required|integer|min:0',
             'TipoPremio'       => 'required|in:sorteo,puntos',
+            'PuntosNecesarios' => 'nullable|integer|min:0',
+            'Disponible'       => 'required|integer|min:0',
         ]);
 
         $data['ID_Evento'] = $evento->ID;
@@ -34,9 +34,9 @@ class PremioController extends Controller
     {
         $data = $request->validate([
             'NombrePremio'     => 'required|string|max:255',
-            'PuntosNecesarios' => 'required|integer|min:1',
-            'Disponible'       => 'required|integer|min:0',
             'TipoPremio'       => 'required|in:sorteo,puntos',
+            'PuntosNecesarios' => 'nullable|integer|min:0',
+            'Disponible'       => 'required|integer|min:0',
         ]);
 
         $premio->update($data);

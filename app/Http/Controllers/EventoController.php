@@ -209,13 +209,25 @@ class EventoController extends Controller
             $face = $faces[array_rand($faces)];
             
             $boletosExtras = 0;
+            $yaGano = false;
+
             foreach ($p->canjes as $canje) {
-                if ($canje->premio && str_contains(strtolower($canje->premio->NombrePremio), 'boleto')) {
-                    $boletosExtras += $canje->Cantidad;
+                if ($canje->premio) {
+                    if (str_contains(strtolower($canje->premio->NombrePremio), 'boleto')) {
+                        $boletosExtras += $canje->Cantidad;
+                    }
+                    if (($canje->premio->TipoPremio ?? 'sorteo') === 'sorteo') {
+                        $yaGano = true;
+                    }
                 }
             }
             
-            $totalEntries = 1 + $boletosExtras;
+            // Si ya ganó un premio de sorteo, no participa
+            if ($yaGano) {
+                continue;
+            }
+            
+            $totalEntries = $boletosExtras;
             
             for ($i = 0; $i < $totalEntries; $i++) {
                 $participantes->push([
@@ -231,17 +243,149 @@ class EventoController extends Controller
         
         $participantes = $participantes->values();
 
-        $premiosRaw = \App\Models\PremioEvento::where('ID_Evento', $evento->ID)->get();
-        $premios = $premiosRaw->map(function($pr) {
-            $colors = ['#ffeb3b', '#00a0e9', '#ff9500', '#76c336', '#e60012'];
+        // Obtener historial de ganadores (Canjes de premios de sorteo)
+        $historialRaw = \App\Models\Canje::with(['participante', 'premio'])
+            ->where('ID_Evento', $evento->ID)
+            ->whereHas('premio', function($q) {
+                $q->where('TipoPremio', 'sorteo')->orWhereNull('TipoPremio');
+            })
+            ->orderBy('Fecha', 'desc')
+            ->get();
+
+        $historial = $historialRaw->map(function($canje) {
             return [
+                'canje_id' => $canje->ID,
+                'display_id' => $canje->participante->ID,
+                'name' => $canje->participante->Nombre,
+                'prize' => $canje->premio->NombrePremio,
+                'delivered' => (bool)$canje->Entregado,
+                'color' => '#00a0e9',
+                'face' => 'excited'
+            ];
+        });
+
+        $premiosRaw = \App\Models\PremioEvento::where('ID_Evento', $evento->ID)
+            ->orderBy('OrdenSorteo', 'asc')
+            ->get();
+            
+        $premios = $premiosRaw->map(function($pr) use ($historialRaw) {
+            $colors = ['#ffeb3b', '#00a0e9', '#ff9500', '#76c336', '#e60012'];
+            $canje = $historialRaw->firstWhere('ID_Premio', $pr->ID);
+            
+            $data = [
                 'id' => 'pr_' . $pr->ID,
                 'name' => $pr->NombrePremio,
                 'color' => $colors[array_rand($colors)],
                 'type' => $pr->TipoPremio ?? 'sorteo'
             ];
+
+            if ($canje) {
+                $data['winner'] = $canje->participante->Nombre;
+                $data['winner_id'] = $canje->participante->ID;
+            }
+
+            return $data;
         })->values();
 
-        return view('eventos.sorteo', compact('evento', 'participantes', 'premios'));
+        // Obtener historial de premios canjeados por puntos
+        $historialPuntosRaw = \App\Models\Canje::with(['participante', 'premio'])
+            ->where('ID_Evento', $evento->ID)
+            ->whereHas('premio', function($q) {
+                $q->where('TipoPremio', 'puntos');
+            })
+            ->orderBy('Fecha', 'desc')
+            ->get();
+
+        $historialPuntos = $historialPuntosRaw->map(function($canje) {
+            return [
+                'canje_id' => $canje->ID,
+                'participante' => $canje->participante->Nombre,
+                'participante_id' => $canje->participante->ID,
+                'premio' => $canje->premio->NombrePremio,
+                'puntos' => $canje->premio->PuntosNecesarios,
+                'cantidad' => $canje->Cantidad,
+                'fecha' => $canje->Fecha ? $canje->Fecha->format('d/m/Y H:i') : ''
+            ];
+        });
+
+        return view('eventos.sorteo', compact('evento', 'participantes', 'premios', 'historial', 'historialPuntos'));
+    }
+
+    public function actualizarOrdenPremio(Request $request, Evento $evento)
+    {
+        $ordenes = $request->input('ordenes', []);
+        foreach ($ordenes as $index => $premioId) {
+            // El premioId viene como 'pr_ID'
+            $idStr = str_replace('pr_', '', $premioId);
+            \App\Models\PremioEvento::where('ID', $idStr)
+                ->where('ID_Evento', $evento->ID)
+                ->update(['OrdenSorteo' => $index]);
+        }
+        return response()->json(['ok' => true]);
+    }
+
+    public function registrarGanador(Request $request, Evento $evento)
+    {
+        $participanteId = $request->input('participante_id');
+        $premioId = str_replace('pr_', '', $request->input('premio_id'));
+
+        $premio = \App\Models\PremioEvento::where('ID', $premioId)
+            ->where('ID_Evento', $evento->ID)
+            ->first();
+
+        $canjeId = null;
+        if ($premio && $premio->Disponible > 0) {
+            $canje = \App\Models\Canje::create([
+                'ID_Evento' => $evento->ID,
+                'ID_Participante' => $participanteId,
+                'ID_Premio' => $premioId,
+                'Cantidad' => 1,
+                'Fecha' => now(),
+            ]);
+            $canjeId = $canje->ID;
+
+            $premio->Disponible -= 1;
+            $premio->save();
+        }
+
+        return response()->json(['ok' => true, 'canje_id' => $canjeId]);
+    }
+
+    public function revertirGanador(Request $request, Evento $evento)
+    {
+        $canjeId = $request->input('canje_id');
+        $canje = \App\Models\Canje::where('ID', $canjeId)
+            ->where('ID_Evento', $evento->ID)
+            ->first();
+
+        if ($canje) {
+            $premio = \App\Models\PremioEvento::where('ID', $canje->ID_Premio)->first();
+            if ($premio) {
+                $premio->Disponible += $canje->Cantidad;
+                $premio->save();
+            }
+            $canje->delete();
+            return response()->json(['ok' => true]);
+        }
+
+        return response()->json(['ok' => false], 404);
+    }
+
+    public function toggleDelivery(Request $request, Evento $evento)
+    {
+        $canjeId = $request->input('canje_id');
+        $delivered = $request->input('delivered');
+
+        $canje = \App\Models\Canje::where('ID', $canjeId)
+            ->where('ID_Evento', $evento->ID)
+            ->first();
+
+        if ($canje) {
+            $canje->Entregado = $delivered ? 1 : 0;
+            $canje->save();
+            return response()->json(['ok' => true]);
+        }
+
+        return response()->json(['ok' => false], 404);
     }
 }

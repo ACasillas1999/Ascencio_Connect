@@ -145,6 +145,7 @@
                     <th>Participante</th>
                     <th>Sucursal</th>
                     <th>Premio</th>
+                    <th style="text-align:center;">Tipo</th>
                     <th style="text-align:center;">Cantidad</th>
                     <th style="text-align:center;">Puntos</th>
                     <th>Fecha</th>
@@ -160,6 +161,13 @@
                     <td style="font-size:12px; color:var(--text-muted);">{{ $canje->participante->Sucursal ?? '—' }}</td>
                     <td>
                         <span class="badge badge-gold">{{ $canje->premio->NombrePremio ?? 'Premio eliminado' }}</span>
+                    </td>
+                    <td style="text-align:center;">
+                        @if(($canje->premio->TipoPremio ?? 'sorteo') === 'puntos')
+                            <span class="badge badge-secondary" style="color:#a855f7; border-color:#d8b4fe; background:#f3e8ff;">🎟️ Canje</span>
+                        @else
+                            <span class="badge badge-secondary" style="color:#ea580c; border-color:#fdba74; background:#ffedd5;">🎯 Ruleta</span>
+                        @endif
                     </td>
                     <td style="text-align:center; font-weight:700;">{{ $canje->Cantidad }}</td>
                     <td style="text-align:center; color:#ef4444; font-weight:600;">

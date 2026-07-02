@@ -374,6 +374,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <thead>
                                 <tr>
                                     <th>Premio</th>
+                                    <th style="text-align:center;">Tipo</th>
                                     <th style="text-align:center;">Cantidad</th>
                                     <th style="text-align:center;">Costo (pts)</th>
                                     <th>Fecha</th>
@@ -388,6 +389,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                                 <strong style="color:var(--text-primary);">${h.premio}</strong>
                                             </div>
                                         </td>
+                                        <td style="text-align:center;">
+                                            ${h.tipo === 'puntos' 
+                                                ? '<span class="badge badge-secondary" style="color:#a855f7; border-color:#d8b4fe; background:#f3e8ff;">🎟️ Canje</span>'
+                                                : '<span class="badge badge-secondary" style="color:#ea580c; border-color:#fdba74; background:#ffedd5;">🎯 Ruleta</span>'
+                                            }
+                                        </td>
                                         <td style="text-align:center; font-weight:700;">${h.cantidad}</td>
                                         <td style="text-align:center;"><span style="color:#ef4444; font-weight:600;">-${Number(h.puntos * h.cantidad).toLocaleString()}</span></td>
                                         <td style="font-size:12px; color:var(--text-muted);">${h.fecha}</td>
@@ -396,7 +403,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </tbody>
                             <tfoot>
                                 <tr style="border-top:2px solid var(--border-subtle);">
-                                    <td style="font-weight:700; color:var(--text-primary);">Total</td>
+                                    <td colspan="2" style="font-weight:700; color:var(--text-primary); text-align:right;">Total</td>
                                     <td style="text-align:center; font-weight:700;">${historial.reduce((s, h) => s + h.cantidad, 0)}</td>
                                     <td style="text-align:center; font-weight:800; color:#ef4444;">-${Number(totalPuntosUsados).toLocaleString()} pts</td>
                                     <td></td>

@@ -39,6 +39,41 @@ Route::get('/migrate', function() {
     }
 });
 
+Route::get('/migrate-sorteo', function() {
+    try {
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('premios_evento', 'OrdenSorteo')) {
+            \DB::statement("ALTER TABLE `premios_evento` ADD COLUMN `OrdenSorteo` INT DEFAULT 0 AFTER `TipoPremio`");
+            return "Columna OrdenSorteo agregada con exito.";
+        }
+        return "La columna OrdenSorteo ya existe.";
+    } catch (\Exception $e) {
+        return "Error: " . $e->getMessage();
+    }
+});
+
+Route::get('/give-tickets', function() {
+    $evento_id = 1;
+    $boleto = \App\Models\PremioEvento::where('ID_Evento', $evento_id)->where('NombrePremio', 'LIKE', '%Boleto%')->first();
+    if (!$boleto) return "No se encontro el premio Boleto";
+
+    $participantes = \App\Models\Participante::where('ID_Evento', $evento_id)->take(5)->get();
+    if ($participantes->isEmpty()) return "No hay participantes";
+
+    $res = "";
+    foreach ($participantes as $p) {
+        $cantidad = rand(1, 3);
+        \App\Models\Canje::create([
+            'ID_Evento' => $evento_id,
+            'ID_Participante' => $p->ID,
+            'ID_Premio' => $boleto->ID,
+            'Cantidad' => $cantidad,
+            'Fecha' => now()
+        ]);
+        $res .= "Se le dieron $cantidad boletos a {$p->Nombre}<br>";
+    }
+    return $res;
+});
+
 Route::get('/migrate-apariencia', function() {
     try {
         if (!\Illuminate\Support\Facades\Schema::hasTable('apariencias')) {
@@ -134,6 +169,10 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:Administrador,Evento')->group(function () {
         Route::get('eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
         Route::get('eventos/{evento}/sorteo', [EventoController::class, 'sorteo'])->name('eventos.sorteo');
+        Route::post('eventos/{evento}/sorteo/orden', [EventoController::class, 'actualizarOrdenPremio'])->name('eventos.sorteo.orden');
+        Route::post('eventos/{evento}/sorteo/ganador', [EventoController::class, 'registrarGanador'])->name('eventos.sorteo.ganador');
+        Route::post('eventos/{evento}/sorteo/revertir-ganador', [EventoController::class, 'revertirGanador'])->name('eventos.sorteo.revertir-ganador');
+        Route::post('eventos/{evento}/sorteo/toggle-delivery', [EventoController::class, 'toggleDelivery'])->name('eventos.sorteo.toggle-delivery');
         
         /* AJAX Asistencia y Scanner QR */
         Route::post('actividades/{actividad}/buscar', [\App\Http\Controllers\ActividadController::class, 'buscarParticipantes'])->name('actividades.buscar');

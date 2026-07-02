@@ -310,6 +310,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Nombre</th>
                         <th>RFC</th>
                         <th>Sucursal</th>
@@ -321,6 +322,7 @@
                 <tbody>
                     @forelse($participantes as $p)
                     <tr>
+                        <td style="font-size:12px;font-weight:bold;color:var(--text-muted)">#{{ $p->ID }}</td>
                         <td style="font-weight:500">{{ $p->Nombre }}</td>
                         <td style="font-size:12px;color:var(--text-muted)">{{ $p->RFC ?: '—' }}</td>
                         <td style="font-size:12px;color:var(--text-secondary)">{{ $p->Sucursal ?: '—' }}</td>
@@ -331,7 +333,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted)">Sin participantes</td></tr>
+                    <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted)">Sin participantes</td></tr>
                     @endforelse
                 </tbody>
             </table>

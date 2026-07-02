@@ -10,6 +10,8 @@
 @endsection
 
 @push('styles')
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -352,70 +354,30 @@
 
         <!-- SECCIÓN DE CONFIGURACIÓN -->
         <section id="setup-view" class="w-full hidden flex-col items-center gap-6">
-            <div class="w-full flex justify-between items-center px-4 max-w-5xl">
-                <button onclick="switchView('tombola-view')" class="wii-btn px-6 py-2.5 font-bold text-gray-700 flex items-center gap-2">
+            <div class="w-full flex justify-between items-center px-4 max-w-5xl mb-2">
+                <button onclick="switchView('tombola-view')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 shadow-md rounded-lg px-6 py-2.5 font-medium flex items-center gap-2 transition-colors">
                     <i class="fa-solid fa-chevron-left"></i> Volver a la Tómbola
                 </button>
                 <div class="text-center">
-                    <h2 class="text-3xl font-bold text-gray-800">CONFIGURACIÓN DEL SORTEO</h2>
-                    <p class="text-sm text-gray-500">Crea personajes participantes y define los premios del bombo</p>
+                    <h2 class="text-3xl font-extrabold text-white tracking-tight drop-shadow-sm">Configuración del Sorteo</h2>
+                    <p class="text-sm text-slate-400 font-medium mt-1 uppercase tracking-widest">Gestión avanzada y control interno</p>
                 </div>
-                <button onclick="resetData()" class="wii-btn px-5 py-2.5 text-sm font-bold text-red-500 flex items-center gap-2">
+                <button onclick="resetData()" class="bg-slate-800 hover:bg-red-900/40 text-red-400 hover:text-red-300 border border-slate-700 hover:border-red-800/50 shadow-md rounded-lg px-5 py-2.5 text-sm font-bold flex items-center gap-2 transition-all">
                     <i class="fa-solid fa-arrow-rotate-left"></i> Reiniciar Todo
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-6xl">
+            <div class="w-full max-w-[1600px] bg-slate-900/50 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.6)] border border-slate-700/60 mx-auto flex flex-col items-center">
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 w-full">
                 
                 <!-- COLUMNA 1: Participantes -->
-                <div class="wii-panel p-6 flex flex-col h-[580px]">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center border-b pb-2">
-                        <span><i class="fa-solid fa-users text-[#00a0e9] mr-2"></i>Participantes</span>
-                        <span id="setup-participant-count" class="bg-[#00a0e9] text-white text-sm px-3 py-1 rounded-full font-bold">0</span>
+                <div class="bg-slate-900/80 backdrop-blur-md p-7 flex flex-col h-[620px] rounded-2xl shadow-2xl border border-slate-700">
+                    <h3 class="text-xl font-bold text-white mb-5 flex justify-between items-center border-b border-slate-700/60 pb-4">
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-users text-indigo-400"></i> Participantes Activos</span>
+                        <span id="setup-participant-count" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs px-3 py-1 rounded-md font-bold tracking-wider">0</span>
                     </h3>
 
-                    <!-- Formulario Añadir Participante -->
-                    <div class="bg-gray-50 p-4 rounded-2xl border-2 border-gray-200/60 mb-4 flex flex-col gap-3">
-                        <div class="flex gap-2">
-                            <input type="text" id="input-mii-name" placeholder="Nombre del personaje..." maxlength="12" class="wii-btn flex-grow px-4 py-2.5 text-gray-700 outline-none focus:border-[#00a0e9] text-sm font-semibold">
-                            <button onclick="addMiiRandom()" class="wii-btn px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 font-semibold text-gray-600 flex items-center justify-center gap-1" title="Personaje Aleatorio">
-                                <i class="fa-solid fa-dice text-lg"></i>
-                            </button>
-                            <button onclick="addMultipleRandomMiis(1000)" class="wii-btn px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 font-semibold text-[#00a0e9] flex items-center justify-center gap-1" title="Añadir 1000 de prueba">
-                                <i class="fa-solid fa-users text-lg"></i> +1k
-                            </button>
-                        </div>
-                        
-                        <!-- Personalizador visual simple -->
-                        <div class="grid grid-cols-3 gap-2">
-                            <div>
-                                <label class="text-xs text-gray-200 block mb-1 font-bold">Color Camiseta</label>
-                                <select id="select-mii-color" class="w-full wii-btn text-xs p-2">
-                                    <option value="#00a0e9">Azul Sport</option>
-                                    <option value="#ff9500">Naranja</option>
-                                    <option value="#76c336">Verde</option>
-                                    <option value="#e60012">Rojo</option>
-                                    <option value="#e91e63">Rosa</option>
-                                    <option value="#9c27b0">Morado</option>
-                                    <option value="#ffeb3b">Amarillo</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="text-xs text-gray-200 block mb-1 font-bold">Expresión</label>
-                                <select id="select-mii-face" class="w-full wii-btn text-xs p-2">
-                                    <option value="happy">Feliz 😊</option>
-                                    <option value="cool">Cool 😎</option>
-                                    <option value="excited">¡Súper! 🤩</option>
-                                    <option value="surprised">Sorpresa 😮</option>
-                                </select>
-                            </div>
-                            <div class="flex items-end">
-                                <button onclick="saveCustomMii()" class="wii-btn wii-btn-blue w-full py-2 text-xs font-bold uppercase tracking-wider">
-                                    <i class="fa-solid fa-plus mr-1"></i> Añadir
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Formulario Añadir Participante (Eliminado) -->
 
                     <!-- Lista de Participantes creados -->
                     <div id="setup-miis-list" class="flex-grow overflow-y-auto space-y-2 pr-1">
@@ -424,15 +386,15 @@
                 </div>
 
                 <!-- COLUMNA 2: Premios del Sorteo -->
-                <div class="wii-panel p-6 flex flex-col h-[580px]">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4 flex justify-between items-center border-b pb-2">
-                        <span><i class="fa-solid fa-trophy text-[#ff9500] mr-2"></i>Historial de Ganadores</span>
-                        <span id="setup-winners-count" class="bg-[#ff9500] text-white text-sm px-3 py-1 rounded-full font-bold">0</span>
+                <div class="bg-slate-900/80 backdrop-blur-md p-7 flex flex-col h-[620px] rounded-2xl shadow-2xl border border-slate-700">
+                    <h3 class="text-xl font-bold text-white mb-5 flex justify-between items-center border-b border-slate-700/60 pb-4">
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-trophy text-amber-400"></i> Registro de Ganadores</span>
+                        <span id="setup-winners-count" class="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs px-3 py-1 rounded-md font-bold tracking-wider">0</span>
                     </h3>
 
-                    <div class="bg-gray-50 p-4 rounded-2xl border-2 border-gray-200/60 mb-4 text-xs font-bold text-slate-800 flex justify-between items-center">
-                        <span>Marca los premios que ya han sido entregados físicamente.</span>
-                        <button onclick="clearHistories()" class="wii-btn px-3 py-1.5 text-red-500 hover:border-red-500"><i class="fa-solid fa-trash mr-1"></i>Limpiar Todo</button>
+                    <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 mb-5 text-xs font-medium text-slate-400 flex justify-between items-center shadow-inner">
+                        <span class="tracking-wide">Marca los premios entregados físicamente.</span>
+                        <button onclick="clearHistories()" class="bg-slate-900 hover:bg-red-900/40 text-slate-400 hover:text-red-400 border border-slate-700 hover:border-red-800/50 rounded-lg px-4 py-2 transition-all flex items-center font-bold tracking-wide"><i class="fa-solid fa-trash-can mr-2 text-[11px]"></i> Limpiar</button>
                     </div>
 
                     <!-- Lista de Ganadores -->
@@ -441,6 +403,39 @@
                     </div>
                 </div>
 
+                <!-- COLUMNA 3: Canjes por Puntos -->
+                <div class="bg-slate-900/80 backdrop-blur-md p-7 flex flex-col h-[620px] rounded-2xl shadow-2xl border border-slate-700">
+                    <h3 class="text-xl font-bold text-white mb-5 flex justify-between items-center border-b border-slate-700/60 pb-4">
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-gift text-emerald-400"></i> Premios Canjeados (Puntos)</span>
+                        <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-3 py-1 rounded-md font-bold tracking-wider">{{ count($historialPuntos) }}</span>
+                    </h3>
+
+                    <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 mb-5 text-xs font-medium text-slate-400 flex justify-between items-center shadow-inner">
+                        <span class="tracking-wide">Historial de premios canjeados mediante puntos.</span>
+                    </div>
+
+                    <!-- Lista de Canjes -->
+                    <div class="flex-grow overflow-y-auto space-y-2 pr-1">
+                        @forelse($historialPuntos as $hp)
+                            <div class="flex items-center justify-between p-3.5 bg-slate-800/60 hover:bg-slate-700/60 rounded-xl border border-slate-700/80 shadow-sm transition-colors mb-2">
+                                <div class="flex flex-col truncate w-full">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="font-bold text-slate-100 text-[15px] tracking-wide truncate" title="{{ $hp['participante'] }}">{{ $hp['participante'] }} <span class="text-[11px] text-slate-400 font-medium ml-2">ID #{{ $hp['participante_id'] }}</span></span>
+                                        <span class="text-xs text-slate-400 font-bold bg-slate-900/50 px-2 py-0.5 rounded">{{ $hp['fecha'] }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center mt-1">
+                                        <span class="text-xs text-emerald-400 font-bold truncate tracking-wide"><i class="fa-solid fa-gift mr-1.5 opacity-80"></i>{{ $hp['premio'] }} <span class="text-white bg-emerald-500/30 px-1.5 py-0.5 rounded ml-1">x{{ $hp['cantidad'] }}</span></span>
+                                        <span class="text-xs text-red-400 font-bold">-{{ number_format($hp['puntos'] * $hp['cantidad']) }} pts</span>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="text-slate-500 text-center py-10 text-sm font-medium"><i class="fa-solid fa-inbox text-2xl mb-2 block opacity-50"></i>No hay canjes registrados.</div>
+                        @endforelse
+                    </div>
+                </div>
+
+                </div>
             </div>
         </section>
 
@@ -892,28 +887,29 @@
         function initData() {
             const backendParticipants = @json($participantes ?? []);
             const backendPrizes = @json($premios ?? []);
+            const backendHistorial = @json($historial ?? []);
 
-            if (backendParticipants && backendParticipants.length > 0) {
-                participants = backendParticipants;
-            } else {
-                const savedPart = localStorage.getItem('sports_participants');
-                participants = savedPart ? JSON.parse(savedPart) : [...defaultMiis];
-            }
-
-            if (backendPrizes && backendPrizes.length > 0) {
-                prizes = backendPrizes;
-            } else {
-                const savedPrizes = localStorage.getItem('sports_prizes');
-                prizes = savedPrizes ? JSON.parse(savedPrizes) : [...defaultPrizes];
-            }
+            participants = backendParticipants || [];
+            prizes = backendPrizes || [];
+            drawnBallsHistory = backendHistorial || [];
             
             updateUI();
         }
 
         function saveToStorage() {
-            localStorage.setItem('sports_participants', JSON.stringify(participants));
-            localStorage.setItem('sports_prizes', JSON.stringify(prizes));
-            localStorage.setItem('sports_history', JSON.stringify(drawnBallsHistory));
+            // Ya no se usa localStorage, se sincroniza con la BD
+        }
+
+        function syncPrizeOrderToDB() {
+            const ordenes = prizes.map(p => p.id);
+            fetch(`{{ route('eventos.sorteo.orden', $evento) }}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ ordenes: ordenes })
+            }).catch(e => console.error(e));
         }
 
         function movePrizeUp(prizeId) {
@@ -931,8 +927,8 @@
                 const temp = prizes[idx];
                 prizes[idx] = prizes[prevIdx];
                 prizes[prevIdx] = temp;
-                saveToStorage();
                 updateUI();
+                syncPrizeOrderToDB();
             }
         }
 
@@ -951,8 +947,8 @@
                 const temp = prizes[idx];
                 prizes[idx] = prizes[nextIdx];
                 prizes[nextIdx] = temp;
-                saveToStorage();
                 updateUI();
+                syncPrizeOrderToDB();
             }
         }
 
@@ -1088,7 +1084,7 @@
                         
                         let winnerHtml = '';
                         if (isWon) {
-                            winnerHtml = `<span class="font-bold text-emerald-400 text-sm truncate bg-emerald-900/60 px-2.5 py-1 rounded-md border border-emerald-800/50"><i class="fa-solid fa-check mr-1"></i>${pr.winner}</span>`;
+                            winnerHtml = `<span class="font-bold text-emerald-400 text-[13px] truncate bg-emerald-900/60 px-2 py-1 rounded-md border border-emerald-800/50" title="${pr.winner} #${pr.winner_id}"><i class="fa-solid fa-check mr-1"></i>${pr.winner} <small class="text-emerald-500/70 ml-0.5">#${pr.winner_id}</small></span>`;
                         } else if (isNext) {
                             winnerHtml = `<span class="font-black text-sky-200 text-[10px] uppercase tracking-widest border border-sky-400/50 px-2 py-0.5 rounded-full bg-sky-800 animate-pulse"><i class="fa-solid fa-crosshairs mr-1"></i>Sorteando</span>`;
                         } else {
@@ -1221,19 +1217,24 @@
             const renderLimitSetup = 150; // Límite de optimización de UI
             groupedParticipants.slice(0, renderLimitSetup).forEach(p => {
                 const row = document.createElement('div');
-                row.className = "flex items-center justify-between p-2.5 bg-white rounded-2xl border-2 border-slate-200 shadow-xs";
+                row.className = "flex items-center justify-between p-3.5 bg-slate-800/60 hover:bg-slate-700/60 rounded-xl border border-slate-700/80 shadow-sm transition-colors mb-2";
                 row.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="w-11 h-11 bg-slate-50 border border-slate-200 rounded-full overflow-hidden p-0.5 flex-shrink-0">
-                            ${generateMiiSVG(p.color, p.face)}
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-slate-900/50 border-2 border-slate-700 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center shadow-inner">
+                            <div class="w-[120%] h-[120%] mt-2 ml-1" style="transform: scale(0.8)">
+                                ${generateMiiSVG(p.color, p.face)}
+                            </div>
                         </div>
                         <div class="flex flex-col">
-                            <span class="font-bold text-gray-800">${p.name} <span class="text-xs text-gray-400">ID #${p.display_id}</span></span>
-                            ${p.count > 1 ? `<span class="text-[10px] bg-[#ff9500] text-white px-2 py-0.5 rounded-full font-bold w-max mt-1"><i class="fa-solid fa-ticket mr-1"></i>${p.count} Boletos</span>` : ''}
+                            <span class="font-bold text-slate-100 text-[15px] tracking-wide">${p.name}</span>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-[11px] text-slate-400 font-medium">ID #${p.display_id}</span>
+                                ${p.count > 1 ? `<span class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-md font-bold tracking-wide"><i class="fa-solid fa-ticket mr-1"></i>${p.count} Boletos</span>` : ''}
+                            </div>
                         </div>
                     </div>
-                    <button onclick="removeParticipant('${p.id}')" class="w-8 h-8 rounded-full bg-red-100 hover:bg-red-500 text-red-500 hover:text-white transition-colors flex items-center justify-center font-bold" title="Eliminar todos los boletos de este participante">
-                        <i class="fa-solid fa-xmark"></i>
+                    <button onclick="removeParticipant('${p.id}')" class="w-9 h-9 rounded-lg bg-slate-900/40 hover:bg-red-500/20 text-slate-500 hover:text-red-400 border border-slate-700 hover:border-red-500/50 transition-all flex items-center justify-center font-bold" title="Eliminar todos los boletos de este participante">
+                        <i class="fa-solid fa-trash-can"></i>
                     </button>
                 `;
                 setupMiis.appendChild(row);
@@ -1251,11 +1252,11 @@
                 setupWinnersList.innerHTML = '';
                 document.getElementById('setup-winners-count').innerText = drawnBallsHistory.length;
                 if (drawnBallsHistory.length === 0) {
-                    setupWinnersList.innerHTML = '<div class="text-gray-400 text-center py-10 text-sm font-bold"><i class="fa-solid fa-inbox text-2xl mb-2 block"></i>Aún no hay ganadores en esta sesión.</div>';
+                    setupWinnersList.innerHTML = '<div class="text-slate-500 text-center py-10 text-sm font-medium"><i class="fa-solid fa-inbox text-2xl mb-2 block opacity-50"></i>Aún no hay ganadores registrados.</div>';
                 } else {
                     drawnBallsHistory.forEach((h, index) => {
                         const row = document.createElement('div');
-                        row.className = "flex items-center justify-between p-3 bg-white rounded-2xl border-2 border-slate-200 shadow-xs";
+                        row.className = "flex items-center justify-between p-3.5 bg-slate-800/60 hover:bg-slate-700/60 rounded-xl border border-slate-700/80 shadow-sm transition-colors mb-2";
                         const isDelivered = h.delivered ? 'checked' : '';
                         
                         const pColor = h.p ? h.p.color : (h.color || '#00a0e9');
@@ -1265,19 +1266,29 @@
                         const pPrize = h.prize && typeof h.prize === 'object' ? h.prize.name : (h.prize || 'Sorteo');
 
                         row.innerHTML = `
-                            <div class="flex items-center gap-3 overflow-hidden w-full">
-                                <div class="w-10 h-10 rounded-full flex-shrink-0 overflow-hidden bg-gray-100 flex items-center justify-center border-2 border-slate-200">
-                                    <div class="w-[150%] h-[150%] mt-2 ml-1" style="transform: scale(0.8)">
-                                        ${generateMiiSVG(pColor, pFace)}
+                            <div class="flex items-center justify-between w-full gap-4">
+                                <div class="flex items-center gap-4 overflow-hidden flex-grow">
+                                    <div class="w-12 h-12 rounded-full flex-shrink-0 overflow-hidden bg-slate-900/50 flex items-center justify-center border-2 border-slate-700 shadow-inner">
+                                        <div class="w-[120%] h-[120%] mt-2 ml-1" style="transform: scale(0.8)">
+                                            ${generateMiiSVG(pColor, pFace)}
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col truncate">
+                                        <span class="font-bold text-slate-100 text-[15px] tracking-wide truncate" title="${pName}">${pName} <span class="text-[11px] text-slate-400 font-medium ml-2">ID #${pId}</span></span>
+                                        <span class="text-xs text-amber-400 font-bold truncate mt-1 tracking-wide"><i class="fa-solid fa-gift mr-1.5 opacity-80"></i>${pPrize}</span>
                                     </div>
                                 </div>
-                                <div class="flex flex-col truncate flex-grow">
-                                    <span class="font-bold text-gray-800 text-[13px] truncate" title="${pName}">${pName} <span class="text-[10px] text-gray-400">ID #${pId}</span></span>
-                                    <span class="text-xs text-[#ff9500] font-black truncate mt-0.5"><i class="fa-solid fa-gift mr-1"></i>${pPrize}</span>
-                                </div>
-                                <div class="flex items-center gap-2 flex-shrink-0 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
-                                    <label class="text-[10px] font-black text-slate-800 uppercase cursor-pointer" for="chk-delivery-${index}">Entregado</label>
-                                    <input type="checkbox" id="chk-delivery-${index}" onchange="toggleDelivery(${index})" ${isDelivered} class="w-4 h-4 rounded cursor-pointer accent-[#76c336]">
+                                
+                                <div class="flex items-center flex-shrink-0 gap-2">
+                                    <div class="cursor-pointer group flex items-center gap-2.5 bg-slate-900/40 hover:bg-slate-900/80 border border-slate-700/80 px-3.5 py-2 rounded-lg transition-colors select-none shadow-inner" onclick="confirmToggleDelivery(event, ${index})">
+                                        <span class="text-[10px] font-bold ${h.delivered ? 'text-emerald-400' : 'text-slate-400 group-hover:text-slate-300'} uppercase tracking-wider transition-colors">Entregado</span>
+                                        <div class="relative w-8 h-4 rounded-full transition-colors ${h.delivered ? 'bg-emerald-500/30 border border-emerald-500/50' : 'bg-slate-800 border border-slate-600'}">
+                                            <div class="absolute top-[1px] left-[1px] w-3 h-3 rounded-full transition-transform duration-300 ease-out ${h.delivered ? 'transform translate-x-4 bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : 'bg-slate-400'}"></div>
+                                        </div>
+                                    </div>
+                                    <button onclick="confirmRevertWinner(event, ${index})" class="w-9 h-9 rounded-lg bg-slate-900/40 hover:bg-red-500/20 text-slate-500 hover:text-red-400 border border-slate-700 hover:border-red-500/50 transition-all flex items-center justify-center font-bold" title="Revertir premio (devolver al sorteo)">
+                                        <i class="fa-solid fa-rotate-left"></i>
+                                    </button>
                                 </div>
                             </div>
                         `;
@@ -1289,13 +1300,120 @@
             updateHistories();
         }
 
-        // Agregamos la función de toggle
-        function toggleDelivery(index) {
-            if (drawnBallsHistory[index]) {
-                drawnBallsHistory[index].delivered = !drawnBallsHistory[index].delivered;
-                saveToStorage();
-                updateUI(); // Se repinta para mantener estado visual si es necesario
-            }
+        // Agregamos la función de confirmación
+        function confirmToggleDelivery(event, index) {
+            // Evitamos que el checkbox cambie su estado automáticamente
+            event.preventDefault();
+            
+            const h = drawnBallsHistory[index];
+            if (!h) return;
+            
+            const isDelivered = h.delivered;
+            const actionText = isDelivered ? '<span class="text-red-400">Desmarcar</span>' : '<span class="text-emerald-400">Marcar</span>';
+            const statusText = isDelivered ? 'NO ENTREGADO' : 'ENTREGADO';
+            const pName = h.p ? h.p.name : (h.name || 'Desconocido');
+            const pPrize = h.prize && typeof h.prize === 'object' ? h.prize.name : (h.prize || 'el premio');
+
+            Swal.fire({
+                title: '¿Confirmar entrega?',
+                html: `¿Deseas ${actionText} como <b>${statusText}</b> el premio <b>${pPrize}</b> de <b>${pName}</b>?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3b82f6',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, confirmar',
+                cancelButtonText: 'Cancelar',
+                background: '#1e293b',
+                color: '#f8fafc',
+                customClass: {
+                    popup: 'border border-slate-700 rounded-2xl shadow-2xl',
+                    title: 'text-white',
+                    htmlContainer: 'text-slate-300'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const newState = !h.delivered;
+                    h.delivered = newState;
+                    updateUI(); // Se repinta la UI completa optimísticamente
+
+                    if (h.canje_id) {
+                        fetch(`{{ route('eventos.sorteo.toggle-delivery', $evento) }}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                canje_id: h.canje_id,
+                                delivered: newState
+                            })
+                        }).catch(e => console.error(e));
+                    }
+                }
+            });
+        }
+
+        function confirmRevertWinner(event, index) {
+            event.preventDefault();
+            const h = drawnBallsHistory[index];
+            if (!h) return;
+            
+            const pName = h.p ? h.p.name : (h.name || 'Desconocido');
+            const pPrize = h.prize && typeof h.prize === 'object' ? h.prize.name : (h.prize || 'el premio');
+
+            Swal.fire({
+                title: '¿Revertir premio?',
+                html: `¿Estás seguro de que quieres anular el premio <b>${pPrize}</b> a <b>${pName}</b>? <br><br> <span class="text-xs text-slate-400">El premio volverá a estar disponible para sortear.</span>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Sí, revertir',
+                cancelButtonText: 'Cancelar',
+                background: '#1e293b',
+                color: '#f8fafc',
+                customClass: {
+                    popup: 'border border-slate-700 rounded-2xl shadow-2xl',
+                    title: 'text-white',
+                    htmlContainer: 'text-slate-300'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (h.canje_id) {
+                        fetch(`{{ route('eventos.sorteo.revertir-ganador', $evento) }}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ canje_id: h.canje_id })
+                        }).then(r => r.json()).then(data => {
+                            if (data.ok) {
+                                // Devolver participante a la lista activa
+                                // Recargar la página es la manera más segura de asegurar que los premios disponibles se actualicen en JS
+                                // Pero si queremos hacerlo con SPA:
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Revertido',
+                                    text: 'Premio devuelto al sorteo. Recargando...',
+                                    background: '#1e293b', color: '#f8fafc',
+                                    timer: 1500, showConfirmButton: false
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire('Error', 'No se pudo revertir', 'error');
+                            }
+                        }).catch(e => console.error(e));
+                    } else {
+                        // Si no hay canje_id, solo lo quitamos localmente (aunque no debería pasar)
+                        drawnBallsHistory.splice(index, 1);
+                        saveToStorage();
+                        updateUI();
+                        window.location.reload();
+                    }
+                }
+            });
         }
 
         // Historial de la vista de Tómbola (Derecha en main)
@@ -1892,6 +2010,7 @@
                 // Asignar el ganador al premio
                 if (prizeIndex !== -1) {
                     prizes[prizeIndex].winner = winnerMii.name;
+                    prizes[prizeIndex].winner_id = winnerMii.display_id;
                 }
 
                 // Remover TODOS los boletos de este participante para que no pueda volver a salir en la ruleta
@@ -1922,13 +2041,35 @@
                 
                 playSoundBallDrop();
 
-                drawnBallsHistory.unshift({
+                const newHistoryItem = {
                     name: winnerMii.name,
                     color: winnerMii.color,
                     face: winnerMii.face,
                     display_id: winnerMii.display_id,
-                    prize: winningPrizeName
-                });
+                    prize: winningPrizeName,
+                    delivered: false
+                };
+                drawnBallsHistory.unshift(newHistoryItem);
+
+                // Registrar ganador en Base de Datos
+                fetch(`{{ route('eventos.sorteo.ganador', $evento) }}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ 
+                        participante_id: winnerMii.display_id,
+                        premio_id: prizes[prizeIndex].id
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.canje_id) {
+                        newHistoryItem.canje_id = data.canje_id;
+                    }
+                })
+                .catch(e => console.error(e));
 
                 // Esperar a que termine la animación de caída antes de mostrar la celebración
                 setTimeout(() => {
@@ -2094,6 +2235,11 @@
             }
         }
 
+        let wiiCursorActive = true;
+        let isConfigMode = false;
+        const wiiPointer = document.getElementById('wii-pointer');
+        const tombolaContainer = document.querySelector('.tombola-container');
+
         function switchView(viewId) {
             playSoundClick();
             document.getElementById('tombola-view').classList.add('hidden');
@@ -2101,17 +2247,21 @@
             document.getElementById(viewId).classList.remove('hidden');
 
             if (viewId === 'tombola-view') {
+                isConfigMode = false;
                 initTombolaPhysics();
+                if (wiiCursorActive) {
+                    tombolaContainer.style.cursor = 'none';
+                    wiiPointer.style.display = 'block';
+                }
+            } else if (viewId === 'setup-view') {
+                isConfigMode = true;
+                tombolaContainer.style.cursor = 'auto';
+                wiiPointer.style.display = 'none';
             }
         }
 
-        // --- MANEJADOR DEL PUNTERO INTERACTIVO ---
-        let wiiCursorActive = true;
-        const wiiPointer = document.getElementById('wii-pointer');
-        const tombolaContainer = document.querySelector('.tombola-container');
-
         tombolaContainer.addEventListener('mousemove', (e) => {
-            if (wiiCursorActive) {
+            if (wiiCursorActive && !isConfigMode) {
                 wiiPointer.style.display = 'block';
                 const rect = tombolaContainer.getBoundingClientRect();
                 wiiPointer.style.left = `${e.clientX - rect.left}px`;
