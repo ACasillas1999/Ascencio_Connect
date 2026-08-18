@@ -15,6 +15,7 @@
         background-color: var(--bg-card, #1e293b);
         color: var(--text-primary, #f8fafc);
     }
+    @media (max-width: 768px) { div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; gap: 16px !important; } .form-control { font-size: 16px !important; } }
 </style>
 @endpush
 
@@ -87,14 +88,29 @@
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
                                 <div class="form-group">
                                     <label class="form-label" for="Sucursal">Sucursal</label>
-                                    <input id="Sucursal" name="Sucursal" type="text" class="form-control"
-                                           value="{{ old('Sucursal') }}">
+                                    @php $suc = old('Sucursal'); @endphp
+                                    <select id="Sucursal" name="Sucursal" class="form-control">
+                                        <option value="" {{ $suc == '' ? 'selected' : '' }}>-- Selecciona una Sucursal --</option>
+                                        <option value="DIMEGSA" {{ $suc == 'DIMEGSA' ? 'selected' : '' }}>DIMEGSA</option>
+                                        <option value="DEASA" {{ $suc == 'DEASA' ? 'selected' : '' }}>DEASA</option>
+                                        <option value="AIESA" {{ $suc == 'AIESA' ? 'selected' : '' }}>AIESA</option>
+                                        <option value="SEGSA" {{ $suc == 'SEGSA' ? 'selected' : '' }}>SEGSA</option>
+                                        <option value="FESA" {{ $suc == 'FESA' ? 'selected' : '' }}>FESA</option>
+                                        <option value="TAPATIA" {{ $suc == 'TAPATIA' ? 'selected' : '' }}>TAPATIA</option>
+                                        <option value="GABSA" {{ $suc == 'GABSA' ? 'selected' : '' }}>GABSA</option>
+                                        <option value="ILUMINACION" {{ $suc == 'ILUMINACION' ? 'selected' : '' }}>ILUMINACION</option>
+                                        <option value="VALLARTA" {{ $suc == 'VALLARTA' ? 'selected' : '' }}>VALLARTA</option>
+                                        <option value="QUERETARO" {{ $suc == 'QUERETARO' ? 'selected' : '' }}>QUERETARO</option>
+                                        <option value="CODI" {{ $suc == 'CODI' ? 'selected' : '' }}>CODI</option>
+                                    </select>
                                 </div>
 
-                                <div class="form-group">
+                                <div class="form-group" style="position:relative;">
                                     <label class="form-label" for="Vendedor">Vendedor</label>
                                     <input id="Vendedor" name="Vendedor" type="text" class="form-control"
-                                           value="{{ old('Vendedor') }}">
+                                           value="{{ old('Vendedor') }}" placeholder="Escribe o selecciona un vendedor..." autocomplete="off">
+                                    <div id="vendedor-dropdown" style="display:none; position:absolute; top:100%; left:0; width:100%; background:var(--bg-card, #1e293b); border:1px solid var(--border-subtle, #334155); border-radius:8px; max-height:200px; overflow-y:auto; z-index:100; box-shadow:0 8px 24px rgba(0,0,0,0.4);">
+                                    </div>
                                 </div>
                             </div>
 
@@ -258,6 +274,114 @@
             document.addEventListener('click', function(e) {
                 if (e.target !== telefonoInput && e.target !== telefonoDropdown && !telefonoDropdown.contains(e.target)) {
                     telefonoDropdown.style.display = 'none';
+                }
+            });
+        }
+
+        // Autocompletado tipo Inline Auto-Fill para Vendedor
+        const vendedorInput = document.getElementById('Vendedor');
+        const vendedorDropdown = document.getElementById('vendedor-dropdown');
+
+        if (vendedorInput && vendedorDropdown) {
+            let listaVendedores = [];
+            let isDeleting = false;
+
+            // Cargar vendedores al iniciar
+            fetch('{{ route("participantes.buscar-vendedores") }}')
+                .then(r => r.json())
+                .then(data => { listaVendedores = data; })
+                .catch(err => console.error(err));
+
+            vendedorInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' || e.key === 'Delete') {
+                    isDeleting = true;
+                } else {
+                    isDeleting = false;
+                }
+
+                if ((e.key === 'Tab' || e.key === 'Enter' || e.key === 'ArrowRight') && this.selectionStart < this.selectionEnd) {
+                    this.setSelectionRange(this.value.length, this.value.length);
+                    vendedorDropdown.style.display = 'none';
+                    if (e.key === 'Enter') e.preventDefault();
+                }
+            });
+
+            function procesarAutocompletado() {
+                const fullVal = vendedorInput.value;
+                const cursor = vendedorInput.selectionStart;
+                const typed = fullVal.substring(0, cursor);
+
+                if (!typed || isDeleting) {
+                    mostrarDropdown(typed);
+                    return;
+                }
+
+                // Buscar la primera coincidencia que empiece con lo escrito
+                const match = listaVendedores.find(v => v.toLowerCase().startsWith(typed.toLowerCase()));
+
+                if (match) {
+                    const typedLen = typed.length;
+                    const rest = match.substring(typedLen);
+                    vendedorInput.value = typed + rest;
+                    vendedorInput.setSelectionRange(typedLen, match.length);
+                }
+
+                mostrarDropdown(typed);
+            }
+
+            function mostrarDropdown(filterText = '') {
+                const matches = listaVendedores.filter(v => 
+                    !filterText || v.toLowerCase().includes(filterText.toLowerCase())
+                ).slice(0, 10);
+
+                if (matches.length > 0) {
+                    let html = '<ul style="list-style:none; margin:0; padding:0;">';
+                    matches.forEach(name => {
+                        html += `
+                            <li class="vendedor-item" style="padding:10px 14px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.05); color:var(--text-primary); font-size:13px; display:flex; align-items:center; gap:8px; transition:background 0.15s;">
+                                <i class="bi bi-person-badge" style="color:var(--accent-gold);"></i> ${name}
+                            </li>
+                        `;
+                    });
+                    html += '</ul>';
+                    vendedorDropdown.innerHTML = html;
+                    vendedorDropdown.style.display = 'block';
+
+                    document.querySelectorAll('.vendedor-item').forEach(li => {
+                        li.addEventListener('mouseenter', function() { this.style.background = 'rgba(212,175,55,0.15)'; });
+                        li.addEventListener('mouseleave', function() { this.style.background = 'transparent'; });
+                        li.addEventListener('click', function() {
+                            const val = this.textContent.trim();
+                            vendedorInput.value = val;
+                            vendedorInput.setSelectionRange(val.length, val.length);
+                            vendedorDropdown.style.display = 'none';
+                        });
+                    });
+                } else {
+                    vendedorDropdown.style.display = 'none';
+                }
+            }
+
+            vendedorInput.addEventListener('focus', function() {
+                if (listaVendedores.length === 0) {
+                    fetch('{{ route("participantes.buscar-vendedores") }}')
+                        .then(r => r.json())
+                        .then(data => {
+                            listaVendedores = data;
+                            mostrarDropdown(vendedorInput.value.trim());
+                        });
+                } else {
+                    mostrarDropdown(vendedorInput.value.trim());
+                }
+            });
+
+            vendedorInput.addEventListener('input', function() {
+                procesarAutocompletado();
+            });
+
+            document.addEventListener('click', function(e) {
+                if (e.target !== vendedorInput && !vendedorDropdown.contains(e.target)) {
+                    vendedorDropdown.style.display = 'none';
                 }
             });
         }

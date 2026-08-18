@@ -17,7 +17,7 @@ class Evento extends Model
         'machote_gafete', 'machote_horario',
         'enviar_whatsapp_auto', 'clases_obligatorias',
         'wa_template_name',
-        'gafete_qr_x', 'gafete_qr_y', 'gafete_nombre_x', 'gafete_nombre_y', 'gafete_font_size',
+        'gafete_qr_x', 'gafete_qr_y', 'gafete_qr_size', 'gafete_nombre_x', 'gafete_nombre_y', 'gafete_font_size',
         'gafete_id_x', 'gafete_id_y', 'gafete_id_font_size', 'gafete_color_nombre', 'gafete_color_id', 'gafete_font_family',
         'horario_nombre_x', 'horario_nombre_y', 'horario_id_x', 'horario_id_y', 'horario_lista_x', 'horario_lista_y', 'horario_lista_w', 'horario_lista_h', 
         'horario_font_size', 'horario_id_font_size', 'horario_lista_font_size', 'horario_color_nombre', 'horario_color_id', 'horario_color_lista', 'horario_font_family'

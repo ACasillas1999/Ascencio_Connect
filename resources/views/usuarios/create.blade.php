@@ -9,6 +9,20 @@
     </a>
 @endsection
 
+@push('styles')
+<style>
+    @media (max-width: 768px) {
+        div[style*="grid-template-columns"] {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+        }
+        .form-control {
+            font-size: 16px !important;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="card" style="max-width: 600px; margin: 0 auto;">
     <div class="card-header">

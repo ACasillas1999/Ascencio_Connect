@@ -15,6 +15,9 @@ class ParticipanteController extends Controller
         if ($request->filled('evento')) {
             $query->where('ID_Evento', $request->evento);
         }
+        if ($request->filled('sucursal')) {
+            $query->where('Sucursal', $request->sucursal);
+        }
         if ($request->filled('search')) {
             $s = $request->search;
             $query->where(function ($q) use ($s) {
@@ -279,6 +282,36 @@ class ParticipanteController extends Controller
             ->take(10); // Límite de 10 resultados para el dropdown
 
         return response()->json($participantes);
+    }
+
+    public function buscarVendedores(Request $request)
+    {
+        $q = trim($request->query('q', ''));
+
+        // 1) Vendedores desde la tabla de Usuarios (username)
+        $usuariosVendedores = \App\Models\Usuario::where('Rol', 'Vendedor')
+            ->when($q, function ($query, $q) {
+                $query->where('username', 'LIKE', "%{$q}%");
+            })
+            ->pluck('username');
+
+        // 2) Vendedores desde la tabla Participante (histórico)
+        $participantesVendedores = Participante::whereNotNull('Vendedor')
+            ->where('Vendedor', '!=', '')
+            ->when($q, function ($query, $q) {
+                $query->where('Vendedor', 'LIKE', "%{$q}%");
+            })
+            ->distinct()
+            ->pluck('Vendedor');
+
+        // Combinar, normalizar, filtrar duplicados y ordenar
+        $vendedores = $usuariosVendedores->merge($participantesVendedores)
+            ->map(fn($v) => trim($v))
+            ->reject(fn($v) => empty($v))
+            ->unique()
+            ->values();
+
+        return response()->json($vendedores);
     }
 
     public function globalProfile($telefono)

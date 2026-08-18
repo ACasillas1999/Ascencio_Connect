@@ -4,13 +4,76 @@
 @section('page-title', 'Perfil de Cliente')
 
 @section('topbar-actions')
-    <a href="{{ route('participantes.index') }}" class="btn btn-secondary">
-        <i class="bi bi-arrow-left"></i> Volver
+    <a href="{{ route('participantes.index') }}" class="btn btn-secondary btn-sm" title="Volver" style="padding:5px 10px; font-size:12px; font-weight:700; display:inline-flex; align-items:center; gap:4px; border-radius:6px;">
+        <i class="bi bi-arrow-left"></i> <span class="d-none d-sm-inline">Volver</span>
     </a>
 @endsection
 
+@push('styles')
+<style>
+    /* ========================================================= */
+    /* DISEÑO RESPONSIVO ULTRA-MODERNO: PERFIL DE CLIENTE       */
+    /* ========================================================= */
+    .cliente-perfil-grid {
+        max-width: 1040px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 24px;
+    }
+
+    .cliente-datos-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+        background: rgba(15, 23, 42, 0.5);
+        padding: 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    [data-theme="light"] .cliente-datos-grid {
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+
+    .cliente-dato-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 4px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        font-size: 13px;
+    }
+
+    .cliente-dato-row:last-child {
+        border-bottom: none;
+    }
+
+    .event-history-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+        .cliente-perfil-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+        }
+        .event-history-grid {
+            grid-template-columns: 1fr !important;
+            gap: 14px !important;
+        }
+        .card {
+            margin-bottom: 0 !important;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
-<div style="max-width:1000px; margin: 0 auto; display:grid; grid-template-columns:1fr 3fr; gap:24px;">
+<div class="cliente-perfil-grid">
     <!-- Columna Izquierda: Info de Perfil -->
     <div style="display:flex; flex-direction:column; gap:24px;">
         <div class="card" style="text-align:center; padding:24px;">
@@ -71,7 +134,7 @@
                 
                 @if($p->clases->count() > 0 || $p->canjes->count() > 0)
                 <div style="padding:16px 20px; border-top:1px solid var(--border-subtle); background:var(--bg-primary);">
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div class="event-history-grid">
                         
                         <!-- Actividades -->
                         @if($p->clases->count() > 0)
@@ -80,7 +143,7 @@
                             <ul style="margin:0; padding-left:16px; font-size:13px; color:var(--text-secondary);">
                                 @foreach($p->clases as $c)
                                     @if($c->agenda)
-                                    <li>{{ $c->agenda->Actividad }} ({{ $c->agenda->Fecha }} {{ $c->agenda->Horario }})</li>
+                                    <li style="margin-bottom:6px; line-height:1.3;"><strong>{{ $c->agenda->Actividad }}</strong> <span style="font-size:11px; color:var(--text-muted); display:block;"><i class="bi bi-clock"></i> {{ $c->agenda->Horario ?: ($c->agenda->Fecha ? $c->agenda->Fecha->format('d/m/Y') : '') }}</span></li>
                                     @endif
                                 @endforeach
                             </ul>
@@ -94,7 +157,7 @@
                             <ul style="margin:0; padding-left:16px; font-size:13px; color:var(--text-secondary);">
                                 @foreach($p->canjes as $canje)
                                     @if($canje->premio)
-                                    <li>{{ $canje->premio->NombrePremio }} <span style="color:#ef4444; font-size:11px;">(-{{ $canje->PuntosGastados }} pts)</span></li>
+                                    <li style="margin-bottom:6px; line-height:1.3;"><strong>{{ $canje->premio->NombrePremio }}</strong> <span style="color:var(--accent-gold); font-size:11px; font-weight:700; display:inline-block; margin-left:4px;">(x{{ $canje->Cantidad }})</span></li>
                                     @endif
                                 @endforeach
                             </ul>

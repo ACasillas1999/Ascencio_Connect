@@ -38,8 +38,16 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (Auth::attempt(['username' => $credentials['username'], 'password' => $credentials['password']], $request->boolean('remember'))) {
+        if (Auth::attempt(['username' => $credentials['username'], 'password' => $credentials['password']], true)) {
             $request->session()->regenerate();
+
+            if (isset(Auth::user()->Activo) && (int)Auth::user()->Activo === 0) {
+                Auth::logout();
+                $request->session()->invalidate();
+                return back()->withErrors([
+                    'username' => 'Tu cuenta ha sido desactivada por el administrador. Contacta al soporte.'
+                ]);
+            }
             if (Auth::user()->Rol === 'Vendedor') {
                 return redirect()->intended(route('participantes.index'));
             }

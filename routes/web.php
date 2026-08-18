@@ -14,7 +14,7 @@ require __DIR__ . '/setup_permisos.php';
 Route::get('/',      [AuthController::class, 'showLogin'])->name('login');
 Route::get('/login', [AuthController::class, 'showLogin']);
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/clear-cache', function() {
     if (function_exists('opcache_reset')) {
@@ -121,13 +121,21 @@ Route::middleware('auth')->group(function () {
 
         /* Usuarios y Roles */
         Route::resource('usuarios', \App\Http\Controllers\UsuarioController::class)->except(['show']);
+    Route::post('usuarios/{id}/toggle-activo', [\App\Http\Controllers\UsuarioController::class, 'toggleActivo'])->name('usuarios.toggle-activo');
+
         Route::resource('roles', \App\Http\Controllers\RoleController::class)->except(['show']);
 
         /* Ubicaciones */
         Route::resource('ubicaciones', \App\Http\Controllers\UbicacionController::class)->parameters(['ubicaciones' => 'ubicacion']);
+        Route::get('ubicaciones/{ubicacion}/salones', [\App\Http\Controllers\SalonController::class, 'index'])->name('ubicaciones.salones.index');
+        Route::post('ubicaciones/{ubicacion}/salones', [\App\Http\Controllers\SalonController::class, 'store'])->name('ubicaciones.salones.store');
+        Route::delete('salones/{salon}', [\App\Http\Controllers\SalonController::class, 'destroy'])->name('salones.destroy');
+        Route::put('salones/{salon}', [\App\Http\Controllers\SalonController::class, 'update'])->name('salones.update');
 
         Route::get('proveedores/gestion', [\App\Http\Controllers\ProveedorController::class, 'gestion'])->name('proveedores.gestion');
         Route::post('proveedores/gestion', [\App\Http\Controllers\ProveedorController::class, 'storeUsuario'])->name('proveedores.storeUsuario');
+        Route::put('proveedores/gestion/{usuario}', [\App\Http\Controllers\ProveedorController::class, 'updateUsuario'])->name('proveedores.updateUsuario');
+        Route::delete('proveedores/gestion/{usuario}', [\App\Http\Controllers\ProveedorController::class, 'destroyUsuario'])->name('proveedores.destroyUsuario');
 
         /* Apariencia CSS */
         Route::get('/apariencia', [\App\Http\Controllers\AparienciaController::class, 'index'])->name('apariencia.index');
@@ -159,6 +167,7 @@ Route::middleware('auth')->group(function () {
         /* Rutas explícitas antes de resource para evitar solapamientos con {participante} */
         Route::get('participantes/buscar-por-telefono/{telefono}', [ParticipanteController::class, 'searchByPhone'])->name('participantes.searchPhone');
         Route::get('participantes/buscar-lista-telefonos', [ParticipanteController::class, 'searchPhonesList'])->name('participantes.searchPhonesList');
+        Route::get('participantes/buscar-vendedores', [ParticipanteController::class, 'buscarVendedores'])->name('participantes.buscar-vendedores');
         
         Route::resource('participantes', ParticipanteController::class)->only(['index', 'show', 'create', 'store']);
         Route::get('eventos/{evento}/agenda-json', [ParticipanteController::class, 'getAgenda'])->name('eventos.agenda.json');
@@ -168,6 +177,8 @@ Route::middleware('auth')->group(function () {
     /* === RUTAS COMPARTIDAS (ADMIN Y EVENTO) === */
     Route::middleware('role:Administrador,Evento')->group(function () {
         Route::get('eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
+        Route::get('eventos/{evento}/estadisticas', [EventoController::class, 'estadisticas'])->name('eventos.estadisticas');
+        Route::get('eventos/{evento}/estadisticas/export', [EventoController::class, 'exportarEstadisticasExcel'])->name('eventos.estadisticas.export');
         Route::get('eventos/{evento}/sorteo', [EventoController::class, 'sorteo'])->name('eventos.sorteo');
         Route::post('eventos/{evento}/sorteo/orden', [EventoController::class, 'actualizarOrdenPremio'])->name('eventos.sorteo.orden');
         Route::post('eventos/{evento}/sorteo/ganador', [EventoController::class, 'registrarGanador'])->name('eventos.sorteo.ganador');
@@ -175,8 +186,9 @@ Route::middleware('auth')->group(function () {
         Route::post('eventos/{evento}/sorteo/toggle-delivery', [EventoController::class, 'toggleDelivery'])->name('eventos.sorteo.toggle-delivery');
         
         /* AJAX Asistencia y Scanner QR */
-        Route::post('actividades/{actividad}/buscar', [\App\Http\Controllers\ActividadController::class, 'buscarParticipantes'])->name('actividades.buscar');
+        Route::match(['get', 'post'], 'actividades/{actividad}/buscar', [\App\Http\Controllers\ActividadController::class, 'buscarParticipantes'])->name('actividades.buscar');
         Route::post('actividades/{actividad}/asistencia', [\App\Http\Controllers\ActividadController::class, 'marcarAsistencia'])->name('actividades.asistencia');
+        Route::post('actividades/{actividad}/toggle-asistencia', [\App\Http\Controllers\ActividadController::class, 'toggleAsistencia'])->name('actividades.toggle-asistencia');
         Route::post('actividades/{actividad}/inscribir', [\App\Http\Controllers\ActividadController::class, 'inscribirParticipante'])->name('actividades.inscribir');
         Route::post('actividades/{actividad}/registro-rapido', [\App\Http\Controllers\ActividadController::class, 'registroRapido'])->name('actividades.registro-rapido');
     });

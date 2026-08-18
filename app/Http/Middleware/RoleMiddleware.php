@@ -25,6 +25,14 @@ class RoleMiddleware
             return redirect()->route('login');
         }
 
+        // Si la cuenta está desactivada por el administrador, expulsar y cerrar sesión en tiempo real
+        if (isset($user->Activo) && (int)$user->Activo === 0) {
+            \Illuminate\Support\Facades\Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect()->route('login')->with('error', 'Tu sesión ha finalizado porque tu cuenta fue desactivada por el administrador.');
+        }
+
         $userRol = $user->Rol;
 
         // Normalizar: tratar 'Admin' y 'Administrador' como equivalentes

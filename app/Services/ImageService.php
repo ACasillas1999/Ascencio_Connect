@@ -90,7 +90,8 @@ class ImageService
 
         if (file_exists($fontPath)) {
             $fontSize = $evento->gafete_font_size ?? 60;
-            $areaWidth = 1000;
+            $templateWidth = imagesx($image);
+            $areaWidth = (int)($templateWidth * 0.5); // 50%
             $areaX = $evento->gafete_nombre_x ?? 202;
             
             $textBox = imagettfbbox($fontSize, 0, $fontPath, $participante->Nombre);
@@ -111,7 +112,13 @@ class ImageService
             $idFontSize = $evento->gafete_id_font_size ?? 40;
             $idX = $evento->gafete_id_x ?? 202;
             $idY = $evento->gafete_id_y ?? 1200;
-            imagettftext($image, $idFontSize, 0, $idX, $idY, $colorId, $fontPath, $idText);
+            
+            $idAreaWidth = (int)($templateWidth * 0.2); // 20%
+            $idTextBox = imagettfbbox($idFontSize, 0, $fontPath, $idText);
+            $idTextWidth = abs($idTextBox[4] - $idTextBox[0]);
+            $idFinalX = $idX + ($idAreaWidth - $idTextWidth) / 2;
+            
+            imagettftext($image, $idFontSize, 0, $idFinalX, $idY, $colorId, $fontPath, $idText);
         } else {
             // Fallback extremo: imagestring (solo soporta tamaños 1-5)
             $fontSize = 5;
@@ -131,7 +138,8 @@ class ImageService
             $qrHeight = imagesy($qrImage);
             
             $templateWidth = imagesx($image);
-            $qrNewWidth = (int)($templateWidth * 0.25); 
+            $qrPercent = ($evento->gafete_qr_size ?? 25) / 100.0;
+            $qrNewWidth = (int)($templateWidth * $qrPercent); 
             $qrNewHeight = $qrNewWidth; 
             $qrResized = imagecreatetruecolor($qrNewWidth, $qrNewHeight);
             imagecopyresampled($qrResized, $qrImage, 0, 0, 0, 0, $qrNewWidth, $qrNewHeight, $qrWidth, $qrHeight);
@@ -204,17 +212,52 @@ class ImageService
         $fontPath = __DIR__ . '/../../public/fonts/roboto.ttf';
 
         if (file_exists($fontPath)) {
-            // Escribir nombre del participante
-            imagettftext($im, 32, 0, 60, 480, $colorNegro, $fontPath, $participante->Nombre);
+            $templateWidth = imagesx($im);
+            $fontSize = $evento->horario_font_size ?? 40;
+            $nombreX = $evento->horario_nombre_x ?? 202;
+            $nombreY = $evento->horario_nombre_y ?? 150;
             
-            // Escribir nombre del evento
-            imagettftext($im, 20, 0, 60, 514, $colorNegro, $fontPath, $evento->name_evento);
-
-            // TODO: Integrar aquí la lógica compleja de cuadrículas (columnas, filas, text wrap) del archivo original.
-            // Para mantener este servicio limpio, se recomienda usar una librería como Intervention Image
-            // o adaptar el renderizado por cuadrícula en base a los días de la agenda.
-        }
-
+            $areaWidth = (int)($templateWidth * 0.5); // 50%
+            $textBox = imagettfbbox($fontSize, 0, $fontPath, $participante->Nombre);
+            $textWidth = abs($textBox[4] - $textBox[0]);
+            $nombreFinalX = $nombreX + ($areaWidth - $textWidth) / 2;
+            
+            imagettftext($im, $fontSize, 0, $nombreFinalX, $nombreY, $colorNegro, $fontPath, $participante->Nombre);
+            
+            // Escribir ID
+            $idText = "ID: " . $participante->ID;
+            $idFontSize = $evento->horario_id_font_size ?? 30;
+            $idX = $evento->horario_id_x ?? 202;
+            $idY = $evento->horario_id_y ?? 250;
+            
+            $idAreaWidth = (int)($templateWidth * 0.3); // 30%
+            $idTextBox = imagettfbbox($idFontSize, 0, $fontPath, $idText);
+            $idTextWidth = abs($idTextBox[4] - $idTextBox[0]);
+            $idFinalX = $idX + ($idAreaWidth - $idTextWidth) / 2;
+            
+            imagettftext($im, $idFontSize, 0, $idFinalX, $idY, $colorNegro, $fontPath, $idText);
+            
+            // Dibujar Lista de Actividades
+            $listaX = $evento->horario_lista_x ?? 100;
+            $listaY = $evento->horario_lista_y ?? 350;
+            $listaW = $evento->horario_lista_w ?? 800;
+            $listaH = $evento->horario_lista_h ?? 1000;
+            $listaFontSize = $evento->horario_lista_font_size ?? 24;
+            
+            imagerectangle($im, $listaX, $listaY, $listaX + $listaW, $listaY + $listaH, $colorNegro);
+            
+            $clases = $participante->clases()->with('agenda')->get();
+            $currY = $listaY + $listaFontSize + 10;
+            foreach ($clases as $clase) {
+                if ($clase->agenda) {
+                    $linea = $clase->agenda->Horario . " - " . $clase->agenda->Actividad;
+                    if ($currY > $listaY + $listaH) break;
+                    imagettftext($im, $listaFontSize, 0, $listaX + 10, $currY, $colorNegro, $fontPath, $linea);
+                    $currY += $listaFontSize + 20;
+                }
+            }
+        } 
+        
         imagepng($im, $outputPath, 9);
         imagedestroy($im);
 
@@ -279,7 +322,8 @@ class ImageService
 
         if (file_exists($fontPath)) {
             $fontSize = $evento->gafete_font_size ?? 60;
-            $areaWidth = 1000;
+            $templateWidth = imagesx($image);
+            $areaWidth = (int)($templateWidth * 0.5); // 50%
             $areaX = $evento->gafete_nombre_x ?? 202;
             
             $textBox = imagettfbbox($fontSize, 0, $fontPath, $nombrePrueba);
@@ -300,7 +344,13 @@ class ImageService
             $idFontSize = $evento->gafete_id_font_size ?? 40;
             $idX = $evento->gafete_id_x ?? 202;
             $idY = $evento->gafete_id_y ?? 1200;
-            imagettftext($image, $idFontSize, 0, $idX, $idY, $colorId, $fontPath, $idText);
+            
+            $idAreaWidth = (int)($templateWidth * 0.2); // 20%
+            $idTextBox = imagettfbbox($idFontSize, 0, $fontPath, $idText);
+            $idTextWidth = abs($idTextBox[4] - $idTextBox[0]);
+            $idFinalX = $idX + ($idAreaWidth - $idTextWidth) / 2;
+            
+            imagettftext($image, $idFontSize, 0, $idFinalX, $idY, $colorId, $fontPath, $idText);
         } else {
             // Fallback extremo: imagestring (solo soporta tamaños 1-5)
             $fontSize = 5;
@@ -339,7 +389,8 @@ class ImageService
             $qrHeight = imagesy($qrImage);
             
             $templateWidth = imagesx($image);
-            $qrNewWidth = (int)($templateWidth * 0.25); 
+            $qrPercent = ($evento->gafete_qr_size ?? 25) / 100.0;
+            $qrNewWidth = (int)($templateWidth * $qrPercent); 
             $qrNewHeight = $qrNewWidth; 
             $qrResized = imagecreatetruecolor($qrNewWidth, $qrNewHeight);
             imagecopyresampled($qrResized, $qrImage, 0, 0, 0, 0, $qrNewWidth, $qrNewHeight, $qrWidth, $qrHeight);
@@ -416,15 +467,29 @@ class ImageService
         }
 
         if (file_exists($fontPath)) {
+            $templateWidth = imagesx($image);
+            
             $fontSize = $evento->horario_font_size ?? 40;
             $nombreX = $evento->horario_nombre_x ?? 202;
             $nombreY = $evento->horario_nombre_y ?? 150;
-            imagettftext($image, $fontSize, 0, $nombreX, $nombreY, $colorNombre, $fontPath, $nombrePrueba);
+            
+            $areaWidth = (int)($templateWidth * 0.5); // 50%
+            $textBox = imagettfbbox($fontSize, 0, $fontPath, $nombrePrueba);
+            $textWidth = abs($textBox[4] - $textBox[0]);
+            $nombreFinalX = $nombreX + ($areaWidth - $textWidth) / 2;
+            
+            imagettftext($image, $fontSize, 0, $nombreFinalX, $nombreY, $colorNombre, $fontPath, $nombrePrueba);
             
             $idFontSize = $evento->horario_id_font_size ?? 30;
             $idX = $evento->horario_id_x ?? 202;
             $idY = $evento->horario_id_y ?? 250;
-            imagettftext($image, $idFontSize, 0, $idX, $idY, $colorId, $fontPath, $idPrueba);
+            
+            $idAreaWidth = (int)($templateWidth * 0.2); // 20%
+            $idTextBox = imagettfbbox($idFontSize, 0, $fontPath, $idPrueba);
+            $idTextWidth = abs($idTextBox[4] - $idTextBox[0]);
+            $idFinalX = $idX + ($idAreaWidth - $idTextWidth) / 2;
+            
+            imagettftext($image, $idFontSize, 0, $idFinalX, $idY, $colorId, $fontPath, $idPrueba);
             
             // Dibujar Lista de Actividades
             $listaX = $evento->horario_lista_x ?? 100;

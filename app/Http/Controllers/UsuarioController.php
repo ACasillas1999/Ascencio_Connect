@@ -116,7 +116,38 @@ class UsuarioController extends Controller
             return redirect()->route('usuarios.index')->with('error', 'No puedes eliminar al administrador principal.');
         }
 
+        // Si el usuario es proveedor, limpiar sus asignaciones de eventos asociadas
+        if (strtolower($usuario->Rol) === 'proveedor') {
+            \Illuminate\Support\Facades\DB::table('proveedor_evento')
+                ->where('NombreProveedor', $usuario->username)
+                ->delete();
+        }
+
         $usuario->delete();
         return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado exitosamente.');
+    }
+
+    public function toggleActivo($id)
+    {
+        $usuario = Usuario::findOrFail($id);
+
+        if ($usuario->username === 'Admin') {
+            return back()->with('error', 'No se puede desactivar al usuario Administrador principal.');
+        }
+
+        $usuario->Activo = ($usuario->Activo == 1) ? 0 : 1;
+        if ($usuario->Activo == 0) {
+            $usuario->remember_token = null;
+        }
+        $usuario->save();
+
+        if (strtolower($usuario->Rol) === 'proveedor') {
+            \Illuminate\Support\Facades\DB::table('proveedor_evento')
+                ->where('NombreProveedor', $usuario->username)
+                ->update(['Activo' => $usuario->Activo]);
+        }
+
+        $estadoText = $usuario->Activo ? 'activado' : 'desactivado (sesiones cerradas)';
+        return back()->with('success', "Usuario \"{$usuario->username}\" {$estadoText} exitosamente.");
     }
 }

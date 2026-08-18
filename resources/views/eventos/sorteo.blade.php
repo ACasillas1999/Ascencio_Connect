@@ -213,7 +213,84 @@
             background: linear-gradient(90deg, transparent 0%, rgba(0, 160, 233, 0.95) 15%, rgba(0, 160, 233, 0.95) 85%, transparent 100%);
             text-shadow: 3px 3px 0px rgba(0,0,0,0.3);
         }
-    </style>
+    
+<style>
+/* ================================================= */
+/* CONFIGURACIÓN DEL SORTEO - MODO CLARO OVERRIDES   */
+/* ================================================= */
+[data-theme="light"] #setup-view {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] #setup-view h2 {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] #setup-view .max-w-\[1600px\] {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme="light"] #setup-view .bg-slate-900\/80 {
+    background-color: #f8fafc !important;
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="light"] #setup-view .bg-slate-900\/80 h3 {
+    color: #b45309 !important;
+    border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] #setup-view .bg-slate-900\/80 h3 span {
+    color: #b45309 !important;
+}
+
+[data-theme="light"] #setup-view .bg-slate-800\/40,
+[data-theme="light"] #setup-view .bg-slate-800\/60 {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+}
+
+[data-theme="light"] #setup-view .bg-slate-800\/60:hover {
+    background-color: #f1f5f9 !important;
+}
+
+[data-theme="light"] #setup-view .text-slate-100 {
+    color: #0f172a !important;
+}
+
+[data-theme="light"] #setup-view .text-slate-400 {
+    color: #475569 !important;
+}
+
+[data-theme="light"] #setup-view .text-slate-500 {
+    color: #64748b !important;
+}
+
+[data-theme="light"] #setup-view .bg-slate-900\/50 {
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] #setup-view .bg-slate-900\/40 {
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] #setup-view .bg-slate-800 {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+}
+</style>
+
+</style>
 @endpush
 
 @section('content')

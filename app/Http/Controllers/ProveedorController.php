@@ -15,23 +15,67 @@ class ProveedorController extends Controller
     /**
      * Muestra la interfaz de escaneo para el proveedor.
      */
-    public function index()
+    public function index(Request $request)
     {
         $usuario = Auth::user()->username;
         
-        // Obtener cuántos puntos da este proveedor y en qué evento activo
-        $proveedor_evento = DB::table('proveedor_evento')
+        // Obtener todos los eventos en los que este proveedor está asignado
+        $eventos_asignados = DB::table('proveedor_evento')
             ->join('evento', 'evento.ID', '=', 'proveedor_evento.ID_Evento')
             ->where('proveedor_evento.NombreProveedor', $usuario)
             ->where('proveedor_evento.Activo', 1)
             ->select('proveedor_evento.Puntos', 'evento.name_evento', 'evento.ID as ID_Evento')
-            ->first();
+            ->get();
+
+        $selected_evento_id = $request->query('evento_id');
+        
+        $proveedor_evento = null;
+        if ($selected_evento_id) {
+            $proveedor_evento = $eventos_asignados->firstWhere('ID_Evento', $selected_evento_id);
+        }
+        if (!$proveedor_evento) {
+            $proveedor_evento = $eventos_asignados->first();
+        }
 
         $puntos = $proveedor_evento ? $proveedor_evento->Puntos : 0;
         $evento_nombre = $proveedor_evento ? $proveedor_evento->name_evento : 'Sin asignar';
         $id_evento = $proveedor_evento ? $proveedor_evento->ID_Evento : null;
 
-        return view('proveedor.index', compact('usuario', 'puntos', 'evento_nombre', 'id_evento'));
+                $historial = collect();
+        $total_puntos_entregados = 0;
+        $total_escaneos = 0;
+
+        if ($id_evento) {
+            $historial = DB::table('puntos_proveedor')
+                ->join('participante', 'participante.ID', '=', 'puntos_proveedor.id_participante')
+                ->where('puntos_proveedor.usuario', $usuario)
+                ->where('puntos_proveedor.id_evento', $id_evento)
+                ->select(
+                    'puntos_proveedor.id_participante',
+                    'puntos_proveedor.puntos',
+                    'puntos_proveedor.fecha',
+                    'participante.Nombre as participante_nombre',
+                    'participante.RFC'
+                )
+                ->orderBy('puntos_proveedor.fecha', 'desc')
+                ->take(50)
+                ->get();
+
+            $total_puntos_entregados = DB::table('puntos_proveedor')
+                ->where('usuario', $usuario)
+                ->where('id_evento', $id_evento)
+                ->sum('puntos');
+
+            $total_escaneos = DB::table('puntos_proveedor')
+                ->where('usuario', $usuario)
+                ->where('id_evento', $id_evento)
+                ->count();
+        }
+
+        return view('proveedor.index', compact(
+            'usuario', 'puntos', 'evento_nombre', 'id_evento', 'eventos_asignados',
+            'historial', 'total_puntos_entregados', 'total_escaneos'
+        ));
     }
 
     /**
@@ -62,14 +106,14 @@ class ProveedorController extends Controller
         // 1) Buscar Participante
         $participante = Participante::find($codigo);
         if (!$participante) {
-            return response("❌ Participante no encontrado con ID: $codigo", 404);
+            return response()->json(['ok' => false, 'message' => "Participante no encontrado con ID: $codigo"], 404);
         }
 
         $id_evento = $participante->ID_Evento;
         $rfc = trim($participante->RFC);
 
         if (!$id_evento) {
-            return response('❌ Participante sin evento válido.', 400);
+            return response()->json(['ok' => false, 'message' => 'Participante sin evento válido.'], 400);
         }
 
         // 2) Buscar configuración del proveedor para este evento
@@ -80,7 +124,7 @@ class ProveedorController extends Controller
             ->first();
 
         if (!$prov_ev) {
-            return response('⚠️ No tienes puntos configurados para este evento.', 400);
+            return response()->json(['ok' => false, 'message' => 'No tienes puntos configurados para este evento.'], 400);
         }
 
         $puntos_a_dar = $prov_ev->Puntos;
@@ -102,7 +146,7 @@ class ProveedorController extends Controller
                 $restan = 120 - $segundos_transcurridos;
                 $mins = floor($restan / 60);
                 $secs = $restan % 60;
-                return response("⏳ Debes esperar 2 minutos para volver a dar puntos a este participante. Faltan {$mins}m {$secs}s.", 400);
+                return response()->json(['ok' => false, 'cooldown' => true, 'message' => "Debes esperar 2 minutos para volver a otorgar puntos a este participante. Faltan {$mins}m {$secs}s."], 429);
             }
         }
 
@@ -162,11 +206,22 @@ class ProveedorController extends Controller
     {
         $rol = strtolower(Auth::user()->Rol);
         if ($rol !== 'admin' && $rol !== 'administrador') {
-            abort(403, 'No tienes permiso para acceder a esta pantalla. Tu rol actual es: ' . Auth::user()->Rol);
+            abort(403, 'No tienes permiso para acceder a esta pantalla.');
         }
 
-        $proveedores = Usuario::where('Rol', 'proveedor')->get();
-        return view('proveedor.gestion', compact('proveedores'));
+        $proveedores = Usuario::whereIn('Rol', ['proveedor', 'Proveedor'])->get();
+
+        foreach ($proveedores as $prov) {
+            $prov->asignaciones = DB::table('proveedor_evento')
+                ->join('evento', 'evento.ID', '=', 'proveedor_evento.ID_Evento')
+                ->where('proveedor_evento.NombreProveedor', $prov->username)
+                ->select('proveedor_evento.ID as id_asignacion', 'proveedor_evento.Puntos', 'proveedor_evento.Activo', 'evento.name_evento', 'evento.ID as ID_Evento')
+                ->get();
+        }
+
+        $eventos = Evento::orderBy('fecha_inicio', 'desc')->get();
+
+        return view('proveedor.gestion', compact('proveedores', 'eventos'));
     }
 
     /**
@@ -192,5 +247,45 @@ class ProveedorController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Proveedor creado correctamente.');
+    }
+
+    /**
+     * Elimina una cuenta de usuario proveedor.
+     */
+    public function destroyUsuario(Usuario $usuario)
+    {
+        $rol = strtolower(Auth::user()->Rol);
+        if ($rol !== 'admin' && $rol !== 'administrador') {
+            abort(403);
+        }
+
+        $usuario->delete();
+
+        return redirect()->back()->with('success', 'Cuenta de proveedor eliminada.');
+    }
+
+    /**
+     * Actualiza la cuenta de usuario proveedor.
+     */
+    public function updateUsuario(Request $request, Usuario $usuario)
+    {
+        $rol = strtolower(Auth::user()->Rol);
+        if ($rol !== 'admin' && $rol !== 'administrador') {
+            abort(403);
+        }
+
+        $request->validate([
+            'username' => 'required|string|max:255|unique:usuarios,username,' . $usuario->ID . ',ID',
+            'password' => 'nullable|string|min:4',
+        ]);
+
+        $usuario->username = $request->username;
+        if ($request->filled('password')) {
+            $usuario->password = Hash::make($request->password);
+            $usuario->password_visible = $request->password;
+        }
+        $usuario->save();
+
+        return redirect()->back()->with('success', 'Cuenta de proveedor actualizada correctamente.');
     }
 }

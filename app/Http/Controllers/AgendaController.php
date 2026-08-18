@@ -31,7 +31,7 @@ class AgendaController extends Controller
 
         Agenda::create($data);
 
-        return redirect()->route('eventos.show', $evento)->with('success', 'Horario agregado a la agenda.');
+        return redirect()->route('eventos.show', [$evento, 'active_tab' => $request->input('active_tab', 'tab-general')])->with('success', 'Horario agregado a la agenda.');
     }
 
     /**
@@ -56,7 +56,7 @@ class AgendaController extends Controller
 
         $agenda->update($data);
 
-        return redirect()->route('eventos.show', $agenda->ID_Evento)->with('success', 'Horario actualizado en la agenda.');
+        return redirect()->route('eventos.show', [$agenda->ID_Evento, 'active_tab' => $request->input('active_tab', 'tab-general')])->with('success', 'Horario actualizado en la agenda.');
     }
 
     /**
@@ -67,7 +67,7 @@ class AgendaController extends Controller
         $evento_id = $agenda->ID_Evento;
         $agenda->delete();
 
-        return redirect()->route('eventos.show', $evento_id)->with('success', 'Horario eliminado de la agenda.');
+        return redirect()->route('eventos.show', [$evento_id, 'active_tab' => request('active_tab', 'tab-general')])->with('success', 'Horario eliminado de la agenda.');
     }
 
     /**

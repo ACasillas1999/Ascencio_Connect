@@ -21,7 +21,14 @@ class CanjeController extends Controller
         $totalCanjes = Canje::where('ID_Evento', $evento->ID)->count();
         $totalPremiosCanjeados = Canje::where('ID_Evento', $evento->ID)->sum('Cantidad');
 
-        return view('canjes.index', compact('evento', 'premios', 'totalCanjes', 'totalPremiosCanjeados'));
+        // Últimos canjes del evento para la vista inicial
+        $ultimosCanjes = Canje::where('ID_Evento', $evento->ID)
+            ->with(['participante', 'premio'])
+            ->orderByDesc('Fecha')
+            ->limit(10)
+            ->get();
+
+        return view('canjes.index', compact('evento', 'premios', 'totalCanjes', 'totalPremiosCanjeados', 'ultimosCanjes'));
     }
 
     /**

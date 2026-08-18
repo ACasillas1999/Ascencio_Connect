@@ -24,7 +24,7 @@ class PremioController extends Controller
 
         PremioEvento::create($data);
 
-        return redirect()->route('eventos.show', $evento)->with('success', 'Premio agregado correctamente.');
+        return redirect()->route('eventos.show', [$evento, 'active_tab' => $request->input('active_tab', 'tab-premios')])->with('success', 'Premio agregado correctamente.');
     }
 
     /**
@@ -41,7 +41,7 @@ class PremioController extends Controller
 
         $premio->update($data);
 
-        return redirect()->route('eventos.show', $premio->ID_Evento)->with('success', 'Premio actualizado.');
+        return redirect()->route('eventos.show', [$premio->ID_Evento, 'active_tab' => $request->input('active_tab', 'tab-premios')])->with('success', 'Premio actualizado.');
     }
 
     /**
@@ -52,7 +52,7 @@ class PremioController extends Controller
         $evento_id = $premio->ID_Evento;
         $premio->delete();
 
-        return redirect()->route('eventos.show', $evento_id)->with('success', 'Premio eliminado.');
+        return redirect()->route('eventos.show', [$evento_id, 'active_tab' => request('active_tab', 'tab-premios')])->with('success', 'Premio eliminado.');
     }
 
     /**

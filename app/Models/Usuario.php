@@ -18,6 +18,8 @@ class Usuario extends Authenticatable
         'password',
         'Rol',
         'password_visible',
+        'Activo',
+        'remember_token',
         'ID_Evento'
     ];
 
@@ -29,6 +31,8 @@ class Usuario extends Authenticatable
     protected $hidden = [
         'password',
         'password_visible',
+        'Activo',
+        'remember_token',
     ];
 
     /* ---------- helpers ---------- */

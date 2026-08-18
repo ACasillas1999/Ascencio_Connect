@@ -2,6 +2,15 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
+    <!-- PWA Manifest & App Icons -->
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Ascencio">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo-pwa.svg') }}">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ascencio Connect — Iniciar Sesión</title>
@@ -226,6 +235,182 @@
         }
         .login-footer span { color: #2563eb; font-weight: 600; }
         
+        
+        
+        .app-brand-logo {
+            max-height: 85px;
+            width: auto;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.15));
+            transition: transform 0.3s ease;
+        }
+        .app-brand-logo:hover {
+            transform: scale(1.04);
+        }
+
+        
+        .app-brand-logo {
+            max-height: 70px;
+            width: auto;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.15));
+        }
+
+        
+        /* --- ESTILO FUTURISTA DARK GLASSMOPRHISM PARA LOGIN MÓVIL --- */
+        @media (max-width: 900px) {
+            body {
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+                height: auto !important;
+                min-height: 100vh !important;
+                background: radial-gradient(circle at 15% 15%, rgba(249, 115, 22, 0.4) 0%, transparent 45%),
+                            radial-gradient(circle at 85% 85%, rgba(37, 99, 235, 0.4) 0%, transparent 50%),
+                            radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.8) 0%, #020617 100%) !important;
+                background-attachment: fixed !important;
+            }
+
+            .bg-tree {
+                display: none !important; /* Oculta árbol en móvil para el fondo glassmorphic líquido */
+            }
+
+            .brand-showcase {
+                display: none !important;
+            }
+
+            .layout-container {
+                flex-direction: column !important;
+                gap: 0 !important;
+                padding: 20px 14px !important;
+                height: auto !important;
+                min-height: 100vh !important;
+                justify-content: center !important;
+                align-items: center !important;
+            }
+
+            /* TARJETA DE CRISTAL OSCURO TRASLÚCIDO */
+            .login-card {
+                padding: 38px 24px 30px !important;
+                border-radius: 28px !important;
+                max-width: 390px !important;
+                width: 94% !important;
+                background: rgba(15, 23, 42, 0.88) !important; backdrop-filter: blur(10px) !important; -webkit-backdrop-filter: blur(10px) !important; will-change: transform; transform: translateZ(0);
+                border: 1px solid rgba(255, 255, 255, 0.18) !important;
+                box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+                margin: auto !important;
+            }
+
+            .login-card::before {
+                display: none !important;
+            }
+
+            /* LOGO Y TIPOGRAFÍA BLANCA CRISTALINA */
+            .app-brand-logo {
+                max-height: 95px !important;
+                margin-bottom: 12px !important;
+                filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.4)) !important;
+            }
+
+            .login-logo {
+                margin-bottom: 24px !important;
+            }
+
+            .logo-title {
+                font-size: 22px !important;
+                font-weight: 800 !important;
+                color: #ffffff !important;
+                letter-spacing: -0.3px !important;
+            }
+
+            .logo-subtitle {
+                color: rgba(255, 255, 255, 0.7) !important;
+                font-size: 11px !important;
+                letter-spacing: 2px !important;
+                text-transform: uppercase !important;
+            }
+
+            /* ETIQUETAS Y CAMPOS PILL EN MÓVIL */
+            .form-label {
+                color: rgba(255, 255, 255, 0.85) !important;
+                font-size: 11px !important;
+                letter-spacing: 1px !important;
+            }
+
+            .form-group {
+                margin-bottom: 18px !important;
+            }
+
+            .form-control {
+                background: rgba(255, 255, 255, 0.08) !important;
+                border: 1px solid rgba(255, 255, 255, 0.22) !important;
+                border-radius: 99px !important; /* Forma redondeada tipo Pill */
+                color: #ffffff !important;
+                padding: 13px 18px 13px 44px !important;
+                font-size: 16px !important;
+                box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+            }
+
+            .form-control:focus {
+                background: rgba(255, 255, 255, 0.14) !important;
+                border-color: #f97316 !important;
+                box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.3) !important;
+            }
+
+            .form-control::placeholder {
+                color: rgba(255, 255, 255, 0.45) !important;
+            }
+
+            .input-icon {
+                color: rgba(255, 255, 255, 0.75) !important;
+            }
+
+            .toggle-pass {
+                color: rgba(255, 255, 255, 0.75) !important;
+                right: 14px !important;
+            }
+
+            .toggle-pass:hover {
+                color: #f97316 !important;
+            }
+
+            /* BOTÓN INGRESAR TIPO PILL NARANJA INTENSO */
+            .btn-login {
+                background: linear-gradient(135deg, #f97316 0%, #ea580c 100%) !important;
+                color: #ffffff !important;
+                border-radius: 99px !important; /* Forma Pill */
+                padding: 14px !important;
+                font-size: 16px !important;
+                font-weight: 800 !important;
+                letter-spacing: 0.5px !important;
+                box-shadow: 0 10px 25px rgba(249, 115, 22, 0.45) !important;
+                margin-top: 6px !important;
+            }
+
+            .login-footer {
+                color: rgba(255, 255, 255, 0.6) !important;
+                margin-top: 24px !important;
+            }
+
+            .login-footer span {
+                color: #f97316 !important;
+                font-weight: 700 !important;
+            }
+
+            /* BOTÓN PWA EN MÓVIL */
+            #pwaInstallWrap {
+                margin-top: 14px !important;
+            }
+
+            #btnPwaInstall {
+                background: rgba(255, 255, 255, 0.1) !important;
+                border: 1px solid rgba(255, 255, 255, 0.25) !important;
+                color: #ffffff !important;
+                border-radius: 99px !important;
+                padding: 10px 18px !important;
+            }
+        }
+
+
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
@@ -248,7 +433,7 @@
 
     <div class="login-card">
         <div class="login-logo">
-            <div class="logo-icon"><i class="bi bi-lightning-charge-fill"></i></div>
+            <img src="{{ asset($config['logo_path']) }}" alt="Conexión Ascencio" class="app-brand-logo">
             <div class="logo-title">Ascencio Connect</div>
             <div class="logo-subtitle">Sistema de Congresos</div>
         </div>
@@ -303,6 +488,13 @@
                 Iniciar Sesión
             </button>
         </form>
+
+        
+        <div id="pwaInstallWrap" style="display: none; text-align: center; margin-top: 18px;">
+            <button type="button" id="btnPwaInstall" style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(59, 130, 246, 0.22)); border: 1px solid rgba(59, 130, 246, 0.4); color: #2563eb; border-radius: 20px; padding: 10px 20px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);">
+                <i class="bi bi-download" style="font-size: 15px;"></i> Instalar Aplicación Móvil
+            </button>
+        </div>
 
         <div class="login-footer">
             Grupo Ascencio &copy; {{ date('Y') }} &mdash; <span>Congresos</span>
@@ -775,7 +967,13 @@
             @endif
         }
 
+        let animationFrameId = null;
+
         function animate() {
+            if (window.innerWidth <= 900) {
+                animationFrameId = null;
+                return;
+            }
             globalTime++;
             ctx.clearRect(0, 0, size, size);
             ctx.drawImage(bgCanvas, 0, 0);
@@ -811,18 +1009,80 @@
                 swing.draw(ctx);
             }
 
-            requestAnimationFrame(animate);
+            animationFrameId = requestAnimationFrame(animate);
         }
 
-        document.getElementById('app-container').addEventListener('click', triggerBurst);
-        window.addEventListener('resize', resizeCanvas);
+        const appCont = document.getElementById('app-container');
+        if (appCont) appCont.addEventListener('click', triggerBurst);
 
-        preRenderSprites(); 
-        preRenderBackground(); 
-        resizeCanvas();       
-        initTree();           
-        animate();            
+        window.addEventListener('resize', () => {
+            if (window.innerWidth <= 900) {
+                if (animationFrameId) {
+                    cancelAnimationFrame(animationFrameId);
+                    animationFrameId = null;
+                }
+            } else {
+                resizeCanvas();
+                if (!animationFrameId) {
+                    if (branches.length === 0) {
+                        preRenderSprites();
+                        preRenderBackground();
+                        initTree();
+                    }
+                    animate();
+                }
+            }
+        });
+
+        if (window.innerWidth > 900) {
+            preRenderSprites();
+            preRenderBackground();
+            resizeCanvas();
+            initTree();
+            animate();
+        }            
     })(); 
 </script>
+
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('{{ asset("sw.js") }}')
+                .then(function(reg) {
+                    console.log('Ascencio Connect PWA ServiceWorker registrado:', reg.scope);
+                })
+                .catch(function(err) {
+                    console.log('Error ServiceWorker:', err);
+                });
+        });
+    }
+</script>
+
+
+<script>
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const pwaWrap = document.getElementById('pwaInstallWrap');
+        if (pwaWrap) pwaWrap.style.display = 'block';
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnInstall = document.getElementById('btnPwaInstall');
+        if (btnInstall) {
+            btnInstall.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log('PWA Install choice:', outcome);
+                    deferredPrompt = null;
+                    document.getElementById('pwaInstallWrap').style.display = 'none';
+                }
+            });
+        }
+    });
+</script>
+
 </body>
 </html>

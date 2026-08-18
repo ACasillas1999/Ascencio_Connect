@@ -45,7 +45,7 @@
 </div>
 
 <!-- BOTTOM GRID -->
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div class="dashboard-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
 
     <!-- Últimos Eventos -->
     <div class="card">
@@ -110,3 +110,28 @@
 </div>
 
 @endsection
+
+
+@push('styles')
+<style>
+    @media (max-width: 768px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+        }
+        .kpi-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 10px !important;
+        }
+        .kpi-card {
+            padding: 14px 16px !important;
+        }
+        .kpi-value {
+            font-size: 22px !important;
+        }
+        .card-header {
+            padding: 14px 16px !important;
+        }
+    }
+</style>
+@endpush
