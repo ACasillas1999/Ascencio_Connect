@@ -1813,7 +1813,7 @@
                         <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
                             <h4 style="font-size: 11px; font-weight: bold; color: var(--accent-gold); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Vista Previa Final</h4>
                             <div style="position:relative; border-radius:8px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.4); width:540px; background:var(--bg-secondary); padding:4px; border: 1px solid rgba(255,255,255,0.05);">
-                                <img id="real-preview-image" src="{{ asset('storage/' . $mockGafete) }}?t={{ time() }}" style="width:100%; display:block; border-radius:4px;" alt="Vista previa real del gafete generado">
+                                <img id="real-preview-image" src="{{ $mockGafete ? asset('storage/' . $mockGafete) . '?t=' . time() : '' }}" style="width:100%; display:block; border-radius:4px;" alt="Vista previa real del gafete generado">
                                 <!-- Spinner superpuesto -->
                                 <div id="preview-spinner" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
                                     <div class="spinner-border" style="color:var(--accent-gold);" role="status">
@@ -1821,7 +1821,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <a href="{{ asset('storage/' . $mockGafete) }}" download="Prueba_Gafete_{{ $evento->ID }}.jpg" class="btn btn-sm" style="margin-top:12px; font-size:12px; font-weight:700; padding:8px 16px; display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(212,175,55,0.08) 100%); border:1px solid var(--accent-gold); color:var(--accent-gold); border-radius:8px; transition:all 0.2s ease;">
+                            <a href="{{ $mockGafete ? asset('storage/' . $mockGafete) : '#' }}" download="Prueba_Gafete_{{ $evento->ID }}.jpg" class="btn btn-sm" style="margin-top:12px; font-size:12px; font-weight:700; padding:8px 16px; display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg, rgba(212,175,55,0.2) 0%, rgba(212,175,55,0.08) 100%); border:1px solid var(--accent-gold); color:var(--accent-gold); border-radius:8px; transition:all 0.2s ease;">
                                 <i class="bi bi-download" style="font-size:14px;"></i> Descargar Prueba de Gafete (JPG)
                             </a>
                         </div>
@@ -1867,7 +1867,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-sm btn-primary" style="width:100%; margin-top:8px; font-size:12px; font-weight:bold; padding:8px 12px;">Guardar Gafete</button>
-                        <a href="{{ asset('storage/' . $mockGafete) }}" download="Prueba_Gafete_{{ $evento->ID }}.jpg" class="btn btn-sm btn-secondary" style="width:100%; margin-top:6px; font-size:11.5px; font-weight:bold; padding:7px 12px; display:inline-flex; align-items:center; justify-content:center; gap:6px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); color:var(--text-primary);">
+                        <a href="{{ $mockGafete ? asset('storage/' . $mockGafete) : '#' }}" download="Prueba_Gafete_{{ $evento->ID }}.jpg" class="btn btn-sm btn-secondary" style="width:100%; margin-top:6px; font-size:11.5px; font-weight:bold; padding:7px 12px; display:inline-flex; align-items:center; justify-content:center; gap:6px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); color:var(--text-primary);">
                             <i class="bi bi-download"></i> Descargar Prueba
                         </a>
                     </div>
