@@ -1355,6 +1355,11 @@
                             <i class="bi bi-grid-1x2"></i> Dashboard
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ route('kiosko.index') }}" class="nav-link {{ request()->routeIs('kiosko.*') ? 'active' : '' }}">
+                            <i class="bi bi-qr-code-scan"></i> Kiosko de Puntos
+                        </a>
+                    </li>
                 @endif
 
                 @if(\App\Helpers\Permisos::tieneAcceso($userRol, 'eventos') || \App\Helpers\Permisos::tieneAcceso($userRol, 'participantes'))

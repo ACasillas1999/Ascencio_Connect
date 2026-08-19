@@ -64,6 +64,15 @@
                 @error('rol') <small style="color:#ef4444; font-size:12px;">Selecciona un rol.</small> @enderror
             </div>
 
+            <div class="form-group" id="kiosko-selector" style="display: {{ \App\Helpers\Permisos::normalizar(old('rol', $usuario->Rol)) === 'Kiosko' ? 'block' : 'none' }}; margin-top:15px;">
+                <label class="form-label" for="tipo_kiosko">Modo / Tipo de Kiosko</label>
+                <select name="tipo_kiosko" id="tipo_kiosko" class="form-control">
+                    <option value="hibrido" {{ old('tipo_kiosko', $usuario->tipo_kiosko ?? 'hibrido') == 'hibrido' ? 'selected' : '' }}>🔄 Híbrido (Cámara + Código ID / Teclado)</option>
+                    <option value="camara" {{ old('tipo_kiosko', $usuario->tipo_kiosko ?? 'hibrido') == 'camara' ? 'selected' : '' }}>📷 Solo Cámara QR</option>
+                    <option value="codigo" {{ old('tipo_kiosko', $usuario->tipo_kiosko ?? 'hibrido') == 'codigo' ? 'selected' : '' }}>🔍 Solo Código ID / Lector USB</option>
+                </select>
+            </div>
+
             <div class="form-group" id="evento-selector" style="display: {{ in_array(\App\Helpers\Permisos::normalizar(old('rol', $usuario->Rol)), ['Evento', 'Proveedor']) ? 'block' : 'none' }}; margin-top:15px;">
                 <label class="form-label" for="ID_Evento">Evento Asignado (Para Rol Evento y Proveedor)</label>
                 <select name="ID_Evento" id="ID_Evento" class="form-control">
@@ -94,10 +103,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function checkEventoRequired() {
         let isEvento = false;
+        let isKiosko = false;
         radios.forEach(r => {
             if (r.checked && (r.value === 'Evento' || r.value === 'Proveedor')) isEvento = true;
+            if (r.checked && r.value === 'Kiosko') isKiosko = true;
         });
         
+        const kioskoSelector = document.getElementById('kiosko-selector');
+        if (kioskoSelector) {
+            kioskoSelector.style.display = isKiosko ? 'block' : 'none';
+        }
+
         if (isEvento) {
             eventoSelector.style.display = 'block';
             idEventoSelect.setAttribute('required', 'required');

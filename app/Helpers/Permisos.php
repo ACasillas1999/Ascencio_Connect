@@ -21,12 +21,13 @@ class Permisos
         'premios'       => ['label' => 'Premios',         'icon' => 'bi-trophy',            'desc' => 'Sorteos y premios del evento'],
         'usuarios'      => ['label' => 'Usuarios',        'icon' => 'bi-person-gear',       'desc' => 'Administrar cuentas de usuario'],
         'roles'         => ['label' => 'Roles & Permisos','icon' => 'bi-shield-lock',       'desc' => 'Configurar acceso por rol'],
+        'kiosko'        => ['label' => 'Kiosko',          'icon' => 'bi-qr-code-scan',       'desc' => 'Consulta de puntos para participantes vía QR'],
     ];
 
     /**
      * Roles canónicos del sistema (los nombres "oficiales").
      */
-    public const ROLES = ['Admin', 'Gerente', 'Vendedor', 'Proveedor', 'Evento'];
+    public const ROLES = ['Admin', 'Gerente', 'Vendedor', 'Proveedor', 'Evento', 'Kiosko'];
 
     /**
      * Mapa de sinónimos: variantes -> nombre canónico.
@@ -39,6 +40,8 @@ class Permisos
         'vendedor'      => 'Vendedor',
         'proveedor'     => 'Proveedor',
         'evento'        => 'Evento',
+        'kiosko'        => 'Kiosko',
+        'kiosk'         => 'Kiosko',
     ];
 
     /**

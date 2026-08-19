@@ -57,6 +57,15 @@
                 @error('rol') <small style="color:#ef4444; font-size:12px;">Selecciona un rol.</small> @enderror
             </div>
 
+            <div class="form-group" id="kiosko-selector" style="display: {{ old('rol') === 'Kiosko' ? 'block' : 'none' }}; margin-top:15px;">
+                <label class="form-label" for="tipo_kiosko">Modo / Tipo de Kiosko</label>
+                <select name="tipo_kiosko" id="tipo_kiosko" class="form-control">
+                    <option value="hibrido" {{ old('tipo_kiosko', 'hibrido') == 'hibrido' ? 'selected' : '' }}>🔄 Híbrido (Cámara + Código ID / Teclado)</option>
+                    <option value="camara" {{ old('tipo_kiosko') == 'camara' ? 'selected' : '' }}>📷 Solo Cámara QR</option>
+                    <option value="codigo" {{ old('tipo_kiosko') == 'codigo' ? 'selected' : '' }}>🔍 Solo Código ID / Lector USB</option>
+                </select>
+            </div>
+
             <div class="form-group" id="evento-selector" style="display: {{ in_array(old('rol'), ['Evento', 'Proveedor']) ? 'block' : 'none' }}; margin-top:15px;">
                 <label class="form-label" for="ID_Evento">Evento Asignado (Para Rol Evento y Proveedor)</label>
                 <select name="ID_Evento" id="ID_Evento" class="form-control">
@@ -87,6 +96,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     radios.forEach(radio => {
         radio.addEventListener('change', function() {
+            const kioskoSelector = document.getElementById('kiosko-selector');
+            if (this.value === 'Kiosko') {
+                if (kioskoSelector) kioskoSelector.style.display = 'block';
+            } else {
+                if (kioskoSelector) kioskoSelector.style.display = 'none';
+            }
+
             if (this.value === 'Evento' || this.value === 'Proveedor') {
                 eventoSelector.style.display = 'block';
                 idEventoSelect.setAttribute('required', 'required');

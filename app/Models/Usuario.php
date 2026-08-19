@@ -20,6 +20,7 @@ class Usuario extends Authenticatable
         'password_visible',
         'Activo',
         'remember_token',
+        'tipo_kiosko',
         'ID_Evento'
     ];
 
@@ -33,6 +34,7 @@ class Usuario extends Authenticatable
         'password_visible',
         'Activo',
         'remember_token',
+        'tipo_kiosko',
     ];
 
     /* ---------- helpers ---------- */

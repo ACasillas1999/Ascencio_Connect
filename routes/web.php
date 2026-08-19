@@ -200,3 +200,9 @@ Route::middleware('auth')->group(function () {
     });
 
 });
+
+/* Kiosko Consulta de Puntos */
+Route::middleware(['auth', 'role:Admin,Gerente,Vendedor,Evento,Kiosko'])->group(function () {
+    Route::get('/kiosko', [\App\Http\Controllers\KioskoController::class, 'index'])->name('kiosko.index');
+    Route::post('/kiosko/buscar', [\App\Http\Controllers\KioskoController::class, 'buscar'])->name('kiosko.buscar');
+});

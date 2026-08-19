@@ -37,6 +37,7 @@ class UsuarioController extends Controller
             'password_visible' => $request->password,
             'Rol'              => $request->rol,
             'ID_Evento'        => in_array($request->rol, ['Evento', 'Proveedor']) ? $request->ID_Evento : null,
+            'tipo_kiosko'      => $request->input('tipo_kiosko', 'hibrido'),
         ]);
 
         if ($request->rol === 'Proveedor' && $request->filled('ID_Evento')) {
@@ -80,6 +81,7 @@ class UsuarioController extends Controller
             'username' => $request->username,
             'Rol'      => $request->rol,
             'ID_Evento'=> in_array($request->rol, ['Evento', 'Proveedor']) ? $request->ID_Evento : null,
+            'tipo_kiosko'=> $request->input('tipo_kiosko', 'hibrido'),
         ];
 
         if ($request->filled('password')) {

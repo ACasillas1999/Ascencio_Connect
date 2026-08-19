@@ -2,88 +2,118 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PremioEvento;
-use App\Models\Participante;
-use App\Models\Canje;
-use App\Models\PuntosRfc;
+use App\Models\Evento;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class KioskoController extends Controller
 {
-    /**
-     * Muestra la interfaz del Kiosko para un participante o RFC
-     */
-    public function index(Request $request)
+    public function index()
     {
-        // ... (Render view logic will be added later)
+        $evento = Evento::where('estado', 'EN CURSO')->first() 
+            ?? Evento::orderByDesc('fecha_inicio')->first();
+
+        $tipoKiosko = auth()->user()->tipo_kiosko ?? 'hibrido';
+        return view('kiosko.index', compact('evento', 'tipoKiosko'));
     }
 
-    /**
-     * Procesa el canje de un premio restando los puntos correspondientes
-     */
-    public function canjear(Request $request)
+    public function buscar(Request $request)
     {
-        $request->validate([
-            'id_premio' => 'required|integer|exists:premios_evento,ID',
-            'id_participante' => 'required|integer|exists:participante,ID',
-            'cantidad' => 'required|integer|min:1'
-        ]);
+        $codigo = trim($request->input('codigo', ''));
 
-        $premio = PremioEvento::with('evento')->findOrFail($request->id_premio);
-        $participante = Participante::findOrFail($request->id_participante);
-        $evento = $premio->evento;
-
-        if (!$evento) {
-            return response()->json(['success' => false, 'message' => 'Evento no encontrado.']);
+        if (empty($codigo)) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Por favor escanea un código QR o ingresa un ID / RFC.'
+            ], 400);
         }
 
-        if ($evento->tipo_puntos === 'ninguno') {
-            return response()->json(['success' => false, 'message' => 'Este evento no utiliza un sistema de puntos.']);
+        // 1. Extraer ID o RFC
+        $id = null;
+        $rfc = null;
+        if (preg_match('/^ID(\d+)/i', $codigo, $matches)) {
+            $id = (int)$matches[1];
+        } elseif (is_numeric($codigo)) {
+            $id = (int)$codigo;
+        } else {
+            $rfc = $codigo;
         }
 
-        $puntosNecesarios = $premio->PuntosNecesarios * $request->cantidad;
-        $puntosDisponibles = 0;
-
-        // Determinar puntos disponibles según la configuración del evento
-        if ($evento->tipo_puntos === 'individual') {
-            $puntosDisponibles = $participante->Puntos ?? 0;
-            
-            if ($puntosDisponibles < $puntosNecesarios) {
-                return response()->json(['success' => false, 'message' => 'Puntos insuficientes (Individual).']);
-            }
-            
-            // Restar puntos al participante
-            $participante->Puntos -= $puntosNecesarios;
-            $participante->save();
-
-        } elseif ($evento->tipo_puntos === 'grupal') {
-            $puntosRfc = PuntosRfc::where('RFC', $participante->RFC)
-                                  ->where('ID_Evento', $evento->ID)
-                                  ->first();
-            
-            $puntosDisponibles = $puntosRfc ? $puntosRfc->Puntos : 0;
-
-            if ($puntosDisponibles < $puntosNecesarios) {
-                return response()->json(['success' => false, 'message' => 'Puntos insuficientes en el grupo (RFC).']);
-            }
-
-            // Restar puntos al grupo RFC
-            $puntosRfc->Puntos -= $puntosNecesarios;
-            $puntosRfc->save();
+        $participante = null;
+        if ($id) {
+            $participante = DB::table('participante')->where('ID', $id)->first();
+        }
+        if (!$participante && $rfc) {
+            $participante = DB::table('participante')
+                ->where('RFC', $rfc)
+                ->orWhere('Nombre', 'LIKE', "%{$rfc}%")
+                ->first();
         }
 
-        // Registrar el canje
-        Canje::create([
-            'ID_Evento' => $evento->ID,
-            'ID_Participante' => $participante->ID,
-            'ID_Premio' => $premio->ID,
-            'Cantidad' => $request->cantidad,
-        ]);
+        if (!$participante) {
+            return response()->json([
+                'ok' => false,
+                'message' => "No se encontró ningún participante registrado con el código \"{$codigo}\"."
+            ], 404);
+        }
+
+        // 2. Calcular Puntos
+        $puntos_indiv = (int)($participante->Puntos ?? 0);
+        
+        $puntos_rfc = 0;
+        if (!empty($participante->RFC) && Schema::hasTable('puntos_rfc')) {
+            $puntos_rfc = (int)(DB::table('puntos_rfc')->where('RFC', $participante->RFC)->value('Puntos') ?? 0);
+        }
+
+        $puntos_prov = 0;
+        if (Schema::hasTable('puntos_proveedor')) {
+            $puntos_prov = (int)(DB::table('puntos_proveedor')->where('id_participante', $participante->ID)->sum('puntos') ?? 0);
+        }
+
+        $puntos_din = 0;
+        if (Schema::hasTable('registro_dinamica')) {
+            $puntos_din = (int)(DB::table('registro_dinamica')->where('id_participante', $participante->ID)->sum('puntos') ?? 0);
+        }
+
+        // Sumar saldo total acumulado de todas las fuentes
+        $puntos_totales = max($puntos_indiv + $puntos_rfc, $puntos_prov + $puntos_din, $puntos_indiv, $puntos_rfc);
+
+        // 3. Historial de Puntos Recibidos y Canjeados
+        $historial_prov = collect();
+        if (Schema::hasTable('puntos_proveedor')) {
+            $historial_prov = DB::table('puntos_proveedor')
+                ->where('id_participante', $participante->ID)
+                ->select('usuario as origen', 'puntos', 'fecha', DB::raw("'proveedor' as tipo"))
+                ->get();
+        }
+
+        $historial_canjes = collect();
+        if (Schema::hasTable('registro_canje')) {
+            $historial_canjes = DB::table('registro_canje')
+                ->where('id_participante', $participante->ID)
+                ->select('premio as origen', DB::raw('-puntos_canjeados as puntos'), 'fecha', DB::raw("'canje' as tipo"))
+                ->get();
+        }
+
+        $historial = $historial_prov->concat($historial_canjes)
+            ->sortByDesc('fecha')
+            ->take(15)
+            ->values();
 
         return response()->json([
-            'success' => true,
-            'message' => 'Canje realizado con éxito.',
-            'puntos_restantes' => $puntosDisponibles - $puntosNecesarios
+            'ok' => true,
+            'participante' => [
+                'id' => $participante->ID,
+                'nombre' => $participante->Nombre ?? 'Sin Nombre',
+                'rfc' => !empty($participante->RFC) ? $participante->RFC : 'Sin RFC',
+                'categoria' => $participante->Categoria ?? 'Participante',
+                'puntos_totales' => $puntos_totales,
+                'puntos_individuales' => $puntos_indiv,
+                'puntos_grupales' => $puntos_rfc,
+                'total_visitas' => count($historial_prov),
+                'historial' => $historial
+            ]
         ]);
     }
 }

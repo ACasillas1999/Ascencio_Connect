@@ -23,6 +23,9 @@ class AuthController extends Controller
         }
 
         if (Auth::check()) {
+            if (Auth::user()->Rol === 'Kiosko' || strtolower(Auth::user()->Rol) === 'kiosko') {
+                return redirect()->route('kiosko.index');
+            }
             if (Auth::user()->Rol === 'Vendedor') {
                 return redirect()->route('participantes.index');
             }
@@ -47,6 +50,9 @@ class AuthController extends Controller
                 return back()->withErrors([
                     'username' => 'Tu cuenta ha sido desactivada por el administrador. Contacta al soporte.'
                 ]);
+            }
+            if (Auth::user()->Rol === 'Kiosko' || strtolower(Auth::user()->Rol) === 'kiosko') {
+                return redirect()->intended(route('kiosko.index'));
             }
             if (Auth::user()->Rol === 'Vendedor') {
                 return redirect()->intended(route('participantes.index'));
