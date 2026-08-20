@@ -1,28 +1,21 @@
 {
-  "name": "Ascencio Connect — Sistema de Congresos",
+  "name": "Ascencio Connect",
   "short_name": "Ascencio",
-  "description": "Sistema de gestión y control de congresos Grupo Ascencio",
-  "start_url": "/Ascencio_Connect/public/",
-  "scope": "/Ascencio_Connect/public/",
+  "description": "Plataforma de Gestión de Congresos, Eventos y Puntos",
+  "start_url": "./",
   "display": "standalone",
-  "background_color": "#020617",
-  "theme_color": "#0f172a",
-  "orientation": "any",
+  "background_color": "#090d16",
+  "theme_color": "#fbbf24",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "/Ascencio_Connect/public/images/logo-pwa.svg",
-      "sizes": "any",
+      "src": "images/logo-pwa.svg",
+      "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/Ascencio_Connect/public/images/logo-pwa.svg",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "/Ascencio_Connect/public/images/logo-pwa.svg",
+      "src": "images/logo-pwa.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"

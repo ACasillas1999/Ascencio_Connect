@@ -125,7 +125,11 @@ class EventoController extends Controller
         $mockGafetePath = 'machotes/mock_gafete_' . $evento->ID . '.jpg';
         $mockHorarioPath = 'machotes/mock_horario_' . $evento->ID . '.jpg';
 
-        $mockGafete = ($evento->machote_gafete && \Storage::disk('public')->exists($mockGafetePath)) ? $mockGafetePath : null;
+        $imageService = new \App\Services\ImageService();
+        if (!\Storage::disk('public')->exists($mockGafetePath)) {
+            $imageService->generarMockGafete($evento);
+        }
+        $mockGafete = \Storage::disk('public')->exists($mockGafetePath) ? $mockGafetePath : $imageService->generarMockGafete($evento);
         $mockHorario = ($evento->machote_horario && \Storage::disk('public')->exists($mockHorarioPath)) ? $mockHorarioPath : null;
         
         $ubicacionModel = \App\Models\Ubicacion::where('Nombre', $evento->ubicacion)->first();
