@@ -2898,10 +2898,21 @@
             }
         };
 
-        // Event listeners para los Sliders de Gafete (tiempo real)
+        // Event listeners para los Sliders e Inputs de Coordenadas de Gafete (Sincronización Bidireccional)
         const fontGafeteInput = document.getElementsByName('gafete_font_size')[0];
         const fontGafeteIdInput = document.getElementsByName('gafete_id_font_size')[0];
         const qrGafeteSizeInput = document.getElementsByName('gafete_qr_size')[0];
+
+        // Sincronizar inputs de coordenadas numéricas con el lienzo superior en tiempo real
+        [qrXInput, qrYInput, nameXInput, nameYInput, idXInput, idYInput].forEach(inp => {
+            if (inp) {
+                inp.addEventListener('input', function() {
+                    window.setupEditor();
+                    clearTimeout(updateTimeout);
+                    updateTimeout = setTimeout(updateRealPreview, 400);
+                });
+            }
+        });
 
         if (fontGafeteInput) {
             fontGafeteInput.addEventListener('input', function(e) {
