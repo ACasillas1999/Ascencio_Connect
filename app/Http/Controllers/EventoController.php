@@ -254,6 +254,20 @@ class EventoController extends Controller
         $data['clases_obligatorias']  = $request->has('clases_obligatorias');
 
         $evento->update($data);
+
+        // Regenerar de inmediato las imágenes del machote con las nuevas coordenadas
+        $imageService = new \App\Services\ImageService();
+        $mockGafete = $imageService->generarMockGafete($evento);
+        $mockHorario = $imageService->generarMockHorario($evento);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'mockGafeteUrl' => $mockGafete ? asset('storage/' . $mockGafete) . '?t=' . microtime(true) : null,
+                'mockHorarioUrl' => $mockHorario ? asset('storage/' . $mockHorario) . '?t=' . microtime(true) : null
+            ]);
+        }
+
         return redirect()->route('eventos.show', [$evento, 'active_tab' => $request->input('active_tab', 'tab-general')])->with('success', 'Evento actualizado.');
     }
 

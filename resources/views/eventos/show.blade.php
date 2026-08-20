@@ -2812,32 +2812,37 @@
     let updateTimeout;
     function updateRealPreview() {
         const form = document.querySelector('#tab-gafete form');
+        if (!form) return;
         const formData = new FormData(form);
-        formData.delete('machote_gafete'); // No subir imagen en cada AJAX
-        
-        if(previewSpinner) previewSpinner.style.display = 'flex';
+        formData.delete('machote_gafete');
+
+        if (previewSpinner) previewSpinner.style.display = 'flex';
 
         fetch(form.action, {
             method: 'POST',
             body: formData,
             headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
             }
-        }).then(response => {
+        })
+        .then(response => response.json())
+        .then(data => {
             const realPreviewImg = document.getElementById('real-preview-image');
-            if(realPreviewImg) {
-                const currentSrc = realPreviewImg.src.split('?')[0];
+            if (realPreviewImg && data.mockGafeteUrl) {
                 const newImg = new Image();
                 newImg.onload = function() {
                     realPreviewImg.src = newImg.src;
-                    if(previewSpinner) previewSpinner.style.display = 'none';
+                    if (previewSpinner) previewSpinner.style.display = 'none';
                 };
-                newImg.src = currentSrc + '?t=' + new Date().getTime();
+                newImg.src = data.mockGafeteUrl;
             } else {
-                if(previewSpinner) previewSpinner.style.display = 'none';
+                if (previewSpinner) previewSpinner.style.display = 'none';
             }
-        }).catch(() => {
-            if(previewSpinner) previewSpinner.style.display = 'none';
+        })
+        .catch(err => {
+            console.error('Error al actualizar vista previa:', err);
+            if (previewSpinner) previewSpinner.style.display = 'none';
         });
     }
 
