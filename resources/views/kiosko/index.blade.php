@@ -83,6 +83,43 @@
         flex-wrap: wrap;
     }
 
+    /* SELECTOR DE MODO DE ALTO IMPACTO EN ENCABEZADO */
+    .kiosko-mode-pills {
+        display: inline-flex !important;
+        background: rgba(15, 23, 42, 0.8) !important;
+        border: 1px solid rgba(251, 191, 36, 0.35) !important;
+        border-radius: 4px !important;
+        padding: 3px !important;
+        gap: 4px !important;
+    }
+
+    .kmode-pill {
+        background: transparent !important;
+        color: #94a3b8 !important;
+        border: none !important;
+        border-radius: 4px !important;
+        padding: 6px 14px !important;
+        font-weight: 800 !important;
+        font-size: 12.5px !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        outline: none !important;
+    }
+
+    .kmode-pill:hover {
+        color: #ffffff !important;
+        background: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .kmode-pill.active {
+        background: linear-gradient(135deg, #fbbf24, #d97706) !important;
+        color: #000000 !important;
+        box-shadow: 0 2px 10px rgba(251, 191, 36, 0.4) !important;
+    }
+
     .totem-clock-badge {
         font-family: 'JetBrains Mono', monospace;
         font-size: 16px;
