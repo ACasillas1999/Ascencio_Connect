@@ -44,6 +44,13 @@ class ParticipanteController extends Controller
 
     public function show(Participante $participante)
     {
+        if (!$participante->Ruta_Gafete || !\Storage::disk('public')->exists($participante->Ruta_Gafete)) {
+            $imageService = new \App\Services\ImageService();
+            $gafetePath = $imageService->generarGafete($participante);
+            if ($gafetePath) {
+                $participante->update(['Ruta_Gafete' => $gafetePath]);
+            }
+        }
         $participante->load(['evento', 'clases.agenda', 'canjes.premio', 'puntosProveedor']);
         return view('participantes.show', compact('participante'));
     }
@@ -201,10 +208,15 @@ class ParticipanteController extends Controller
             }
         }
 
-        // Generar Gafete y Horario
+        // Generar Gafete y Horario y guardar las rutas en la BD
         $imageService = new \App\Services\ImageService();
         $gafetePath = $imageService->generarGafete($participante);
         $horarioPath = $imageService->generarHorario($participante);
+
+        $participante->update([
+            'Ruta_Gafete' => $gafetePath,
+            'Ruta_Horario' => $horarioPath
+        ]);
 
         // Envío de WhatsApp si la configuración global del evento lo indica
         if ($evento->enviar_whatsapp_auto) {
