@@ -799,16 +799,36 @@
 
         /* --- GLOBAL MODALS OVERRIDE --- */
         .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
             backdrop-filter: blur(8px) !important;
             -webkit-backdrop-filter: blur(8px) !important;
-            background: rgba(0, 0, 0, 0.5) !important;
+            background: rgba(2, 6, 23, 0.75) !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         .modal-content, .modal-card {
-            background: var(--bg-secondary) !important;
-            border: 1px solid var(--border) !important;
-            border-radius: 16px !important;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5) !important;
+            background: var(--bg-card, #1e293b) !important;
+            border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12)) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6) !important;
+            padding: 28px 32px !important;
+            max-width: 580px;
+            width: 95%;
+            box-sizing: border-box;
+        }
+
+        [data-theme="light"] .modal-content,
+        [data-theme="light"] .modal-card {
+            background: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15) !important;
         }
 
         /* --- FORM CONTROL --- */

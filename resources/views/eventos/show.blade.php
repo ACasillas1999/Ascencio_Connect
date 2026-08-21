@@ -2105,38 +2105,40 @@
 <!-- Modales (Nuevos) -->
 <!-- Modal Actividad -->
 <div id="modal-actividad" class="modal-overlay">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 580px;">
         <div class="modal-header">
-            <h3 class="modal-title" id="modal-actividad-title">Agregar Actividad</h3>
-            <button class="modal-close" onclick="closeModal('modal-actividad')">&times;</button>
+            <h3 class="modal-title">
+                <i class="bi bi-calendar-event-fill" style="color:var(--accent-gold);"></i> <span id="modal-actividad-title">Agregar Actividad</span>
+            </h3>
+            <button type="button" class="modal-close" onclick="closeModal('modal-actividad')">&times;</button>
         </div>
         <form id="form-actividad" method="POST" action="{{ route('eventos.actividades.store', $evento) }}">
             @csrf
             <input type="hidden" name="_method" id="form-actividad-method" value="POST">
             <input type="hidden" name="active_tab" value="tab-actividades">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
                 <div style="grid-column:1/-1;">
-                    <label class="form-label" style="font-size:12px">Nombre de la Actividad *</label>
+                    <label class="form-label">Nombre de la Actividad *</label>
                     <input name="Actividad" id="actividad-nombre" type="text" class="form-control" required placeholder="Ej: Conferencia Inicial">
                 </div>
                 <div style="grid-column:1/-1;">
-                    <label class="form-label" style="font-size:12px">Descripción *</label>
+                    <label class="form-label">Descripción *</label>
                     <textarea name="Descripcion" id="actividad-descripcion" class="form-control" rows="2" required placeholder="Breve descripción de la actividad"></textarea>
                 </div>
                 <div>
-                    <label class="form-label" style="font-size:12px">Capacidad *</label>
+                    <label class="form-label">Capacidad *</label>
                     <input name="capacidad" id="actividad-capacidad" type="number" class="form-control" required value="100">
                 </div>
                 <div>
-                    <label class="form-label" style="font-size:12px">Puntos Default</label>
+                    <label class="form-label">Puntos Default</label>
                     <input name="Puntos_Default" id="actividad-puntos" type="number" class="form-control" value="0">
                 </div>
-                <div style="grid-column:1/-1; display:flex; align-items:center; gap:8px; margin-top:8px;">
+                <div style="grid-column:1/-1; display:flex; align-items:center; gap:8px; margin-top:6px;">
                     <input type="checkbox" name="Exclusiva" id="actividad-exclusiva" value="1" style="accent-color:var(--accent-gold); width:16px; height:16px;">
-                    <label style="font-size:13px;margin:0;color:var(--text-primary);">¿Es Exclusiva?</label>
+                    <label style="font-size:13px; margin:0; color:var(--text-primary); cursor:pointer;">¿Es Exclusiva?</label>
                 </div>
             </div>
-            <div style="margin-top:24px; display:flex; justify-content:flex-end; gap:12px;">
+            <div style="margin-top:28px; display:flex; justify-content:flex-end; gap:12px;">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('modal-actividad')">Cancelar</button>
                 <button type="submit" class="btn btn-primary">Guardar</button>
             </div>
@@ -2456,39 +2458,41 @@
 
 <!-- Modal Premio -->
 <div id="modal-premio" class="modal-overlay">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 540px;">
         <div class="modal-header">
-            <h3 class="modal-title" id="modal-premio-title">Agregar Premio</h3>
-            <button class="modal-close" onclick="closeModal('modal-premio')">&times;</button>
+            <h3 class="modal-title">
+                <i class="bi bi-gift-fill" style="color:var(--accent-gold);"></i> <span id="modal-premio-title">Agregar Premio</span>
+            </h3>
+            <button type="button" class="modal-close" onclick="closeModal('modal-premio')">&times;</button>
         </div>
         <form id="form-premio" method="POST" action="{{ route('eventos.premios.store', $evento) }}">
             @csrf
             <input type="hidden" name="active_tab" value="tab-premios">
             <input type="hidden" name="_method" id="form-premio-method" value="POST">
-            <div style="display:grid;gap:12px;">
+            <div style="display:grid; gap:16px;">
                 <div>
-                    <label class="form-label" style="font-size:12px">Nombre del Premio *</label>
+                    <label class="form-label">Nombre del Premio *</label>
                     <input name="NombrePremio" id="premio-nombre" type="text" class="form-control" required placeholder="Ej: Gorra Conmemorativa">
                 </div>
                 <div>
-                    <label class="form-label" style="font-size:12px">Modo de Entrega *</label>
-                    <select name="TipoPremio" id="premio-tipo" class="form-control" required style="color:#fff;">
-                        <option value="sorteo" style="color:#000;">🎯 Sorteo en Ruleta</option>
-                        <option value="puntos" style="color:#000;">🎟️ Canje por Puntos</option>
+                    <label class="form-label">Modo de Entrega *</label>
+                    <select name="TipoPremio" id="premio-tipo" class="form-control" required>
+                        <option value="sorteo">🎯 Sorteo en Ruleta</option>
+                        <option value="puntos">🎟️ Canje por Puntos</option>
                     </select>
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
                     <div>
-                        <label class="form-label" style="font-size:12px">Puntos Necesarios *</label>
+                        <label class="form-label">Puntos Necesarios *</label>
                         <input name="PuntosNecesarios" id="premio-puntos" type="number" class="form-control" required min="1" value="100">
                     </div>
                     <div>
-                        <label class="form-label" style="font-size:12px">Stock Disponible *</label>
+                        <label class="form-label">Stock Disponible *</label>
                         <input name="Disponible" id="premio-stock" type="number" class="form-control" required min="0" value="10">
                     </div>
                 </div>
             </div>
-            <div style="margin-top:24px; display:flex; justify-content:flex-end; gap:12px;">
+            <div style="margin-top:28px; display:flex; justify-content:flex-end; gap:12px;">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('modal-premio')">Cancelar</button>
                 <button type="submit" class="btn btn-primary">Guardar</button>
             </div>
