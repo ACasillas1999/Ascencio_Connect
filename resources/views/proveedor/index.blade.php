@@ -329,21 +329,32 @@
             try {
                 data = JSON.parse(rawText);
             } catch (e) {
-                data = { ok: false, message: rawText };
+                data = null;
             }
 
-            const message = (data && data.message) ? data.message : "Ocurrió un problema al procesar el código.";
+            const message = (data && data.message) ? data.message : rawText;
 
-            if (res.status === 429 || (data && data.cooldown)) {
+            const isSuccess = res.ok && (
+                (data && data.ok === true) || 
+                rawText.includes('✅') || 
+                rawText.toLowerCase().includes('puntos asignados')
+            );
+
+            const isCooldown = (res.status === 429) || 
+                (data && data.cooldown) || 
+                rawText.toLowerCase().includes('esperar 2 minutos') || 
+                rawText.toLowerCase().includes('cooldown');
+
+            if (isCooldown) {
                 Swal.fire({
                     target: modalTarget,
-                    icon: "warning",
-                    title: "⏳ Cooldown de 2 Minutos",
+                    icon: "info",
+                    title: "⏳ Tiempo de Espera (2 Minutos)",
                     text: message,
                     confirmButtonColor: "#f97316",
                     confirmButtonText: "Entendido"
                 });
-            } else if (res.ok && (data ? data.ok !== false : true)) {
+            } else if (isSuccess) {
                 Swal.fire({
                     target: modalTarget,
                     icon: "success",
@@ -357,7 +368,7 @@
             } else {
                 Swal.fire({
                     target: modalTarget,
-                    icon: "error",
+                    icon: "warning",
                     title: "⚠️ Atención",
                     text: message,
                     confirmButtonColor: "#f97316"
@@ -368,7 +379,7 @@
             console.error("Error en fetch de asignar puntos:", err);
             Swal.fire({
                 target: modalTarget,
-                icon: "error",
+                icon: "warning",
                 title: "Error de Conexión",
                 text: "Ocurrió un problema de comunicación con el servidor.",
                 confirmButtonColor: "#f97316"
