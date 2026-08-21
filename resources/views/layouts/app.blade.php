@@ -1644,5 +1644,14 @@
     });
 </script>
 
+
+    <!-- Keep-Alive Session Heartbeat (Ping cada 5 min para prevenir 419) -->
+    <script>
+        setInterval(function() {
+            fetch("{{ url('/ping') }}", {
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            }).catch(function() {});
+        }, 5 * 60 * 1000);
+    </script>
 </body>
 </html>

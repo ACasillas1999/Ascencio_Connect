@@ -1,5 +1,10 @@
 <?php
 
+Route::get('/ping', function () {
+    return response()->json(['ok' => true, 'time' => now()->toDateTimeString()]);
+});
+
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
