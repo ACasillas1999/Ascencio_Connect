@@ -76,6 +76,25 @@ class KioskoController extends Controller
             $puntos_din = (int)(DB::table('registro_dinamica')->where('id_participante', $participante->ID)->sum('puntos') ?? 0);
         }
 
+        // Historial de Asistencia a Salones / Agenda
+        $historial_asistencia = collect();
+        $puntos_asistencia = 0;
+        if (Schema::hasTable('clase') && Schema::hasTable('agenda')) {
+            $historial_asistencia = DB::table('clase')
+                ->join('agenda', 'clase.ID_Agenda', '=', 'agenda.ID')
+                ->where('clase.ID_Participante', $participante->ID)
+                ->where('clase.Asistio', 1)
+                ->select(
+                    DB::raw("CONCAT(COALESCE(agenda.Salon, 'Salón'), ' — ', COALESCE(agenda.Actividad, 'Asistencia')) as origen"),
+                    'agenda.Puntos_Asistencia as puntos',
+                    'clase.Asistencia_Fecha as fecha',
+                    DB::raw("'asistencia' as tipo")
+                )
+                ->get();
+            
+            $puntos_asistencia = (int)$historial_asistencia->sum('puntos');
+        }
+
         // Puntos gastados en Canjes
         $puntos_canjeados = 0;
         if (Schema::hasTable('canjes')) {
@@ -86,12 +105,12 @@ class KioskoController extends Controller
         }
 
         // Puntos acumulados brutos
-        $puntos_acumulados = max($puntos_indiv + $puntos_rfc, $puntos_prov + $puntos_din, $puntos_indiv, $puntos_rfc);
+        $puntos_acumulados = max($puntos_indiv + $puntos_rfc, $puntos_prov + $puntos_din + $puntos_asistencia, $puntos_indiv, $puntos_rfc);
 
         // Puntos netos disponibles (restando los canjes realizados)
         $puntos_totales = max(0, $puntos_acumulados - $puntos_canjeados);
 
-        // 3. Historial de Puntos Recibidos y Canjeados
+        // 3. Historial de Puntos Recibidos (Proveedores, Canjes, Asistencias)
         $historial_prov = collect();
         if (Schema::hasTable('puntos_proveedor')) {
             $historial_prov = DB::table('puntos_proveedor')
@@ -114,9 +133,11 @@ class KioskoController extends Controller
                 ->get();
         }
 
-        $historial = $historial_prov->concat($historial_canjes)
+        $historial = $historial_prov
+            ->concat($historial_canjes)
+            ->concat($historial_asistencia)
             ->sortByDesc('fecha')
-            ->take(15)
+            ->take(20)
             ->values();
 
         return response()->json([
