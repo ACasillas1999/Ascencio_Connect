@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PremioEvento;
 use App\Models\Evento;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PremioController extends Controller
 {
@@ -22,7 +23,20 @@ class PremioController extends Controller
 
         $data['ID_Evento'] = $evento->ID;
 
-        PremioEvento::create($data);
+        try {
+            PremioEvento::create($data);
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() == 22003 || str_contains($e->getMessage(), '1264') || str_contains($e->getMessage(), 'Disponible')) {
+                try {
+                    DB::statement("ALTER TABLE `premios_evento` MODIFY COLUMN `Disponible` INT NOT NULL DEFAULT 0");
+                    PremioEvento::create($data);
+                } catch (\Exception $exRetry) {
+                    throw $e;
+                }
+            } else {
+                throw $e;
+            }
+        }
 
         return redirect()->route('eventos.show', [$evento, 'active_tab' => $request->input('active_tab', 'tab-premios')])->with('success', 'Premio agregado correctamente.');
     }
@@ -39,7 +53,20 @@ class PremioController extends Controller
             'Disponible'       => 'required|integer|min:0',
         ]);
 
-        $premio->update($data);
+        try {
+            $premio->update($data);
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() == 22003 || str_contains($e->getMessage(), '1264') || str_contains($e->getMessage(), 'Disponible')) {
+                try {
+                    DB::statement("ALTER TABLE `premios_evento` MODIFY COLUMN `Disponible` INT NOT NULL DEFAULT 0");
+                    $premio->update($data);
+                } catch (\Exception $exRetry) {
+                    throw $e;
+                }
+            } else {
+                throw $e;
+            }
+        }
 
         return redirect()->route('eventos.show', [$premio->ID_Evento, 'active_tab' => $request->input('active_tab', 'tab-premios')])->with('success', 'Premio actualizado.');
     }
@@ -71,8 +98,18 @@ class PremioController extends Controller
         $nuevoStock = $premio->Disponible + $data['delta'];
         if ($nuevoStock < 0) $nuevoStock = 0;
 
-        $premio->Disponible = $nuevoStock;
-        $premio->save();
+        try {
+            $premio->Disponible = $nuevoStock;
+            $premio->save();
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() == 22003 || str_contains($e->getMessage(), '1264') || str_contains($e->getMessage(), 'Disponible')) {
+                DB::statement("ALTER TABLE `premios_evento` MODIFY COLUMN `Disponible` INT NOT NULL DEFAULT 0");
+                $premio->Disponible = $nuevoStock;
+                $premio->save();
+            } else {
+                throw $e;
+            }
+        }
 
         return response()->json(['ok' => true, 'nuevoStock' => $nuevoStock]);
     }
