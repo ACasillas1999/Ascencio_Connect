@@ -106,7 +106,8 @@ class EventoController extends Controller
 
     public function show(Evento $evento)
     {
-        if (auth()->check() && (auth()->user()->Rol === 'Vendedor' || (method_exists(auth()->user(), 'esVendedor') && auth()->user()->esVendedor()))) {
+        $normRol = auth()->check() ? \App\Helpers\Permisos::normalizar(auth()->user()->Rol) : '';
+        if (in_array($normRol, ['Vendedor', 'Gerente'])) {
             if ($evento->estado === 'FINALIZADO') {
                 return redirect()->route('participantes.index')->with('error', 'No tienes permiso para acceder a eventos finalizados.');
             }

@@ -28,7 +28,8 @@ class ParticipanteController extends Controller
             });
         }
 
-        if (auth()->check() && auth()->user()->Rol === 'Vendedor') {
+        $normRol = auth()->check() ? \App\Helpers\Permisos::normalizar(auth()->user()->Rol) : '';
+        if (in_array($normRol, ['Vendedor', 'Gerente'])) {
             $query->whereHas('evento', function ($q) {
                 $q->whereIn('estado', ['EN CURSO', 'PRÓXIMO']);
             });
@@ -44,7 +45,8 @@ class ParticipanteController extends Controller
 
     public function show(Participante $participante)
     {
-        if (auth()->check() && (auth()->user()->Rol === 'Vendedor' || (method_exists(auth()->user(), 'esVendedor') && auth()->user()->esVendedor()))) {
+        $normRol = auth()->check() ? \App\Helpers\Permisos::normalizar(auth()->user()->Rol) : '';
+        if (in_array($normRol, ['Vendedor', 'Gerente'])) {
             if ($participante->evento && $participante->evento->estado === 'FINALIZADO') {
                 return redirect()->route('participantes.index')->with('error', 'No tienes permiso para acceder a participantes de eventos finalizados.');
             }
@@ -191,7 +193,8 @@ class ParticipanteController extends Controller
         // Verificación de exclusividad por Rol
         if (!empty($data['actividades'])) {
             $userRol = auth()->check() ? auth()->user()->Rol : null;
-            if ($userRol !== 'Administrador' && $userRol !== 'Gerente') {
+            $normRol = auth()->check() ? \App\Helpers\Permisos::normalizar(auth()->user()->Rol) : '';
+            if (!in_array($normRol, ['Admin', 'Gerente'])) {
                 $exclusivasCount = \App\Models\Agenda::whereIn('agenda.ID', $data['actividades'])
                     ->join('actividades', function($join) {
                         $join->on('agenda.ID_Evento', '=', 'actividades.ID_Evento')
@@ -258,7 +261,8 @@ class ParticipanteController extends Controller
             ->get();
 
         // Ocultar las actividades exclusivas a quienes no sean Gerente o Administrador
-        if ($userRol !== 'Administrador' && $userRol !== 'Gerente') {
+        $normRol = auth()->check() ? \App\Helpers\Permisos::normalizar(auth()->user()->Rol) : '';
+        if (!in_array($normRol, ['Admin', 'Gerente'])) {
             $agenda = $agenda->reject(function($item) {
                 return $item->Exclusiva == 1;
             })->values();

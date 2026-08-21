@@ -1354,12 +1354,21 @@
                 $normRol = \App\Helpers\Permisos::normalizar($userRol);
             @endphp
 
-            {{-- Rol Proveedor / Vendedor --}}
-            @if($normRol === 'Proveedor' || $normRol === 'Vendedor')
+            {{-- Rol Proveedor --}}
+            @if($normRol === 'Proveedor')
                 <li class="nav-section-title">Escáner</li>
                 <li class="nav-item">
                     <a href="{{ route('proveedor.index') }}" class="nav-link {{ request()->routeIs('proveedor.*') ? 'active' : '' }}">
                         <i class="bi bi-qr-code-scan"></i> Escanear QR
+                    </a>
+                </li>
+
+            {{-- Rol Vendedor / Gerente --}}
+            @elseif($normRol === 'Vendedor' || $normRol === 'Gerente')
+                <li class="nav-section-title">Gestión</li>
+                <li class="nav-item">
+                    <a href="{{ route('participantes.index') }}" class="nav-link {{ request()->routeIs('participantes.*') ? 'active' : '' }}">
+                        <i class="bi bi-people"></i> Participantes
                     </a>
                 </li>
 
