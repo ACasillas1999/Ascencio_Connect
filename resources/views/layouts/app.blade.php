@@ -518,6 +518,21 @@
             box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15) !important;
         }
 
+        [data-theme="light"] #actividades-container {
+            background-color: #f8fafc !important;
+            border: 1px solid #cbd5e1 !important;
+        }
+
+        [data-theme="light"] .actividad-label {
+            background-color: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+
+        [data-theme="light"] .actividad-label span {
+            color: #0f172a !important;
+        }
+
         [data-theme="light"] .btn-secondary {
             background-color: #f1f5f9 !important;
             color: #0f172a !important;
@@ -1458,7 +1473,7 @@
     <!-- TOPBAR -->
     <div class="topbar" style="gap: 16px;">
         <button type="button" id="sidebar-toggle-btn" onclick="window.toggleMobileSidebar()" title="Abrir Menú" aria-label="Abrir Menú"><i class="bi bi-list"></i></button>
-        <div class="topbar-title" style="flex-shrink: 0; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="@yield('page-title')">@yield('page-title', 'Dashboard')</div>
+        <div class="topbar-title" style="flex-shrink: 0; max-width: 450px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="@yield('page-title')">@yield('page-title', 'Dashboard')</div>
         <div style="flex: 1; min-width: 0; display: flex; justify-content: center; align-items: center; height: 100%;">
             @yield('topbar-center')
         </div>

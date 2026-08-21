@@ -148,7 +148,7 @@
                         </p>
 
                         <!-- Lista de actividades dinámicas por evento (Requiere AJAX) -->
-                        <div id="actividades-container" style="background: #1e293b; padding: 16px; border-radius: 8px; max-height: 500px; overflow-y: auto;">
+                        <div id="actividades-container" style="background: var(--bg-card, #1e293b); border: 1px solid var(--border-subtle, rgba(255,255,255,0.08)); padding: 16px; border-radius: 8px; max-height: 500px; overflow-y: auto;">
                             <p style="color:#94a3b8; margin:0;">Por favor, selecciona un evento primero para ver las actividades disponibles.</p>
                         </div>
                     </div>
@@ -473,7 +473,7 @@
                                 cb.closest('label').title = 'Se solapa con otra actividad seleccionada';
                             } else {
                                 cb.disabled = false;
-                                cb.closest('label').style.background = 'rgba(255,255,255,0.05)'; // Normal
+                                cb.closest('label').style.background = ''; // Normal
                                 cb.closest('label').style.borderColor = 'rgba(255,255,255,0.1)';
                                 cb.closest('label').style.opacity = '1';
                                 cb.closest('label').title = '';
