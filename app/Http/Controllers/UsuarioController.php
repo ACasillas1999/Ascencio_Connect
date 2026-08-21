@@ -36,7 +36,7 @@ class UsuarioController extends Controller
             'password'         => Hash::make($request->password),
             'password_visible' => $request->password,
             'Rol'              => $request->rol,
-            'ID_Evento'        => in_array($request->rol, ['Evento', 'Proveedor']) ? $request->ID_Evento : null,
+            'ID_Evento'        => in_array(\App\Helpers\Permisos::normalizar($request->rol), ['Evento', 'Proveedor', 'Kiosko']) ? $request->ID_Evento : null,
             'tipo_kiosko'      => $request->input('tipo_kiosko', 'hibrido'),
         ]);
 

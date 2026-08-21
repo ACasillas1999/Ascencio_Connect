@@ -73,8 +73,8 @@
                 </select>
             </div>
 
-            <div class="form-group" id="evento-selector" style="display: {{ in_array(\App\Helpers\Permisos::normalizar(old('rol', $usuario->Rol)), ['Evento', 'Proveedor']) ? 'block' : 'none' }}; margin-top:15px;">
-                <label class="form-label" for="ID_Evento">Evento Asignado (Para Rol Evento y Proveedor)</label>
+            <div class="form-group" id="evento-selector" style="display: {{ in_array(\App\Helpers\Permisos::normalizar(old('rol', $usuario->Rol)), ['Evento', 'Proveedor', 'Kiosko']) ? 'block' : 'none' }}; margin-top:15px;">
+                <label class="form-label" for="ID_Evento">Evento Asignado (Para Rol Evento, Proveedor y Kiosko)</label>
                 <select name="ID_Evento" id="ID_Evento" class="form-control">
                     <option value="">Selecciona un evento...</option>
                     @foreach($eventos as $ev)
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let isEvento = false;
         let isKiosko = false;
         radios.forEach(r => {
-            if (r.checked && (r.value === 'Evento' || r.value === 'Proveedor')) isEvento = true;
+            if (r.checked && (r.value === 'Evento' || r.value === 'Proveedor' || r.value === 'Kiosko')) isEvento = true;
             if (r.checked && r.value === 'Kiosko') isKiosko = true;
         });
         

@@ -67,7 +67,7 @@
             </div>
 
             <div class="form-group" id="evento-selector" style="display: {{ in_array(old('rol'), ['Evento', 'Proveedor']) ? 'block' : 'none' }}; margin-top:15px;">
-                <label class="form-label" for="ID_Evento">Evento Asignado (Para Rol Evento y Proveedor)</label>
+                <label class="form-label" for="ID_Evento">Evento Asignado (Para Rol Evento, Proveedor y Kiosko)</label>
                 <select name="ID_Evento" id="ID_Evento" class="form-control">
                     <option value="">Selecciona un evento...</option>
                     @foreach($eventos as $ev)
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (kioskoSelector) kioskoSelector.style.display = 'none';
             }
 
-            if (this.value === 'Evento' || this.value === 'Proveedor') {
+            if (this.value === 'Evento' || this.value === 'Proveedor' || this.value === 'Kiosko') {
                 eventoSelector.style.display = 'block';
                 idEventoSelect.setAttribute('required', 'required');
             } else {
