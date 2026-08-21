@@ -366,9 +366,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 stopCamScanner();
                 document.getElementById('camScannerPanel').style.display = 'none';
                 document.getElementById('camBtnText').innerText = 'Cámara QR';
-                // Trigger auto search or select
-                if (/^\d+$/.test(text.trim())) {
-                    seleccionarParticipante(parseInt(text.trim()));
+                
+                const foundId = extractIdFromQr(text);
+                if (foundId) {
+                    seleccionarParticipante(foundId);
                 } else {
                     buscarInput.dispatchEvent(new Event('input'));
                 }
@@ -418,13 +419,29 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300);
     });
 
-    // Enter = si es ID numérico, cargar directo
+    // Helper para extraer ID numérico de texto QR o escaneos (ej: ID3272ÑAlejandro...)
+    function extractIdFromQr(str) {
+        if (!str) return null;
+        const s = str.trim();
+        if (s.includes('Ñ') || s.toUpperCase().startsWith('ID')) {
+            const parts = s.split('Ñ');
+            if (parts[0]) {
+                const rawId = parts[0].replace(/ID/gi, '').replace(/\D/g, '');
+                if (rawId) return parseInt(rawId);
+            }
+        }
+        if (/^\d+$/.test(s)) return parseInt(s);
+        return null;
+    }
+
+    // Enter = si contiene ID escaneado o numérico, cargar directo
     buscarInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
             const q = this.value.trim();
-            if (/^\d+$/.test(q)) {
-                seleccionarParticipante(parseInt(q));
+            const foundId = extractIdFromQr(q);
+            if (foundId) {
+                seleccionarParticipante(foundId);
             } else if (q.length >= 2) {
                 clearTimeout(debounceTimer);
                 buscarInput.dispatchEvent(new Event('input'));

@@ -75,19 +75,45 @@ class CanjeController extends Controller
     public function buscarParticipante(Request $request, Evento $evento)
     {
         $q = trim($request->input('q', ''));
-        // Permitir búsqueda por ID con 1 dígito, pero nombre requiere 2+ caracteres
-        if ($q === '' || (!is_numeric($q) && strlen($q) < 2)) {
+        if ($q === '') {
             return response()->json([]);
         }
 
+        $parsedId = null;
+        $cleanSearch = $q;
+
+        // Parseo automático del formato QR ID3272ÑAlejandro Casillas...
+        if (str_contains($q, 'Ñ') || str_starts_with(strtoupper($q), 'ID')) {
+            $partes = explode("Ñ", $q);
+            if (isset($partes[0])) {
+                $raw_id = trim(str_replace(['ID', 'id', 'Id'], '', $partes[0]));
+                $num = preg_replace('/\D/', '', $raw_id);
+                if (!empty($num)) {
+                    $parsedId = (int)$num;
+                }
+            }
+            if (isset($partes[1]) && !empty(trim($partes[1]))) {
+                $cleanSearch = trim($partes[1]);
+            }
+        }
+
         $participantes = Participante::where('ID_Evento', $evento->ID)
-            ->where(function ($query) use ($q) {
-                $query->where('Nombre', 'LIKE', "%{$q}%")
-                      ->orWhere('Telefono', 'LIKE', "%{$q}%")
-                      ->orWhere('RFC', 'LIKE', "%{$q}%")
-                      ->orWhere('ID', $q);
+            ->where(function ($query) use ($q, $parsedId, $cleanSearch) {
+                if ($parsedId) {
+                    $query->where('ID', $parsedId);
+                }
+                if (!empty($cleanSearch)) {
+                    $query->orWhere('Nombre', 'LIKE', "%{$cleanSearch}%")
+                          ->orWhere('Telefono', 'LIKE', "%{$cleanSearch}%")
+                          ->orWhere('RFC', 'LIKE', "%{$cleanSearch}%");
+                }
+                if (is_numeric($q)) {
+                    $query->orWhere('ID', (int)$q);
+                } else {
+                    $query->orWhere('Nombre', 'LIKE', "%{$q}%");
+                }
             })
-            ->select('ID', 'Nombre', 'Telefono', 'Puntos', 'Proveedor', 'Sucursal')
+            ->select('ID', 'Nombre', 'Telefono', 'Puntos', 'Proveedor', 'Sucursal', 'RFC')
             ->limit(10)
             ->get();
 
