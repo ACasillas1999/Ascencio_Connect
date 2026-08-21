@@ -76,17 +76,21 @@ class KioskoController extends Controller
             $puntos_din = (int)(DB::table('registro_dinamica')->where('id_participante', $participante->ID)->sum('puntos') ?? 0);
         }
 
-        // Historial de Asistencia a Salones / Agenda
+        // Historial de Asistencia a Salones / Agenda (Unión con actividades y agenda para puntos reales)
         $historial_asistencia = collect();
         $puntos_asistencia = 0;
         if (Schema::hasTable('clase') && Schema::hasTable('agenda')) {
             $historial_asistencia = DB::table('clase')
                 ->join('agenda', 'clase.ID_Agenda', '=', 'agenda.ID')
+                ->leftJoin('actividades', function ($join) {
+                    $join->on('agenda.ID_Evento', '=', 'actividades.ID_Evento')
+                         ->on('agenda.Actividad', '=', 'actividades.Actividad');
+                })
                 ->where('clase.ID_Participante', $participante->ID)
                 ->where('clase.Asistio', 1)
                 ->select(
                     DB::raw("CONCAT(COALESCE(agenda.Salon, 'Salón'), ' — ', COALESCE(agenda.Actividad, 'Asistencia')) as origen"),
-                    'agenda.Puntos_Asistencia as puntos',
+                    DB::raw("COALESCE(actividades.Puntos_Default, agenda.Puntos_Asistencia, 0) as puntos"),
                     'clase.Asistencia_Fecha as fecha',
                     DB::raw("'asistencia' as tipo")
                 )
