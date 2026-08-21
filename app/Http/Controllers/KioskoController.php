@@ -108,11 +108,8 @@ class KioskoController extends Controller
                 ->sum(DB::raw('canjes.Cantidad * premios_evento.PuntosNecesarios'));
         }
 
-        // Puntos acumulados brutos
-        $puntos_acumulados = max($puntos_indiv + $puntos_rfc, $puntos_prov + $puntos_din + $puntos_asistencia, $puntos_indiv, $puntos_rfc);
-
-        // Puntos netos disponibles (restando los canjes realizados)
-        $puntos_totales = max(0, $puntos_acumulados - $puntos_canjeados);
+        // Puntos netos disponibles (el campo Puntos de participante ya fue decrementado al canjear)
+        $puntos_totales = max($puntos_indiv + $puntos_rfc, 0);
 
         // 3. Historial de Puntos Recibidos (Proveedores, Canjes, Asistencias)
         $historial_prov = collect();
