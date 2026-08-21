@@ -227,20 +227,8 @@ class CanjeController extends Controller
             return response()->json(['ok' => false, 'msg' => 'Premio no encontrado.']);
         }
 
-        // Calcular puntos gastados previamente
-        $canjesPrevios = Canje::where('ID_Participante', $participante->ID)
-            ->where('ID_Evento', $evento->ID)
-            ->with('premio')
-            ->get();
-
-        $puntosGastados = 0;
-        foreach ($canjesPrevios as $c) {
-            if ($c->premio) {
-                $puntosGastados += ($c->premio->PuntosNecesarios * $c->Cantidad);
-            }
-        }
-
-        $puntosDisponibles = $participante->Puntos - $puntosGastados;
+        // El campo Puntos de participante guarda el saldo neto disponible en tiempo real
+        $puntosDisponibles = max(0, (int)$participante->Puntos);
         $costoTotal = $premio->PuntosNecesarios * $request->cantidad;
 
         if ($costoTotal > $puntosDisponibles) {
