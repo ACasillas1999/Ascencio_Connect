@@ -10,23 +10,7 @@ class ParticipanteController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Participante::with('evento');
-
-        if ($request->filled('evento')) {
-            $query->where('ID_Evento', $request->evento);
-        }
-        if ($request->filled('sucursal')) {
-            $query->where('Sucursal', $request->sucursal);
-        }
-        if ($request->filled('search')) {
-            $s = $request->search;
-            $query->where(function ($q) use ($s) {
-                $q->where('Nombre', 'like', "%$s%")
-                  ->orWhere('RFC', 'like', "%$s%")
-                  ->orWhere('Telefono', 'like', "%$s%")
-                  ->orWhere('Sucursal', 'like', "%$s%");
-            });
-        }
+        $query = Participante::query();
 
         $normRol = auth()->check() ? \App\Helpers\Permisos::normalizar(auth()->user()->Rol) : '';
         if (in_array($normRol, ['Vendedor', 'Gerente'])) {
@@ -38,7 +22,53 @@ class ParticipanteController extends Controller
             $eventos = Evento::orderByDesc('fecha_inicio')->get();
         }
 
-        $participantes = $query->orderBy('Nombre')->paginate(25)->withQueryString();
+        if ($request->filled('evento')) {
+            $query->where('participante.ID_Evento', $request->evento);
+        }
+        if ($request->filled('sucursal')) {
+            $query->where('participante.Sucursal', $request->sucursal);
+        }
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->where('participante.Nombre', 'like', "%$s%")
+                  ->orWhere('participante.RFC', 'like', "%$s%")
+                  ->orWhere('participante.Telefono', 'like', "%$s%")
+                  ->orWhere('participante.Sucursal', 'like', "%$s%");
+            });
+        }
+
+        // Definición de columnas ordenables (Por defecto ID descendente)
+        $sortableColumns = [
+            'id'        => 'participante.ID',
+            'nombre'    => 'participante.Nombre',
+            'rfc'       => 'participante.RFC',
+            'telefono'  => 'participante.Telefono',
+            'sucursal'  => 'participante.Sucursal',
+            'proveedor' => 'participante.Proveedor',
+            'puntos'    => 'participante.Puntos',
+            'evento'    => 'evento_nombre',
+        ];
+
+        $sort = strtolower($request->query('sort', 'id'));
+        $direction = strtolower($request->query('direction', 'desc'));
+        if (!in_array($direction, ['asc', 'desc'])) {
+            $direction = 'desc';
+        }
+
+        if ($sort === 'evento') {
+            $query->leftJoin('evento', 'participante.ID_Evento', '=', 'evento.ID')
+                  ->select('participante.*')
+                  ->orderBy('evento.name_evento', $direction);
+        } elseif (array_key_exists($sort, $sortableColumns)) {
+            $query->select('participante.*')
+                  ->orderBy($sortableColumns[$sort], $direction);
+        } else {
+            $query->select('participante.*')
+                  ->orderByDesc('participante.ID');
+        }
+
+        $participantes = $query->with('evento')->paginate(25)->withQueryString();
 
         return view('participantes.index', compact('participantes', 'eventos'));
     }

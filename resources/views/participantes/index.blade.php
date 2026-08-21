@@ -240,17 +240,47 @@
             <span style="font-size:12px;color:var(--text-muted);font-weight:400;margin-left:8px">({{ $participantes->total() }})</span>
         </span>
     </div>
+    @php
+    $currentSort = strtolower(request('sort', 'id'));
+    $currentDir = strtolower(request('direction', 'desc'));
+
+    $renderSortHeader = function($key, $label) use ($currentSort, $currentDir) {
+        $isActive = ($currentSort === $key);
+        $nextDir = ($isActive && $currentDir === 'asc') ? 'desc' : 'asc';
+        
+        $query = array_merge(request()->query(), [
+            'sort' => $key,
+            'direction' => $nextDir
+        ]);
+        
+        $url = route('participantes.index', $query);
+
+        $iconClass = 'bi bi-arrow-down-up';
+        if ($isActive) {
+            $iconClass = ($currentDir === 'asc') ? 'bi bi-sort-up-alt' : 'bi bi-sort-down';
+        }
+
+        $activeStyle = $isActive 
+            ? 'color: var(--accent-gold); font-weight: 800;' 
+            : 'color: var(--text-primary); opacity: 0.85;';
+
+        return '<a href="' . e($url) . '" class="sort-header-link" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; ' . $activeStyle . '" title="Ordenar por ' . e($label) . '">'
+            . e($label)
+            . ' <i class="' . $iconClass . '" style="font-size:12px; opacity:' . ($isActive ? '1' : '0.4') . ';"></i></a>';
+    };
+@endphp
+
     <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Nombre</th>
-                    <th>Evento</th>
-                    <th>Sucursal</th>
-                    <th>Proveedor</th>
-                    <th>Teléfono</th>
-                    <th>Puntos</th>
+                    <th>{!! $renderSortHeader('id', '#') !!}</th>
+                    <th>{!! $renderSortHeader('nombre', 'Nombre') !!}</th>
+                    <th>{!! $renderSortHeader('evento', 'Evento') !!}</th>
+                    <th>{!! $renderSortHeader('sucursal', 'Sucursal') !!}</th>
+                    <th>{!! $renderSortHeader('proveedor', 'Proveedor') !!}</th>
+                    <th>{!! $renderSortHeader('telefono', 'Teléfono') !!}</th>
+                    <th>{!! $renderSortHeader('puntos', 'Puntos') !!}</th>
                     <th>Documentos</th>
                     <th>Acciones</th>
                 </tr>
