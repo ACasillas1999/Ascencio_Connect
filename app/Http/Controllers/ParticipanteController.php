@@ -44,6 +44,12 @@ class ParticipanteController extends Controller
 
     public function show(Participante $participante)
     {
+        if (auth()->check() && (auth()->user()->Rol === 'Vendedor' || (method_exists(auth()->user(), 'esVendedor') && auth()->user()->esVendedor()))) {
+            if ($participante->evento && $participante->evento->estado === 'FINALIZADO') {
+                return redirect()->route('participantes.index')->with('error', 'No tienes permiso para acceder a participantes de eventos finalizados.');
+            }
+        }
+
         if (!$participante->Ruta_Gafete || !\Storage::disk('public')->exists($participante->Ruta_Gafete)) {
             $imageService = new \App\Services\ImageService();
             $gafetePath = $imageService->generarGafete($participante);
@@ -57,7 +63,14 @@ class ParticipanteController extends Controller
 
     public function edit(Participante $participante)
     {
-        $eventos = Evento::orderByDesc('fecha_inicio')->get();
+        if (auth()->check() && (auth()->user()->Rol === 'Vendedor' || (method_exists(auth()->user(), 'esVendedor') && auth()->user()->esVendedor()))) {
+            if ($participante->evento && $participante->evento->estado === 'FINALIZADO') {
+                return redirect()->route('participantes.index')->with('error', 'No tienes permiso para editar participantes de eventos finalizados.');
+            }
+            $eventos = Evento::whereIn('estado', ['EN CURSO', 'PRÓXIMO'])->orderByDesc('fecha_inicio')->get();
+        } else {
+            $eventos = Evento::orderByDesc('fecha_inicio')->get();
+        }
         return view('participantes.edit', compact('participante', 'eventos'));
     }
 
@@ -256,9 +269,15 @@ class ParticipanteController extends Controller
 
     public function searchByPhone($telefono)
     {
-        $participante = Participante::where('Telefono', $telefono)
-            ->orderBy('ID', 'desc')
-            ->first();
+        $query = Participante::where('Telefono', $telefono);
+
+        if (auth()->check() && (auth()->user()->Rol === 'Vendedor' || (method_exists(auth()->user(), 'esVendedor') && auth()->user()->esVendedor()))) {
+            $query->whereHas('evento', function ($qEv) {
+                $qEv->whereIn('estado', ['EN CURSO', 'PRÓXIMO']);
+            });
+        }
+
+        $participante = $query->orderBy('ID', 'desc')->first();
 
         if ($participante) {
             return response()->json([
@@ -284,8 +303,15 @@ class ParticipanteController extends Controller
             return response()->json([]);
         }
 
-        // Obtener los participantes únicos por teléfono
-        $participantes = Participante::where('Telefono', 'like', "%{$q}%")
+        $query = Participante::where('Telefono', 'like', "%{$q}%");
+
+        if (auth()->check() && (auth()->user()->Rol === 'Vendedor' || (method_exists(auth()->user(), 'esVendedor') && auth()->user()->esVendedor()))) {
+            $query->whereHas('evento', function ($qEv) {
+                $qEv->whereIn('estado', ['EN CURSO', 'PRÓXIMO']);
+            });
+        }
+
+        $participantes = $query
             ->select('Telefono', 'Nombre', 'RFC', 'Sucursal', 'Vendedor', 'Proveedor', 'Puesto')
             ->orderBy('ID', 'desc')
             ->get()
@@ -328,10 +354,16 @@ class ParticipanteController extends Controller
 
     public function globalProfile($telefono)
     {
-        $participantes = Participante::where('Telefono', $telefono)
-            ->with(['evento', 'clases.agenda', 'canjes.premio'])
-            ->orderBy('ID', 'desc')
-            ->get();
+        $query = Participante::where('Telefono', $telefono)
+            ->with(['evento', 'clases.agenda', 'canjes.premio']);
+
+        if (auth()->check() && (auth()->user()->Rol === 'Vendedor' || (method_exists(auth()->user(), 'esVendedor') && auth()->user()->esVendedor()))) {
+            $query->whereHas('evento', function ($q) {
+                $q->whereIn('estado', ['EN CURSO', 'PRÓXIMO']);
+            });
+        }
+
+        $participantes = $query->orderBy('ID', 'desc')->get();
 
         if ($participantes->isEmpty()) {
             return redirect()->route('participantes.index')->with('error', 'No se encontró perfil para ese teléfono.');

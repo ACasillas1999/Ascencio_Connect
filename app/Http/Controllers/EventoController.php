@@ -106,6 +106,12 @@ class EventoController extends Controller
 
     public function show(Evento $evento)
     {
+        if (auth()->check() && (auth()->user()->Rol === 'Vendedor' || (method_exists(auth()->user(), 'esVendedor') && auth()->user()->esVendedor()))) {
+            if ($evento->estado === 'FINALIZADO') {
+                return redirect()->route('participantes.index')->with('error', 'No tienes permiso para acceder a eventos finalizados.');
+            }
+        }
+
         $evento->loadCount(['participantes', 'actividades', 'agenda']);
         $participantes = $evento->participantes()->paginate(20);
         
