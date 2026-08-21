@@ -324,32 +324,42 @@
             body: "codigo=" + encodeURIComponent(codigo)
         })
         .then(async res => {
-            const data = await res.json().catch(() => null);
-            if (res.ok) {
+            const rawText = await res.text();
+            let data = null;
+            try {
+                data = JSON.parse(rawText);
+            } catch (e) {
+                data = { ok: false, message: rawText };
+            }
+
+            const message = (data && data.message) ? data.message : "Ocurrió un problema al procesar el código.";
+
+            if (res.status === 429 || (data && data.cooldown)) {
+                Swal.fire({
+                    target: modalTarget,
+                    icon: "warning",
+                    title: "⏳ Cooldown de 2 Minutos",
+                    text: message,
+                    confirmButtonColor: "#f97316",
+                    confirmButtonText: "Entendido"
+                });
+            } else if (res.ok && (data ? data.ok !== false : true)) {
                 Swal.fire({
                     target: modalTarget,
                     icon: "success",
                     title: "🟢 ¡Puntos Otorgados!",
-                    text: data && data.message ? data.message : "Puntos asignados correctamente al participante.",
+                    text: message,
                     confirmButtonColor: "#f97316",
                     confirmButtonText: "Entendido"
                 }).then(() => {
                     location.reload();
                 });
-            } else if (res.status === 429 || (data && data.cooldown)) {
-                Swal.fire({
-                    target: modalTarget,
-                    icon: "warning",
-                    title: "⏳ Cooldown de 2 Minutos",
-                    text: data && data.message ? data.message : "Debes esperar 2 minutos para volver a dar puntos.",
-                    confirmButtonColor: "#f97316"
-                });
             } else {
                 Swal.fire({
                     target: modalTarget,
                     icon: "error",
-                    title: "⚠️ Incidencia / Error",
-                    text: data && data.message ? data.message : "Ocurrió un problema al procesar el código.",
+                    title: "⚠️ Atención",
+                    text: message,
                     confirmButtonColor: "#f97316"
                 });
             }
