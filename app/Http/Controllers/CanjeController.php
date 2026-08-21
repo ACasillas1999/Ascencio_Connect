@@ -260,9 +260,25 @@ class CanjeController extends Controller
             'Fecha'           => now(),
         ]);
 
-        // Reducir stock
+        // Reducir stock del premio
         $premio->Disponible -= $request->cantidad;
         $premio->save();
+
+        // Descontar puntos al participante
+        if ($participante->Puntos >= $costoTotal) {
+            $participante->decrement('Puntos', $costoTotal);
+        } else {
+            $participante->Puntos = max(0, $participante->Puntos - $costoTotal);
+            $participante->save();
+        }
+
+        if (!empty($participante->RFC) && Schema::hasTable('puntos_rfc')) {
+            $puntosRfcActual = DB::table('puntos_rfc')->where('RFC', $participante->RFC)->value('Puntos') ?? 0;
+            if ($puntosRfcActual > 0) {
+                $nuevoRfc = max(0, $puntosRfcActual - $costoTotal);
+                DB::table('puntos_rfc')->where('RFC', $participante->RFC)->update(['Puntos' => $nuevoRfc]);
+            }
+        }
 
         $nuevoDisponible = $puntosDisponibles - $costoTotal;
 

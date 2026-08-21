@@ -58,7 +58,7 @@ class KioskoController extends Controller
             ], 404);
         }
 
-        // 2. Calcular Puntos
+        // 2. Calcular Puntos Acumulados y Canjeados
         $puntos_indiv = (int)($participante->Puntos ?? 0);
         
         $puntos_rfc = 0;
@@ -76,8 +76,20 @@ class KioskoController extends Controller
             $puntos_din = (int)(DB::table('registro_dinamica')->where('id_participante', $participante->ID)->sum('puntos') ?? 0);
         }
 
-        // Sumar saldo total acumulado de todas las fuentes
-        $puntos_totales = max($puntos_indiv + $puntos_rfc, $puntos_prov + $puntos_din, $puntos_indiv, $puntos_rfc);
+        // Puntos gastados en Canjes
+        $puntos_canjeados = 0;
+        if (Schema::hasTable('canjes')) {
+            $puntos_canjeados = (int)DB::table('canjes')
+                ->join('premios_evento', 'canjes.ID_Premio', '=', 'premios_evento.ID')
+                ->where('canjes.ID_Participante', $participante->ID)
+                ->sum(DB::raw('canjes.Cantidad * premios_evento.PuntosNecesarios'));
+        }
+
+        // Puntos acumulados brutos
+        $puntos_acumulados = max($puntos_indiv + $puntos_rfc, $puntos_prov + $puntos_din, $puntos_indiv, $puntos_rfc);
+
+        // Puntos netos disponibles (restando los canjes realizados)
+        $puntos_totales = max(0, $puntos_acumulados - $puntos_canjeados);
 
         // 3. Historial de Puntos Recibidos y Canjeados
         $historial_prov = collect();
@@ -89,10 +101,16 @@ class KioskoController extends Controller
         }
 
         $historial_canjes = collect();
-        if (Schema::hasTable('registro_canje')) {
-            $historial_canjes = DB::table('registro_canje')
-                ->where('id_participante', $participante->ID)
-                ->select('premio as origen', DB::raw('-puntos_canjeados as puntos'), 'fecha', DB::raw("'canje' as tipo"))
+        if (Schema::hasTable('canjes')) {
+            $historial_canjes = DB::table('canjes')
+                ->join('premios_evento', 'canjes.ID_Premio', '=', 'premios_evento.ID')
+                ->where('canjes.ID_Participante', $participante->ID)
+                ->select(
+                    DB::raw("CONCAT(premios_evento.NombrePremio, ' (x', canjes.Cantidad, ')') as origen"),
+                    DB::raw('-(canjes.Cantidad * premios_evento.PuntosNecesarios) as puntos'),
+                    'canjes.Fecha as fecha',
+                    DB::raw("'canje' as tipo")
+                )
                 ->get();
         }
 
