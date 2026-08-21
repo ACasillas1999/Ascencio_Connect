@@ -7,6 +7,8 @@ use App\Models\Canje;
 use App\Models\PremioEvento;
 use App\Models\Participante;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class CanjeController extends Controller
 {
