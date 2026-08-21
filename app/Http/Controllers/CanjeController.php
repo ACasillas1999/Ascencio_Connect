@@ -117,6 +117,19 @@ class CanjeController extends Controller
             ->limit(10)
             ->get();
 
+        // Recalcular puntos netos disponibles (restando los canjes realizados) para el autocompletado
+        $participantes->transform(function ($p) use ($evento) {
+            $puntosGastados = (int)\DB::table('canjes')
+                ->join('premios_evento', 'canjes.ID_Premio', '=', 'premios_evento.ID')
+                ->where('canjes.ID_Participante', $p->ID)
+                ->where('canjes.ID_Evento', $evento->ID)
+                ->sum(\DB::raw('canjes.Cantidad * premios_evento.PuntosNecesarios'));
+
+            $puntosAcumulados = (int)($p->Puntos ?? 0);
+            $p->Puntos = max(0, $puntosAcumulados - $puntosGastados);
+            return $p;
+        });
+
         return response()->json($participantes);
     }
 
