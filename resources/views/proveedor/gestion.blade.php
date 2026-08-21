@@ -264,8 +264,8 @@
         </div>
 
         <!-- TABLA DE PROVEEDORES -->
-        <div style="padding:0; display:flex; flex-direction:column; width:100%;">
-        <div class="table-wrapper" style="flex:1; padding:0;">
+        <div style="padding:0; display:flex; flex-direction:column; width:100%; flex:1; min-height:0; overflow-y:auto;">
+        <div class="table-wrapper" style="flex:1; padding:0; overflow-y:auto;">
             <table id="table-main-proveedores" style="width:100%; border-collapse:collapse;">
                 <thead style="position:sticky; top:0; z-index:10; background:rgba(15,23,42,0.95); backdrop-filter:blur(4px);">
                     <tr style="border-bottom:1px solid rgba(255,255,255,0.08); text-align:left;">
