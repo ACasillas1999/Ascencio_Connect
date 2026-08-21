@@ -778,6 +778,60 @@
         border-color: rgba(239, 68, 68, 0.4) !important;
     }
 
+        /* ESTILOS DE SELECT Y OPCIONES */
+    select.form-control option,
+    select option {
+        background-color: #0f172a !important;
+        color: #ffffff !important;
+    }
+
+    /* ESTILOS DESKTOP PARA MODAL AGENDA */
+    #modal-agenda .modal-content,
+    #modal-agenda-edit .modal-content {
+        padding: 24px !important;
+    }
+
+    .modal-agenda-grid {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 24px !important;
+        flex: 1 !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+        padding-top: 8px !important;
+    }
+    .modal-agenda-form-col {
+        width: 370px !important;
+        flex-shrink: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+        overflow-y: auto !important;
+        padding-right: 12px !important;
+    }
+    .modal-agenda-preview-col {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+        padding-left: 12px !important;
+    }
+    .desktop-only-divider {
+        width: 1px !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        margin: 0 4px !important;
+    }
+    .modal-footer-btns {
+        display: flex !important;
+        gap: 12px !important;
+        margin-top: auto !important;
+        padding-top: 16px !important;
+    }
+    .modal-footer-btns .btn {
+        flex: 1 !important;
+    }
+
     @media (max-width: 768px) {
         .modal-agenda-preview-col,
         .desktop-only-divider {

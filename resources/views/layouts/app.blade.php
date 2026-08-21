@@ -37,7 +37,7 @@
         function updateThemeUI(theme) {
             const icon = document.getElementById('theme-toggle-icon');
             if (icon) {
-                icon.className = theme === 'light' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+                icon.className = theme === 'light' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
             }
         }
 
@@ -822,6 +822,17 @@
         }
         .form-control::placeholder { color: var(--text-muted); }
         select.form-control { cursor: pointer; }
+        select.form-control option,
+        select option {
+            background-color: #0f172a !important;
+            color: #ffffff !important;
+            padding: 8px 12px;
+        }
+        [data-theme="light"] select.form-control option,
+        [data-theme="light"] select option {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+        }
 
         /* --- ALERTS --- */
         .alert { padding: 12px 16px; border-radius: 8px; font-size: 13.5px; margin-bottom: 16px; }
@@ -1453,7 +1464,7 @@
         </div>
         <div class="topbar-actions" style="flex-shrink: 0; display: flex; gap: 8px; align-items: center;">
             <button type="button" id="theme-toggle-btn" onclick="toggleAppTheme()" class="btn-icon-theme" title="Cambiar Tema" aria-label="Cambiar Tema">
-                <i id="theme-toggle-icon" class="bi bi-moon-fill"></i>
+                <i id="theme-toggle-icon" class="bi bi-sun-fill"></i>
             </button>
             @yield('topbar-actions')
         </div>
