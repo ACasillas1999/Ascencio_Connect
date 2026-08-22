@@ -426,6 +426,128 @@
         padding: 10px 12px;
         border-bottom: 1px solid rgba(255,255,255,0.05);
     }
+
+    /* -------------------------------------------------------------
+       LIGHT MODE ADAPTATIONS FOR KIOSKO
+    ------------------------------------------------------------- */
+    [data-theme="light"] .totem-header-banner {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%) !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+    }
+    [data-theme="light"] .totem-main-title {
+        color: #0f172a !important;
+    }
+    [data-theme="light"] .totem-sub-title {
+        color: #d97706 !important;
+    }
+    [data-theme="light"] .kiosko-mode-pills {
+        background: #e2e8f0 !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+    [data-theme="light"] .kmode-pill {
+        color: #475569 !important;
+    }
+    [data-theme="light"] .kmode-pill:hover {
+        color: #0f172a !important;
+        background: #cbd5e1 !important;
+    }
+    [data-theme="light"] .kmode-pill.active {
+        background: linear-gradient(135deg, #d97706, #b45309) !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3) !important;
+    }
+    [data-theme="light"] .totem-clock-badge {
+        background: #ffffff !important;
+        border: 1px solid #d97706 !important;
+        color: #b45309 !important;
+    }
+    [data-theme="light"] .totem-event-badge {
+        background: #eff6ff !important;
+        border: 1px solid #bfdbfe !important;
+        color: #1d4ed8 !important;
+    }
+    [data-theme="light"] .totem-card {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+    }
+    [data-theme="light"] .totem-card-title {
+        color: #0f172a !important;
+    }
+    [data-theme="light"] .totem-card p,
+    [data-theme="light"] .totem-card small,
+    [data-theme="light"] .totem-card label {
+        color: #334155 !important;
+    }
+    [data-theme="light"] .totem-scan-prompt {
+        background: #fef3c7 !important;
+        border: 1px solid #fde68a !important;
+        color: #92400e !important;
+    }
+    [data-theme="light"] .totem-input {
+        background: #ffffff !important;
+        border: 2px solid #cbd5e1 !important;
+        color: #0f172a !important;
+    }
+    [data-theme="light"] .totem-input:focus {
+        border-color: #d97706 !important;
+        box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15) !important;
+    }
+    [data-theme="light"] .totem-btn-action {
+        background: linear-gradient(135deg, #d97706, #b45309) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3) !important;
+    }
+    [data-theme="light"] .totem-result-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+        border: 2px solid #d97706 !important;
+        color: #0f172a !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+    }
+    [data-theme="light"] .totem-part-header {
+        border-bottom-color: #e2e8f0 !important;
+    }
+    [data-theme="light"] .totem-part-name {
+        color: #0f172a !important;
+    }
+    [data-theme="light"] .totem-stat-box {
+        background: #f1f5f9 !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+    [data-theme="light"] .totem-stat-num {
+        color: #d97706 !important;
+    }
+    [data-theme="light"] .totem-stat-txt {
+        color: #475569 !important;
+    }
+    [data-theme="light"] .totem-reset-bar {
+        background: #fffbebf5 !important;
+        border: 1px solid #fde68a !important;
+        color: #92400e !important;
+    }
+    [data-theme="light"] .totem-reset-bar span,
+    [data-theme="light"] .totem-reset-bar strong {
+        color: #78350f !important;
+    }
+    [data-theme="light"] .totem-progress-container {
+        background: #fef3c7 !important;
+    }
+    [data-theme="light"] .totem-progress-fill {
+        background: linear-gradient(90deg, #d97706, #0284c7) !important;
+    }
+    [data-theme="light"] .totem-table-wrap {
+        border-color: #cbd5e1 !important;
+        background: #ffffff !important;
+    }
+    [data-theme="light"] .totem-table th {
+        background: #f1f5f9 !important;
+        color: #475569 !important;
+    }
+    [data-theme="light"] .totem-table td {
+        border-bottom-color: #e2e8f0 !important;
+        color: #1e293b !important;
+    }
 </style>
 @endpush
 
