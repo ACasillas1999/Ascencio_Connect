@@ -80,7 +80,7 @@ class UsuarioController extends Controller
         $data = [
             'username' => $request->username,
             'Rol'      => $request->rol,
-            'ID_Evento'=> in_array($request->rol, ['Evento', 'Proveedor']) ? $request->ID_Evento : null,
+            'ID_Evento'=> in_array(\App\Helpers\Permisos::normalizar($request->rol), ['Evento', 'Proveedor', 'Kiosko']) ? ($request->filled('ID_Evento') ? $request->ID_Evento : null) : null,
             'tipo_kiosko'=> $request->input('tipo_kiosko', 'hibrido'),
         ];
 
