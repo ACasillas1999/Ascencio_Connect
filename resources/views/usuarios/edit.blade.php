@@ -100,35 +100,33 @@ document.addEventListener('DOMContentLoaded', function() {
     const radios = document.querySelectorAll('input[name="rol"]');
     const eventoSelector = document.getElementById('evento-selector');
     const idEventoSelect = document.getElementById('ID_Evento');
+    const kioskoSelector = document.getElementById('kiosko-selector');
 
     function checkEventoRequired() {
-        let isEvento = false;
-        let isKiosko = false;
+        let selectedRol = '';
         radios.forEach(r => {
-            if (r.checked && (r.value === 'Evento' || r.value === 'Proveedor' || r.value === 'Kiosko')) isEvento = true;
-            if (r.checked && r.value === 'Kiosko') isKiosko = true;
+            if (r.checked) selectedRol = r.value;
         });
-        
-        const kioskoSelector = document.getElementById('kiosko-selector');
+
+        const requiresEvento = ['Evento', 'Proveedor', 'Kiosko'].includes(selectedRol);
+        const isKiosko = selectedRol === 'Kiosko';
+
         if (kioskoSelector) {
             kioskoSelector.style.display = isKiosko ? 'block' : 'none';
         }
 
-        if (isEvento) {
+        if (requiresEvento) {
             eventoSelector.style.display = 'block';
-            idEventoSelect.setAttribute('required', 'required');
         } else {
             eventoSelector.style.display = 'none';
             idEventoSelect.removeAttribute('required');
-            idEventoSelect.value = '';
         }
     }
 
     radios.forEach(radio => {
         radio.addEventListener('change', checkEventoRequired);
     });
-    
-    // Initial check on load
+
     checkEventoRequired();
 });
 </script>

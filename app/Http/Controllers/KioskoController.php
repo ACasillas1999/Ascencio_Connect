@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Evento;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -11,7 +12,7 @@ class KioskoController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
+        $user = Usuario::find(auth()->id());
         $evento = null;
         if ($user && $user->ID_Evento) {
             $evento = Evento::find($user->ID_Evento);
@@ -36,7 +37,7 @@ class KioskoController extends Controller
             ], 400);
         }
 
-        $user = auth()->user();
+        $user = Usuario::find(auth()->id());
         $eventoId = ($user && $user->ID_Evento) ? $user->ID_Evento : null;
 
         if (!$eventoId) {

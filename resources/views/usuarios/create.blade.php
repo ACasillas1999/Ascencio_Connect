@@ -93,26 +93,34 @@ document.addEventListener('DOMContentLoaded', function() {
     const radios = document.querySelectorAll('input[name="rol"]');
     const eventoSelector = document.getElementById('evento-selector');
     const idEventoSelect = document.getElementById('ID_Evento');
+    const kioskoSelector = document.getElementById('kiosko-selector');
+
+    function checkEventoRequired() {
+        let selectedRol = '';
+        radios.forEach(r => {
+            if (r.checked) selectedRol = r.value;
+        });
+
+        const requiresEvento = ['Evento', 'Proveedor', 'Kiosko'].includes(selectedRol);
+        const isKiosko = selectedRol === 'Kiosko';
+
+        if (kioskoSelector) {
+            kioskoSelector.style.display = isKiosko ? 'block' : 'none';
+        }
+
+        if (requiresEvento) {
+            eventoSelector.style.display = 'block';
+        } else {
+            eventoSelector.style.display = 'none';
+            idEventoSelect.removeAttribute('required');
+        }
+    }
 
     radios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            const kioskoSelector = document.getElementById('kiosko-selector');
-            if (this.value === 'Kiosko') {
-                if (kioskoSelector) kioskoSelector.style.display = 'block';
-            } else {
-                if (kioskoSelector) kioskoSelector.style.display = 'none';
-            }
-
-            if (this.value === 'Evento' || this.value === 'Proveedor' || this.value === 'Kiosko') {
-                eventoSelector.style.display = 'block';
-                idEventoSelect.setAttribute('required', 'required');
-            } else {
-                eventoSelector.style.display = 'none';
-                idEventoSelect.removeAttribute('required');
-                idEventoSelect.value = '';
-            }
-        });
+        radio.addEventListener('change', checkEventoRequired);
     });
+
+    checkEventoRequired();
 });
 </script>
 @endsection
