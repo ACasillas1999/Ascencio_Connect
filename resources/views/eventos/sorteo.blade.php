@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'T�mbola - ' . $evento->name_evento)
-@section('page-title', 'T�mbola - ' . $evento->name_evento)
+@section('title', 'Tï¿½mbola - ' . $evento->name_evento)
+@section('page-title', 'Tï¿½mbola - ' . $evento->name_evento)
 
 @section('topbar-actions')
     <a href="{{ route('eventos.show', $evento) }}" class="btn btn-secondary">
@@ -38,7 +38,7 @@
             position: relative;
         }
 
-        /* --- OVERRIDES DE PERSONALIZACI�N DEL SISTEMA --- */
+        /* --- OVERRIDES DE PERSONALIZACIï¿½N DEL SISTEMA --- */
         .tombola-container .bg-white, 
         .tombola-container .bg-white\/80, 
         .tombola-container .bg-white\/90 {
@@ -70,7 +70,7 @@
         .tombola-container .text-sky-800 { color: var(--text-primary) !important; }
         /* ------------------------------------------------ */
         
-        /* Animaciones para la apertura de la bola f�sica de sorteo */
+        /* Animaciones para la apertura de la bola fï¿½sica de sorteo */
         .animate-sphere-bounce {
             animation: sphere-bounce 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
@@ -111,7 +111,7 @@
             100% { transform: scaleY(1) translateY(0); opacity: 1; }
         }
 
-        /* Puntero de mano cl�sico */
+        /* Puntero de mano clï¿½sico */
         #wii-pointer {
             position: absolute;
             width: 50px;
@@ -186,7 +186,7 @@
             background-color: transparent;
         }
 
-        /* Animaci�n de flotar suave */
+        /* Animaciï¿½n de flotar suave */
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-8px); }
@@ -196,7 +196,7 @@
             animation: float 4s ease-in-out infinite;
         }
 
-        /* Animaci�n del Ticker de Nombres */
+        /* Animaciï¿½n del Ticker de Nombres */
         @keyframes marquee {
             0% { transform: translateX(100vw); }
             100% { transform: translateX(-100%); }
@@ -216,7 +216,7 @@
     
 <style>
 /* ================================================= */
-/* CONFIGURACI�N DEL SORTEO - MODO CLARO OVERRIDES   */
+/* CONFIGURACIï¿½N DEL SORTEO - MODO CLARO OVERRIDES   */
 /* ================================================= */
 [data-theme="light"] #setup-view {
     color: #0f172a !important;
@@ -300,7 +300,7 @@
             box-sizing: border-box !important;
         }
 
-        /* Fondo punteado en Pantalla Completa seg�n tema */
+        /* Fondo punteado en Pantalla Completa segï¿½n tema */
         .tombola-container:fullscreen.wii-bg-grid {
             background-image: radial-gradient(var(--border-subtle, #cbd5e1) 20%, transparent 20%),
                               radial-gradient(var(--border-subtle, #cbd5e1) 20%, transparent 20%) !important;
@@ -447,22 +447,22 @@
                 <i class="fa-solid fa-circle-nodes"></i>
                 <span>Plaza de Sorteos</span>
             </div>
-            <h1 class="text-2xl font-bold text-gray-700 tracking-wide">T�mbola Ascencio</h1>
+            <h1 class="text-2xl font-bold text-gray-700 tracking-wide">Tï¿½mbola Ascencio</h1>
         </div>
         
         <!-- Controladores y Sonido -->
         <div class="flex items-center space-x-3">
-            <!-- Bot�n de m�sica -->
+            <!-- Botï¿½n de mï¿½sica -->
             <button onclick="toggleMusic()" id="music-btn" class="wii-btn px-4 py-2 flex items-center gap-2 text-gray-700 font-medium text-sm">
                 <i id="music-icon" class="fa-solid fa-volume-xmark text-red-500"></i>
-                <span id="music-text">M�sica: OFF</span>
+                <span id="music-text">Mï¿½sica: OFF</span>
             </button>
             <!-- Interruptor para cursor de mano -->
             <button onclick="toggleWiiCursor()" class="wii-btn px-4 py-2 flex items-center gap-2 text-gray-700 font-medium text-sm">
                 <i class="fa-solid fa-hand-pointer text-[#00a0e9]"></i>
                 <span>Puntero de Mano</span>
             </button>
-            <!-- Bot�n Pantalla Completa -->
+            <!-- Botï¿½n Pantalla Completa -->
             <button onclick="toggleFullscreen()" class="wii-btn px-4 py-2 flex items-center gap-2 text-gray-700 font-medium text-sm">
                 <i id="fs-icon" class="fa-solid fa-expand text-[#00a0e9]"></i>
                 <span id="fs-text">Pantalla Completa</span>
@@ -481,10 +481,10 @@
             <div class="w-full flex justify-between items-center px-4">
                 <div class="flex items-center gap-2 bg-white/90 border-2 border-slate-200 px-4 py-2 rounded-2xl shadow-sm">
                     <span class="w-3.5 h-3.5 bg-emerald-500 rounded-full animate-ping"></span>
-                    <span class="text-sm font-bold text-gray-600 uppercase tracking-wide">T�mbola Activa</span>
+                    <span class="text-sm font-bold text-gray-600 uppercase tracking-wide">Tï¿½mbola Activa</span>
                 </div>
                 <div class="text-center">
-                    <h2 class="text-3xl font-bold text-gray-800 tracking-wide">T�MBOLA DE ASCENCIO</h2>
+                    <h2 class="text-3xl font-bold text-gray-800 tracking-wide">Tï¿½MBOLA DE ASCENCIO</h2>
                     <p class="text-sm text-gray-500">Mezcla las esferas de los participantes y extrae un ganador.</p>
                 </div>
                 <button onclick="switchView('setup-view')" class="wii-btn px-6 py-2.5 font-bold text-emerald-600 flex items-center gap-2">
@@ -500,13 +500,13 @@
                         <span id="tombola-participant-count" class="bg-[#00a0e9] text-white text-xs px-2.5 py-1 rounded-full">0</span>
                     </h3>
                     <div id="tombola-miis-list" class="flex-grow overflow-y-auto space-y-2 pr-1">
-                        <!-- Generado din�micamente -->
+                        <!-- Generado dinï¿½micamente -->
                     </div>
                 </div>
 
-                <!-- Centro: Lienzo de la T�mbola F�sica -->
+                <!-- Centro: Lienzo de la Tï¿½mbola Fï¿½sica -->
                 <div class="wii-panel p-6 flex flex-col items-center justify-between lg:col-span-2 h-[65vh] min-h-[450px] relative">
-                    <!-- Canvas de la t�mbola -->
+                    <!-- Canvas de la tï¿½mbola -->
                     <div class="relative w-full h-full flex-grow flex items-center justify-center">
                         <canvas id="tombola-canvas" class="w-full h-full min-h-[300px] rounded-2xl bg-gradient-to-b from-sky-50 to-white border-2 border-slate-200/50 shadow-inner"></canvas>
                         
@@ -520,7 +520,7 @@
 
 
 
-                    <!-- Controles de la T�mbola -->
+                    <!-- Controles de la Tï¿½mbola -->
                     <div class="w-full flex gap-4 mt-4">
                         <button id="btn-spin-tombola" onclick="spinTombolaManual()" class="wii-btn wii-btn-orange flex-1 py-4 font-bold text-xl flex items-center justify-center gap-2">
                             <i class="fa-solid fa-arrows-spin"></i>
@@ -528,7 +528,7 @@
                         </button>
                         <button id="btn-draw-ball" onclick="drawBall()" class="wii-btn wii-btn-blue flex-1 py-4 font-bold text-xl flex items-center justify-center gap-2">
                             <i class="fa-solid fa-gift"></i>
-                            <span>�EXTRAER GANADOR!</span>
+                            <span>ï¿½EXTRAER GANADOR!</span>
                         </button>
                     </div>
                 </div>
@@ -548,13 +548,13 @@
                     </div>
                     
                     <div id="tombola-available-prizes" class="flex-grow overflow-y-auto pr-1 space-y-1.5 mt-2">
-                        <!-- Rellenado din�micamente -->
+                        <!-- Rellenado dinï¿½micamente -->
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Men� Contextual para Reordenar Premios (Windows Style) -->
+        <!-- Menï¿½ Contextual para Reordenar Premios (Windows Style) -->
         <div id="prize-context-menu" class="hidden absolute bg-white/95 backdrop-blur-md border border-gray-200 rounded-lg shadow-lg z-[10000] w-40 text-[13px] font-sans text-gray-800 p-1">
             <button onclick="contextMenuUp()" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 rounded-md transition-none border-none outline-none flex items-center gap-2">
                 <i class="fa-solid fa-arrow-up text-[10px] text-gray-500"></i> Ascender
@@ -564,15 +564,15 @@
             </button>
         </div>
 
-        <!-- SECCI�N DE CONFIGURACI�N -->
+        <!-- SECCIï¿½N DE CONFIGURACIï¿½N -->
         <section id="setup-view" class="w-full hidden flex-col items-center gap-6">
             <div class="w-full flex justify-between items-center px-4 max-w-5xl mb-2">
                 <button onclick="switchView('tombola-view')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 shadow-md rounded-lg px-6 py-2.5 font-medium flex items-center gap-2 transition-colors">
-                    <i class="fa-solid fa-chevron-left"></i> Volver a la T�mbola
+                    <i class="fa-solid fa-chevron-left"></i> Volver a la Tï¿½mbola
                 </button>
                 <div class="text-center">
-                    <h2 class="text-3xl font-extrabold text-white tracking-tight drop-shadow-sm">Configuraci�n del Sorteo</h2>
-                    <p class="text-sm text-slate-400 font-medium mt-1 uppercase tracking-widest">Gesti�n avanzada y control interno</p>
+                    <h2 class="text-3xl font-extrabold text-white tracking-tight drop-shadow-sm">Configuraciï¿½n del Sorteo</h2>
+                    <p class="text-sm text-slate-400 font-medium mt-1 uppercase tracking-widest">Gestiï¿½n avanzada y control interno</p>
                 </div>
                 <button onclick="resetData()" class="bg-slate-800 hover:bg-red-900/40 text-red-400 hover:text-red-300 border border-slate-700 hover:border-red-800/50 shadow-md rounded-lg px-5 py-2.5 text-sm font-bold flex items-center gap-2 transition-all">
                     <i class="fa-solid fa-arrow-rotate-left"></i> Reiniciar Todo
@@ -589,11 +589,11 @@
                         <span id="setup-participant-count" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs px-3 py-1 rounded-md font-bold tracking-wider">0</span>
                     </h3>
 
-                    <!-- Formulario A�adir Participante (Eliminado) -->
+                    <!-- Formulario Aï¿½adir Participante (Eliminado) -->
 
                     <!-- Lista de Participantes creados -->
                     <div id="setup-miis-list" class="flex-grow overflow-y-auto space-y-2 pr-1">
-                        <!-- Generado din�micamente -->
+                        <!-- Generado dinï¿½micamente -->
                     </div>
                 </div>
 
@@ -605,13 +605,13 @@
                     </h3>
 
                     <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 mb-5 text-xs font-medium text-slate-400 flex justify-between items-center shadow-inner">
-                        <span class="tracking-wide">Marca los premios entregados f�sicamente.</span>
+                        <span class="tracking-wide">Marca los premios entregados fï¿½sicamente.</span>
                         <button onclick="clearHistories()" class="bg-slate-900 hover:bg-red-900/40 text-slate-400 hover:text-red-400 border border-slate-700 hover:border-red-800/50 rounded-lg px-4 py-2 transition-all flex items-center font-bold tracking-wide"><i class="fa-solid fa-trash-can mr-2 text-[11px]"></i> Limpiar</button>
                     </div>
 
                     <!-- Lista de Ganadores -->
                     <div id="setup-winners-list" class="flex-grow overflow-y-auto space-y-2 pr-1">
-                        <!-- Generado din�micamente -->
+                        <!-- Generado dinï¿½micamente -->
                     </div>
                 </div>
 
@@ -653,29 +653,29 @@
 
     </main>
 
-    <!-- MODAL DE APERTURA DE BOLA Y CELEBRACI�N -->
+    <!-- MODAL DE APERTURA DE BOLA Y CELEBRACIï¿½N -->
     <div id="sphere-opening-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex flex-col items-center justify-center hidden z-50">
         
         <!-- Contenedor de confeti de fondo -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none" id="modal-confetti" style="z-index: 2;"></div>
 
-        <!-- Banner de Victoria Horizontal (Cruza por detr�s de la bola) -->
+        <!-- Banner de Victoria Horizontal (Cruza por detrï¿½s de la bola) -->
         <div id="victory-strike-banner" class="strike-banner w-full py-8 md:py-12 absolute left-0 right-0 top-1/2 -translate-y-1/2 scale-y-0 opacity-0 transition-all duration-500 flex flex-col md:flex-row justify-between items-center px-6 md:px-20" style="z-index: 5;">
             <!-- Franja superior de acento blanco -->
             <div class="absolute top-0 w-full h-1.5 bg-white/40"></div>
             
             <!-- Bloque Izquierdo: Datos del Ganador -->
             <div class="text-center md:text-left flex flex-col justify-center w-full md:w-1/3 mb-2 md:mb-0">
-                <span class="text-orange-400 font-black tracking-widest text-sm md:text-xl uppercase drop-shadow animate-pulse">? �TENEMOS UN GANADOR! ?</span>
+                <span class="text-orange-400 font-black tracking-widest text-sm md:text-xl uppercase drop-shadow animate-pulse">? ï¿½TENEMOS UN GANADOR! ?</span>
                 <h2 id="strike-winner-name" class="text-white font-extrabold text-4xl md:text-6xl uppercase tracking-wide truncate drop-shadow">MATT</h2>
             </div>
             
-            <!-- Bloque Centro (Espacio vac�o reservado para que se luzca la esfera y el papel) -->
+            <!-- Bloque Centro (Espacio vacï¿½o reservado para que se luzca la esfera y el papel) -->
             <div class="hidden md:block w-1/3"></div>
             
             <!-- Bloque Derecho: Datos del Premio -->
             <div class="text-center md:text-right flex flex-col justify-center w-full md:w-1/3 mt-2 md:mt-0">
-                <span class="text-sky-200 font-bold tracking-widest text-sm md:text-xl uppercase drop-shadow">PREMIO EXTRA�DO</span>
+                <span class="text-sky-200 font-bold tracking-widest text-sm md:text-xl uppercase drop-shadow">PREMIO EXTRAï¿½DO</span>
                 <h3 id="strike-prize-name" class="text-yellow-300 font-black text-2xl md:text-4xl truncate drop-shadow">Premio Especial</h3>
             </div>
             
@@ -687,7 +687,7 @@
         <div class="text-center flex flex-col items-center max-w-3xl w-full px-4 z-10 relative">
             
             <h3 id="modal-sphere-title" class="text-white text-4xl md:text-5xl font-bold mb-20 tracking-wide uppercase drop-shadow animate-pulse">
-                �BOLA SELECCIONADA!
+                ï¿½BOLA SELECCIONADA!
             </h3>
 
             <!-- Contenedor principal de la esfera interactiva -->
@@ -697,10 +697,10 @@
                 <div id="drawn-paper" class="absolute w-72 bg-gradient-to-b from-amber-50 to-orange-50 border-4 border-amber-400 rounded-2xl shadow-2xl p-6 flex flex-col items-center justify-center opacity-0 transform origin-top" style="z-index: 15;">
                     <!-- Avatar del ganador celebrando -->
                     <div class="w-24 h-24 bg-white rounded-full border-4 border-amber-400 p-1 overflow-hidden shadow-md mb-3 flex items-center justify-center" id="paper-mii-mini">
-                        <!-- Renderizado din�micamente -->
+                        <!-- Renderizado dinï¿½micamente -->
                     </div>
                     
-                    <span class="text-xs text-orange-600 font-extrabold tracking-widest uppercase animate-pulse">�Felicidades!</span>
+                    <span class="text-xs text-orange-600 font-extrabold tracking-widest uppercase animate-pulse">ï¿½Felicidades!</span>
                     <h3 id="paper-winner-name" class="text-3xl font-black text-slate-800 tracking-wide mt-2 mb-1 text-center truncate w-full">Nombre</h3>
                     <div class="w-full border-t-2 border-dashed border-amber-400 my-2"></div>
                     
@@ -749,10 +749,10 @@
                 </div>
             </div>
 
-            <!-- Bot�n para finalizar la celebraci�n -->
+            <!-- Botï¿½n para finalizar la celebraciï¿½n -->
             <button id="btn-proceed-celebration" onclick="closeVictoryModal()" class="wii-btn wii-btn-orange px-12 py-5 text-2xl font-bold rounded-2xl max-w-md w-full shadow-2xl opacity-0 transform translate-y-4 transition-all duration-500" style="z-index: 10;">
                 <i class="fa-solid fa-check mr-2"></i>
-                <span>�EXCELENTE!</span>
+                <span>ï¿½EXCELENTE!</span>
             </button>
         </div>
     </div>
@@ -761,18 +761,18 @@
     <div id="prize-announcement-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center hidden z-50 transition-opacity duration-300">
         <div class="strike-banner w-full py-12 absolute left-0 right-0 top-1/2 -translate-y-1/2 scale-y-0 opacity-0 transition-all duration-500 flex flex-col items-center justify-center px-6" id="prize-announcement-banner">
             <div class="absolute top-0 w-full h-1.5 bg-white/40"></div>
-            <span class="text-orange-400 font-black tracking-widest text-xl md:text-2xl uppercase drop-shadow animate-pulse mb-2">? PR�XIMO PREMIO EN JUEGO ?</span>
+            <span class="text-orange-400 font-black tracking-widest text-xl md:text-2xl uppercase drop-shadow animate-pulse mb-2">? PRï¿½XIMO PREMIO EN JUEGO ?</span>
             <h2 id="announcement-prize-name" class="text-white font-extrabold text-5xl md:text-7xl uppercase tracking-wide truncate drop-shadow text-center">TV 4K</h2>
             <div class="absolute bottom-0 w-full h-1.5 bg-white/40"></div>
         </div>
     </div>
 
-    <!-- Pie de P�gina -->
+    <!-- Pie de Pï¿½gina -->
     <footer class="w-full bg-[#f4f7f8] border-t-4 border-white py-4 px-6 flex justify-between items-center z-10 text-xs text-slate-800 font-semibold">
         <div>
             <span>Plaza de Sorteos v1.6</span>
             <span class="mx-2">|</span>
-            <span class="text-emerald-600"><i class="fa-solid fa-wifi"></i> Conexi�n de T�mbola Estable</span>
+            <span class="text-emerald-600"><i class="fa-solid fa-wifi"></i> Conexiï¿½n de Tï¿½mbola Estable</span>
         </div>
         <div class="flex items-center gap-4">
             <span class="bg-gray-200 px-3 py-1 rounded-full text-gray-600">
@@ -788,7 +788,7 @@
         let bgmSource = null;
         let isMusicPlaying = false;
 
-        // Sonido de ca�da de la bola seleccionada
+        // Sonido de caï¿½da de la bola seleccionada
         function playSoundBallDrop() {
             try {
                 const now = audioCtx.currentTime;
@@ -806,7 +806,7 @@
             } catch(e){}
         }
 
-        // Sonido de vibraci�n de suspenso
+        // Sonido de vibraciï¿½n de suspenso
         function playSoundRumble() {
             try {
                 const now = audioCtx.currentTime;
@@ -826,7 +826,7 @@
             } catch(e){}
         }
 
-        // Sonido de explosi�n pop al abrirse la bola
+        // Sonido de explosiï¿½n pop al abrirse la bola
         function playSoundBallPop() {
             try {
                 const now = audioCtx.currentTime;
@@ -858,7 +858,7 @@
             } catch(e){}
         }
 
-        // Sonido de papel estir�ndose/desenroll�ndose
+        // Sonido de papel estirï¿½ndose/desenrollï¿½ndose
         function playSoundRustle() {
             try {
                 const now = audioCtx.currentTime;
@@ -908,7 +908,7 @@
             } catch(e){}
         }
 
-        // Sonido de clic (pop seco cl�sico)
+        // Sonido de clic (pop seco clï¿½sico)
         function playSoundClick() {
             try {
                 const osc = audioCtx.createOscillator();
@@ -998,7 +998,7 @@
             } catch(e){}
         }
 
-        // M�sica de fondo sintetizada en tiempo real (estilo men� deportivo retro)
+        // Mï¿½sica de fondo sintetizada en tiempo real (estilo menï¿½ deportivo retro)
         function startBgm() {
             if (isMusicPlaying) return;
             try {
@@ -1041,9 +1041,9 @@
                 isMusicPlaying = true;
                 
                 document.getElementById('music-icon').className = "fa-solid fa-volume-high text-emerald-500";
-                document.getElementById('music-text').innerText = "M�sica: ON";
+                document.getElementById('music-text').innerText = "Mï¿½sica: ON";
             } catch(e) {
-                console.error("No se pudo iniciar la m�sica sintetizada:", e);
+                console.error("No se pudo iniciar la mï¿½sica sintetizada:", e);
             }
         }
 
@@ -1054,7 +1054,7 @@
             }
             isMusicPlaying = false;
             document.getElementById('music-icon').className = "fa-solid fa-volume-xmark text-red-500";
-            document.getElementById('music-text').innerText = "M�sica: OFF";
+            document.getElementById('music-text').innerText = "Mï¿½sica: OFF";
         }
 
         function toggleMusic() {
@@ -1068,7 +1068,7 @@
     </script>
 
     <script>
-        // --- BASE DE DATOS Y ESTADO DE LA APLICACI�N ---
+        // --- BASE DE DATOS Y ESTADO DE LA APLICACIï¿½N ---
         let participants = [];
         let prizes = [];
         let drawnBallsHistory = [];
@@ -1079,19 +1079,19 @@
         // Lista de personajes preestablecidos (Sin nombres del elenco original de la consola)
         const defaultMiis = [
             { id: '1', display_id: 101, name: 'Carlos', color: '#ff9500', face: 'cool' },
-            { id: '2', display_id: 102, name: 'Sof�a', color: '#e91e63', face: 'happy' },
+            { id: '2', display_id: 102, name: 'Sofï¿½a', color: '#e91e63', face: 'happy' },
             { id: '3', display_id: 103, name: 'Beto', color: '#76c336', face: 'excited' },
             { id: '4', display_id: 104, name: 'Ana', color: '#00a0e9', face: 'happy' },
-            { id: '5', display_id: 105, name: 'Tom�s', color: '#9c27b0', face: 'surprised' },
-            { id: '6', display_id: 106, name: 'Luc�a', color: '#e60012', face: 'cool' },
+            { id: '5', display_id: 105, name: 'Tomï¿½s', color: '#9c27b0', face: 'surprised' },
+            { id: '6', display_id: 106, name: 'Lucï¿½a', color: '#e60012', face: 'cool' },
             { id: '7', display_id: 107, name: 'Silvia', color: '#ffeb3b', face: 'excited' }
         ];
 
-        // Lista de premios preestablecidos (Gen�ricos)
+        // Lista de premios preestablecidos (Genï¿½ricos)
         const defaultPrizes = [
             { id: 'p1', name: '?? Gran Trofeo de Oro', color: '#ffeb3b', type: 'sorteo' },
-            { id: 'p2', name: '?? Remera de Campe�n de Sorteos', color: '#00a0e9', type: 'sorteo' },
-            { id: 'p3', name: '?? Gran Pizza Party de Celebraci�n', color: '#ff9500', type: 'sorteo' },
+            { id: 'p2', name: '?? Remera de Campeï¿½n de Sorteos', color: '#00a0e9', type: 'sorteo' },
+            { id: 'p3', name: '?? Gran Pizza Party de Celebraciï¿½n', color: '#ff9500', type: 'sorteo' },
             { id: 'p4', name: '?? Raqueta Profesional de Tenis', color: '#76c336', type: 'sorteo' },
             { id: 'p5', name: '??? 500 Puntos de Regalo', color: '#9c27b0', type: 'puntos' }
         ];
@@ -1164,11 +1164,11 @@
             }
         }
 
-        // --- MANEJO DEL MEN� CONTEXTUAL (CLIC DERECHO) ---
+        // --- MANEJO DEL MENï¿½ CONTEXTUAL (CLIC DERECHO) ---
         let currentContextMenuId = null;
 
         function showPrizeMenu(e, prizeId) {
-            e.preventDefault(); // Ocultar el men� por defecto del navegador
+            e.preventDefault(); // Ocultar el menï¿½ por defecto del navegador
             e.stopPropagation(); // Evitar que el clic llegue al document y lo cierre
             
             const menu = document.getElementById('prize-context-menu');
@@ -1183,7 +1183,7 @@
             let xPos = e.clientX - rect.left;
             let yPos = e.clientY - rect.top;
             
-            // Evitar que el men� se salga del contenedor
+            // Evitar que el menï¿½ se salga del contenedor
             if (xPos + 180 > rect.width) xPos -= 180; // 180px aprox ancho
             if (yPos + 80 > rect.height) yPos -= 80;  // 80px aprox alto
 
@@ -1227,7 +1227,7 @@
 
         // --- GENERADOR DE AVATARES DE PERSONAJES EN SVG ---
         function generateMiiSVG(color, faceType) {
-            // Mapeamos el color a un icono de herramientas/material el�ctrico consistente
+            // Mapeamos el color a un icono de herramientas/material elï¿½ctrico consistente
             const tools = [
                 'fa-wrench', 'fa-screwdriver-wrench', 'fa-hammer', 'fa-plug', 
                 'fa-lightbulb', 'fa-bolt', 'fa-toolbox', 'fa-hard-hat', 
@@ -1235,7 +1235,7 @@
                 'fa-screwdriver', 'fa-plug-circle-check', 'fa-power-off'
             ];
             
-            // Hash simple del color (ej: #ff5733) para obtener un �ndice siempre igual para cada persona
+            // Hash simple del color (ej: #ff5733) para obtener un ï¿½ndice siempre igual para cada persona
             let hash = 0;
             if (color) {
                 for (let i = 0; i < color.length; i++) {
@@ -1254,7 +1254,7 @@
     </script>
 
     <script>
-        // --- ACTUALIZACI�N DE INTERFAZ DE USUARIO ---
+        // --- ACTUALIZACIï¿½N DE INTERFAZ DE USUARIO ---
         function updateUI() {
             document.getElementById('tombola-participant-count').innerText = participants.length;
             document.getElementById('setup-participant-count').innerText = participants.length;
@@ -1265,7 +1265,7 @@
             const tombolaPrizes = document.getElementById('tombola-available-prizes');
             if (tombolaPrizes) {
                 tombolaPrizes.innerHTML = '';
-                // En la t�mbola solo mostramos los premios destinados al azar (sorteo) que NO est�n marcados como entregados
+                // En la tï¿½mbola solo mostramos los premios destinados al azar (sorteo) que NO estï¿½n marcados como entregados
                 const sorteoPrizes = prizes.filter(p => {
                     if ((p.type || 'sorteo') !== 'sorteo') return false;
                     
@@ -1364,7 +1364,7 @@
                         allWonMsg.className = "mt-4 p-5 rounded-2xl bg-gradient-to-b from-emerald-900/40 to-emerald-950/40 border-2 border-emerald-500/50 text-center shadow-lg";
                         allWonMsg.innerHTML = `
                             <div class="text-emerald-400 text-4xl mb-3 drop-shadow-[0_0_10px_rgba(52,211,153,0.5)]"><i class="fa-solid fa-trophy"></i></div>
-                            <h4 class="font-black text-white text-[13px] uppercase tracking-widest">�Sorteo Finalizado!</h4>
+                            <h4 class="font-black text-white text-[13px] uppercase tracking-widest">ï¿½Sorteo Finalizado!</h4>
                             <p class="text-emerald-200/80 text-xs mt-1 font-semibold">Todos los premios han sido entregados.</p>
                         `;
                         tombolaPrizes.appendChild(allWonMsg);
@@ -1388,7 +1388,7 @@
             tombolaList.innerHTML = '';
             
             if (groupedParticipants.length === 0) {
-                tombolaList.innerHTML = '<div class="text-gray-400 text-center py-10 text-sm">No hay participantes cargados. Agrega algunos en Configuraci�n.</div>';
+                tombolaList.innerHTML = '<div class="text-gray-400 text-center py-10 text-sm">No hay participantes cargados. Agrega algunos en Configuraciï¿½n.</div>';
                 tombolaList.style.overflowY = 'auto';
             } else {
                 const fragment = document.createDocumentFragment();
@@ -1420,7 +1420,7 @@
                 if (groupedParticipants.length > renderLimit) {
                     const extra = document.createElement('div');
                     extra.className = "text-center py-3 mt-2 text-gray-500 font-bold text-sm bg-gray-50 rounded-xl border-2 border-dashed";
-                    extra.innerText = `+ ${groupedParticipants.length - renderLimit} participantes m�s...`;
+                    extra.innerText = `+ ${groupedParticipants.length - renderLimit} participantes mï¿½s...`;
                     fragment.appendChild(extra);
                 }
                 
@@ -1428,7 +1428,7 @@
 
                 if (isScrollable && groupedParticipants.length <= renderLimit) {
                     tombolaList.style.overflowY = 'hidden';
-                    // Ocultar scrollbar est�ndar en navegadores webkit temporalmente si es posible
+                    // Ocultar scrollbar estï¿½ndar en navegadores webkit temporalmente si es posible
                     tombolaList.style.scrollbarWidth = 'none'; // Firefox
                     
                     let scrollPos = tombolaList.scrollTop;
@@ -1461,7 +1461,7 @@
 
             const setupMiis = document.getElementById('setup-miis-list');
             setupMiis.innerHTML = '';
-            const renderLimitSetup = 150; // L�mite de optimizaci�n de UI
+            const renderLimitSetup = 150; // Lï¿½mite de optimizaciï¿½n de UI
             groupedParticipants.slice(0, renderLimitSetup).forEach(p => {
                 const row = document.createElement('div');
                 row.className = "flex items-center justify-between p-3.5 bg-slate-800/60 hover:bg-slate-700/60 rounded-xl border border-slate-700/80 shadow-sm transition-colors mb-2";
@@ -1499,7 +1499,7 @@
                 setupWinnersList.innerHTML = '';
                 document.getElementById('setup-winners-count').innerText = drawnBallsHistory.length;
                 if (drawnBallsHistory.length === 0) {
-                    setupWinnersList.innerHTML = '<div class="text-slate-500 text-center py-10 text-sm font-medium"><i class="fa-solid fa-inbox text-2xl mb-2 block opacity-50"></i>A�n no hay ganadores registrados.</div>';
+                    setupWinnersList.innerHTML = '<div class="text-slate-500 text-center py-10 text-sm font-medium"><i class="fa-solid fa-inbox text-2xl mb-2 block opacity-50"></i>Aï¿½n no hay ganadores registrados.</div>';
                 } else {
                     drawnBallsHistory.forEach((h, index) => {
                         const row = document.createElement('div');
@@ -1547,7 +1547,7 @@
             updateHistories();
         }
 
-        // Agregamos la funci�n de confirmaci�n
+        // Agregamos la funciï¿½n de confirmaciï¿½n
         function confirmToggleDeliveryByPrize(event, prizeId) {
             event.preventDefault();
             const pr = prizes.find(p => p.id == prizeId);
@@ -1587,7 +1587,7 @@
         }
 
         function confirmToggleDelivery(event, index) {
-            // Evitamos que el checkbox cambie su estado autom�ticamente
+            // Evitamos que el checkbox cambie su estado automï¿½ticamente
             event.preventDefault();
             
             const h = drawnBallsHistory[index];
@@ -1600,13 +1600,13 @@
             const pPrize = h.prize && typeof h.prize === 'object' ? h.prize.name : (h.prize || 'el premio');
 
             Swal.fire({
-                title: '�Confirmar entrega?',
-                html: `�Deseas ${actionText} como <b>${statusText}</b> el premio <b>${pPrize}</b> de <b>${pName}</b>?`,
+                title: 'ï¿½Confirmar entrega?',
+                html: `ï¿½Deseas ${actionText} como <b>${statusText}</b> el premio <b>${pPrize}</b> de <b>${pName}</b>?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3b82f6',
                 cancelButtonColor: '#64748b',
-                confirmButtonText: 'S�, confirmar',
+                confirmButtonText: 'Sï¿½, confirmar',
                 cancelButtonText: 'Cancelar',
                 background: '#1e293b',
                 color: '#f8fafc',
@@ -1627,7 +1627,7 @@
                     if (matchingPrize) {
                         matchingPrize.delivered = newState;
                     }
-                    updateUI(); // Se repinta la UI completa optim�sticamente
+                    updateUI(); // Se repinta la UI completa optimï¿½sticamente
 
                     if (h.canje_id) {
                         fetch(`{{ route('eventos.sorteo.toggle-delivery', $evento) }}`, {
@@ -1655,13 +1655,13 @@
             const pPrize = h.prize && typeof h.prize === 'object' ? h.prize.name : (h.prize || 'el premio');
 
             Swal.fire({
-                title: '�Revertir premio?',
-                html: `�Est�s seguro de que quieres anular el premio <b>${pPrize}</b> a <b>${pName}</b>? <br><br> <span class="text-xs text-slate-400">El premio volver� a estar disponible para sortear.</span>`,
+                title: 'ï¿½Revertir premio?',
+                html: `ï¿½Estï¿½s seguro de que quieres anular el premio <b>${pPrize}</b> a <b>${pName}</b>? <br><br> <span class="text-xs text-slate-400">El premio volverï¿½ a estar disponible para sortear.</span>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
                 cancelButtonColor: '#64748b',
-                confirmButtonText: 'S�, revertir',
+                confirmButtonText: 'Sï¿½, revertir',
                 cancelButtonText: 'Cancelar',
                 background: '#1e293b',
                 color: '#f8fafc',
@@ -1683,7 +1683,7 @@
                         }).then(r => r.json()).then(data => {
                             if (data.ok) {
                                 // Devolver participante a la lista activa
-                                // Recargar la p�gina es la manera m�s segura de asegurar que los premios disponibles se actualicen en JS
+                                // Recargar la pï¿½gina es la manera mï¿½s segura de asegurar que los premios disponibles se actualicen en JS
                                 // Pero si queremos hacerlo con SPA:
                                 Swal.fire({
                                     icon: 'success',
@@ -1699,7 +1699,7 @@
                             }
                         }).catch(e => console.error(e));
                     } else {
-                        // Si no hay canje_id, solo lo quitamos localmente (aunque no deber�a pasar)
+                        // Si no hay canje_id, solo lo quitamos localmente (aunque no deberï¿½a pasar)
                         drawnBallsHistory.splice(index, 1);
                         saveToStorage();
                         updateUI();
@@ -1709,14 +1709,14 @@
             });
         }
 
-        // Historial de la vista de T�mbola (Derecha en main)
+        // Historial de la vista de Tï¿½mbola (Derecha en main)
         function updateHistories() {
             const tombolaHistEl = document.getElementById('tombola-history');
             if (!tombolaHistEl) return;
             
             tombolaHistEl.innerHTML = '';
             if (drawnBallsHistory.length === 0) {
-                tombolaHistEl.innerHTML = '<p class="text-gray-400 text-sm py-1">No se han extra�do ganadores todav�a.</p>';
+                tombolaHistEl.innerHTML = '<p class="text-gray-400 text-sm py-1">No se han extraï¿½do ganadores todavï¿½a.</p>';
             } else {
                 drawnBallsHistory.forEach(b => {
                     const badge = document.createElement('div');
@@ -1730,7 +1730,7 @@
             }
         }
 
-        // --- ACCIONES DE GESTI�N (A�adir/Eliminar) ---
+        // --- ACCIONES DE GESTIï¿½N (Aï¿½adir/Eliminar) ---
         function saveCustomMii() {
             playSoundClick();
             const nameInput = document.getElementById('input-mii-name');
@@ -1758,7 +1758,7 @@
 
         function addMiiRandom() {
             playSoundClick();
-            const names = ['Felipe', 'Luc�a', 'Nicol�s', 'Martina', 'Gast�n', 'Sof�a', 'Sandro', 'Estela', 'Charly', 'Renata', 'Mateo', 'Valentina'];
+            const names = ['Felipe', 'Lucï¿½a', 'Nicolï¿½s', 'Martina', 'Gastï¿½n', 'Sofï¿½a', 'Sandro', 'Estela', 'Charly', 'Renata', 'Mateo', 'Valentina'];
             const randomName = names[Math.floor(Math.random() * names.length)] + " " + Math.floor(Math.random()*90 + 10);
             const colors = ['#00a0e9', '#ff9500', '#76c336', '#e60012', '#e91e63', '#9c27b0', '#ffeb3b'];
             const faces = ['happy', 'cool', 'excited', 'surprised'];
@@ -1780,7 +1780,7 @@
 
         function addMultipleRandomMiis(amount) {
             playSoundClick();
-            const names = ['Felipe', 'Luc�a', 'Nicol�s', 'Martina', 'Gast�n', 'Sof�a', 'Sandro', 'Estela', 'Charly', 'Renata', 'Mateo', 'Valentina', 'Alex', 'Juan', 'Maria', 'Pedro', 'Ana'];
+            const names = ['Felipe', 'Lucï¿½a', 'Nicolï¿½s', 'Martina', 'Gastï¿½n', 'Sofï¿½a', 'Sandro', 'Estela', 'Charly', 'Renata', 'Mateo', 'Valentina', 'Alex', 'Juan', 'Maria', 'Pedro', 'Ana'];
             const colors = ['#00a0e9', '#ff9500', '#76c336', '#e60012', '#e91e63', '#9c27b0', '#ffeb3b'];
             const faces = ['happy', 'cool', 'excited', 'surprised'];
 
@@ -1799,7 +1799,7 @@
             saveToStorage();
             updateUI();
             initTombolaPhysics();
-            showCustomToast(`�A�adidos!`, `Se agregaron ${amount} participantes de prueba al instante.`);
+            showCustomToast(`ï¿½Aï¿½adidos!`, `Se agregaron ${amount} participantes de prueba al instante.`);
         }
 
         function removeParticipant(id) {
@@ -1841,7 +1841,7 @@
     </script>
 
     <script>
-        // --- SISTEMA F�SICO DE LA T�MBOLA EN CANVAS ---
+        // --- SISTEMA Fï¿½SICO DE LA Tï¿½MBOLA EN CANVAS ---
         const tombolaCanvas = document.getElementById('tombola-canvas');
         const tombolaCtx = tombolaCanvas.getContext('2d');
         let tombolaBalls = [];
@@ -1851,7 +1851,7 @@
         let animationFrameId = null;
         let droppingBallObj = null;
 
-        // Escala din�mica
+        // Escala dinï¿½mica
         let tombolaScale = 1;
         let tombolaOffsetX = 0;
         let tombolaOffsetY = 0;
@@ -1900,7 +1900,7 @@
                 // Fuerza de gravedad constante hacia abajo
                 this.vy += 0.25;
                 
-                // Rotaci�n impulsada por el tambor (si la bola toca las paredes)
+                // Rotaciï¿½n impulsada por el tambor (si la bola toca las paredes)
                 const dx = this.x - centerX;
                 const dy = this.y - centerY;
                 const dist = Math.sqrt(dx * dx + dy * dy);
@@ -1912,14 +1912,14 @@
                     this.vy += Math.sin(angle + Math.PI/2) * cageRotation * 2.5;
                 }
 
-                // Fricci�n del aire
+                // Fricciï¿½n del aire
                 this.vx *= 0.99;
                 this.vy *= 0.99;
 
                 this.x += this.vx;
                 this.y += this.vy;
 
-                // Colisi�n con la pared circular exterior
+                // Colisiï¿½n con la pared circular exterior
                 const dx2 = this.x - centerX;
                 const dy2 = this.y - centerY;
                 const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
@@ -1947,8 +1947,8 @@
                 const floorY = 345 - this.radius;
                 if (this.y > floorY) {
                     this.y = floorY;
-                    this.vy *= -0.65; // Rebote el�stico
-                    this.vx *= 0.96;  // Fricci�n horizontal
+                    this.vy *= -0.65; // Rebote elï¿½stico
+                    this.vx *= 0.96;  // Fricciï¿½n horizontal
                 }
             }
 
@@ -1972,7 +1972,7 @@
             }
 
             draw(ctx) {
-                // Sombra interna de la bola (iluminaci�n)
+                // Sombra interna de la bola (iluminaciï¿½n)
                 ctx.beginPath();
                 ctx.arc(this.x + this.radius*0.15, this.y + this.radius*0.15, this.radius, 0, Math.PI * 2);
                 ctx.fillStyle = "rgba(0,0,0,0.15)";
@@ -1994,7 +1994,7 @@
                 ctx.fillStyle = "#ffffff";
                 ctx.fill();
 
-                // N�mero de bola pintado en el centro, escalado con el radio
+                // Nï¿½mero de bola pintado en el centro, escalado con el radio
                 ctx.fillStyle = "#1e293b";
                 ctx.font = "bold " + Math.max(9, Math.round(this.radius * 0.75)) + "px 'Fredoka'";
                 ctx.textAlign = "center";
@@ -2007,9 +2007,9 @@
             resizeTombolaCanvas();
             tombolaBalls = [];
             
-            // Para evitar que el navegador colapse con la f�sica O(n^2) de 1000+ colisiones,
-            // limitamos la cantidad m�xima de bolas que se dibujan f�sicamente dentro del tambor.
-            // (Nota: 75 bolas llenan visualmente el tambor ampliado dej�ndoles suficiente espacio para rebotar)
+            // Para evitar que el navegador colapse con la fï¿½sica O(n^2) de 1000+ colisiones,
+            // limitamos la cantidad mï¿½xima de bolas que se dibujan fï¿½sicamente dentro del tambor.
+            // (Nota: 75 bolas llenan visualmente el tambor ampliado dejï¿½ndoles suficiente espacio para rebotar)
             const maxVisibleBalls = 75;
             
             // Mezclamos un poco visualmente para que las bolas "visibles" sean variadas
@@ -2037,15 +2037,15 @@
                         const nx = dx / (dist || 1);
                         const ny = dy / (dist || 1);
 
-                        // Resolver interpenetraci�n suavemente (Soft body relaxation para evitar temblores/jittering)
-                        // En lugar de moverlos al 100% (0.5 cada uno), aplicamos un factor de relajaci�n (0.15)
+                        // Resolver interpenetraciï¿½n suavemente (Soft body relaxation para evitar temblores/jittering)
+                        // En lugar de moverlos al 100% (0.5 cada uno), aplicamos un factor de relajaciï¿½n (0.15)
                         const relaxation = 0.15;
                         b1.x -= nx * overlap * relaxation;
                         b1.y -= ny * overlap * relaxation;
                         b2.x += nx * overlap * relaxation;
                         b2.y += ny * overlap * relaxation;
 
-                        // Transferencia el�stica de impulsos vectoriales
+                        // Transferencia elï¿½stica de impulsos vectoriales
                         const kx = b1.vx - b2.vx;
                         const ky = b1.vy - b2.vy;
                         const p = 2 * (nx * kx + ny * ky) / 2;
@@ -2076,7 +2076,7 @@
             const centerY = 165;
             const cageRadius = 150;
 
-            // Dibujar soporte met�lico inferior
+            // Dibujar soporte metï¿½lico inferior
             tombolaCtx.strokeStyle = "#adb9be";
             tombolaCtx.lineWidth = 14;
             tombolaCtx.lineCap = "round";
@@ -2094,7 +2094,7 @@
             tombolaCtx.lineWidth = 8;
             tombolaCtx.stroke();
 
-            // L�gica de aceleraci�n/fricci�n al girar
+            // Lï¿½gica de aceleraciï¿½n/fricciï¿½n al girar
             if (isSpinningTombola) {
                 tombolaSpeed += 0.02;
                 if (tombolaSpeed > 0.4) tombolaSpeed = 0.4;
@@ -2121,7 +2121,7 @@
             tombolaCtx.arc(0, 0, cageRadius, 0, Math.PI * 2);
             tombolaCtx.stroke();
 
-            // Rayos del tambor met�lico
+            // Rayos del tambor metï¿½lico
             tombolaCtx.strokeStyle = "rgba(128,146,154,0.45)";
             tombolaCtx.lineWidth = 2.5;
             const spokes = 16;
@@ -2143,7 +2143,7 @@
             tombolaCtx.stroke();
 
             if (programLogoImg.complete && programLogoImg.naturalWidth !== 0) {
-                const logoSize = 48; // Tama�o ajustado para caber en el centro de 64px de di�metro
+                const logoSize = 48; // Tamaï¿½o ajustado para caber en el centro de 64px de diï¿½metro
                 tombolaCtx.drawImage(programLogoImg, -logoSize/2, -logoSize/2, logoSize, logoSize);
             } else {
                 tombolaCtx.fillStyle = "#5b5b5b";
@@ -2183,7 +2183,7 @@
             tombolaCtx.fill();
             tombolaCtx.restore();
             
-            // Dibujar la bola cayendo (bola ganadora extra�da con efecto 3D)
+            // Dibujar la bola cayendo (bola ganadora extraï¿½da con efecto 3D)
             if (droppingBallObj) {
                 droppingBallObj.updateDrop();
                 droppingBallObj.drawDrop(tombolaCtx);
@@ -2210,7 +2210,7 @@
                 document.getElementById('btn-spin-tombola').innerHTML = '<i class="fa-solid fa-arrows-spin"></i><span>MEZCLAR BOLAS</span>';
             } else {
                 if (participants.length === 0) {
-                    showCustomToast("�No hay participantes!", "Agrega algunos personajes en el panel de Ajustes.");
+                    showCustomToast("ï¿½No hay participantes!", "Agrega algunos personajes en el panel de Ajustes.");
                     return;
                 }
                 isSpinningTombola = true;
@@ -2230,11 +2230,11 @@
     </script>
 
     <script>
-        // --- EXTRACCI�N Y REVELACI�N DEL GANADOR ---
+        // --- EXTRACCIï¿½N Y REVELACIï¿½N DEL GANADOR ---
         function drawBall() {
             playSoundClick();
             if (participants.length === 0) {
-                showCustomToast("�No hay bolas!", "Introduce participantes para jugar.");
+                showCustomToast("ï¿½No hay bolas!", "Introduce participantes para jugar.");
                 return;
             }
 
@@ -2243,17 +2243,17 @@
             drawBtn.classList.add('opacity-50');
 
             // Determinar el premio antes de empezar
-            // Filtramos premios que son para 'sorteo' y que a�n no tengan ganador
+            // Filtramos premios que son para 'sorteo' y que aï¿½n no tengan ganador
             let availablePrizes = prizes.filter(p => (p.type || 'sorteo') === 'sorteo' && !p.winner);
             
-            let winningPrizeName = "�Premio Sorpresa!";
+            let winningPrizeName = "ï¿½Premio Sorpresa!";
             let prizeIndex = -1;
             
             if (availablePrizes.length > 0) {
                 // Elegir el primer premio disponible (en el orden actual de la lista)
                 const selectedPrize = availablePrizes[0];
                 
-                // Encontrar su �ndice real en el array 'prizes' global para actualizarlo despu�s
+                // Encontrar su ï¿½ndice real en el array 'prizes' global para actualizarlo despuï¿½s
                 prizeIndex = prizes.findIndex(p => p.id === selectedPrize.id);
                 winningPrizeName = prizes[prizeIndex].name;
             }
@@ -2271,7 +2271,7 @@
             
             modal.classList.remove('hidden');
             
-            // Subida de suspenso tipo notificaci�n
+            // Subida de suspenso tipo notificaciï¿½n
             setTimeout(() => {
                 playSoundClick();
                 banner.classList.remove('scale-y-0', 'opacity-0');
@@ -2286,7 +2286,7 @@
                     modal.classList.add('hidden');
                     callback();
                 }, 400); // tiempo de salida
-            }, 2500); // 2.5 segundos de visualizaci�n
+            }, 2500); // 2.5 segundos de visualizaciï¿½n
         }
 
         function executeDrawSequence(winningPrizeName, prizeIndex) {
@@ -2315,8 +2315,8 @@
                     droppingBallObj = tombolaBalls[winningBallIndex];
                     tombolaBalls.splice(winningBallIndex, 1);
                 } else {
-                    // Si la bola no estaba renderizada por el l�mite de m�ximo de bolas, 
-                    // creamos una instancia fresca de la nada solo para la animaci�n de expulsi�n
+                    // Si la bola no estaba renderizada por el lï¿½mite de mï¿½ximo de bolas, 
+                    // creamos una instancia fresca de la nada solo para la animaciï¿½n de expulsiï¿½n
                     droppingBallObj = new PhysicalBall(
                         winnerMii.name, 
                         winnerMii.color, 
@@ -2329,7 +2329,7 @@
                 // Posicionarla en el centro para expulsarla hacia el frente
                 droppingBallObj.x = 200;
                 droppingBallObj.y = 165; // Centro del tambor
-                droppingBallObj.vx = (Math.random() - 0.5) * 10; // Impulso lateral m�s fuerte
+                droppingBallObj.vx = (Math.random() - 0.5) * 10; // Impulso lateral mï¿½s fuerte
                 droppingBallObj.vy = -12; // Salto alto simulando que es lanzada hacia afuera
                 
                 playSoundBallDrop();
@@ -2364,22 +2364,22 @@
                 })
                 .catch(e => console.error(e));
 
-                // Esperar a que termine la animaci�n de ca�da antes de mostrar la celebraci�n
+                // Esperar a que termine la animaciï¿½n de caï¿½da antes de mostrar la celebraciï¿½n
                 setTimeout(() => {
                     droppingBallObj = null; // Quitarla de la pantalla principal
                     const drawBtn = document.getElementById('btn-draw-ball');
                     drawBtn.disabled = false;
                     drawBtn.classList.remove('opacity-50');
 
-                    // Iniciar la cinem�tica integrada de la bola abri�ndose
+                    // Iniciar la cinemï¿½tica integrada de la bola abriï¿½ndose
                     triggerSphereOpeningAnimation(winnerMii, winningPrizeName, winnerIndex);
                     updateUI();
                 }, 1800);
                 
-            }, 1800); // Tiempo girando la t�mbola
+            }, 1800); // Tiempo girando la tï¿½mbola
         }
 
-        // Ejecuci�n de la cinem�tica detallada de la esfera f�sica del bingo
+        // Ejecuciï¿½n de la cinemï¿½tica detallada de la esfera fï¿½sica del bingo
         function triggerSphereOpeningAnimation(winnerMii, winningPrizeName, winnerIndex) {
             currentAnimWinnerMii = winnerMii;
             currentAnimWinningPrizeName = winningPrizeName;
@@ -2405,9 +2405,9 @@
             actionBtn.classList.add('opacity-0', 'translate-y-4');
             actionBtn.classList.remove('opacity-100', 'translate-y-0');
 
-            titleEl.textContent = "�BOLA SELECCIONADA!";
+            titleEl.textContent = "ï¿½BOLA SELECCIONADA!";
 
-            // Color e �ndice de la bola f�sica
+            // Color e ï¿½ndice de la bola fï¿½sica
             const sphereColor = winnerMii.color;
             const displayId = winnerMii.display_id || (winnerIndex + 1);
             document.getElementById('svg-sphere-top-bg').setAttribute('fill', sphereColor);
@@ -2428,9 +2428,9 @@
             // Desplegar modal
             document.getElementById('sphere-opening-modal').classList.remove('hidden');
 
-            // --- SECUENCIA CRONOL�GICA DE ANIMACI�N ---
+            // --- SECUENCIA CRONOLï¿½GICA DE ANIMACIï¿½N ---
             
-            // 1. Ca�da gravitatoria y rebote el�stico de la bola en pantalla
+            // 1. Caï¿½da gravitatoria y rebote elï¿½stico de la bola en pantalla
             wrapper.classList.add('animate-sphere-bounce');
             playSoundBallDrop();
 
@@ -2441,7 +2441,7 @@
                 playSoundRumble();
             }, 750);
 
-            // 3. �Se abre f�sicamente la c�psula!
+            // 3. ï¿½Se abre fï¿½sicamente la cï¿½psula!
             setTimeout(() => {
                 wrapper.classList.remove('animate-sphere-shake');
                 topHalf.classList.add('animate-split-top');
@@ -2455,7 +2455,7 @@
                 playSoundRustle();
             }, 1900);
 
-            // 5. �EXPLOSI�N DE FIESTA! Se despliega el banner de victoria y llueve confeti
+            // 5. ï¿½EXPLOSIï¿½N DE FIESTA! Se despliega el banner de victoria y llueve confeti
             setTimeout(() => {
                 strikeBanner.classList.remove('scale-y-0', 'opacity-0');
                 strikeBanner.classList.add('scale-y-100', 'opacity-100');
@@ -2463,7 +2463,7 @@
                 triggerConfettiRain();
             }, 2200);
 
-            // 6. Aparece bot�n de confirmaci�n
+            // 6. Aparece botï¿½n de confirmaciï¿½n
             setTimeout(() => {
                 actionBtn.classList.remove('opacity-0', 'translate-y-4');
                 actionBtn.classList.add('opacity-100', 'translate-y-0');
@@ -2472,7 +2472,7 @@
 
         let confettiInterval = null;
 
-        // Genera r�fagas f�sicas de confeti cayendo continuamente
+        // Genera rï¿½fagas fï¿½sicas de confeti cayendo continuamente
         function triggerConfettiRain() {
             const confettiContainer = document.getElementById('modal-confetti');
             confettiContainer.innerHTML = '';
@@ -2498,13 +2498,13 @@
                     flake.style.transition = `top ${duration}s linear, transform ${duration}s ease-in-out`;
                     confettiContainer.appendChild(flake);
 
-                    // Fuerza f�sica simulada de gravedad para la ca�da
+                    // Fuerza fï¿½sica simulada de gravedad para la caï¿½da
                     setTimeout(() => {
                         flake.style.top = '105%';
                         flake.style.transform = `rotate(${Math.random()*720}deg) translateX(${Math.random()*100 - 50}px)`;
                     }, 50);
 
-                    // Limpieza al terminar la ca�da para que no sature la memoria
+                    // Limpieza al terminar la caï¿½da para que no sature la memoria
                     setTimeout(() => {
                         if (flake.parentNode) flake.remove();
                     }, duration * 1000 + 100);
@@ -2514,7 +2514,7 @@
             // Disparo fuerte inicial
             for(let k=0; k<4; k++) dropBatch();
             
-            // Bucle infinito de ca�da
+            // Bucle infinito de caï¿½da
             if (confettiInterval) clearInterval(confettiInterval);
             confettiInterval = setInterval(dropBatch, 400);
         }
@@ -2621,7 +2621,7 @@
             }
         });
 
-        // --- INICIALIZADORES AL CARGAR LA P�GINA ---
+        // --- INICIALIZADORES AL CARGAR LA Pï¿½GINA ---
         window.onload = function() {
             initData();
 
