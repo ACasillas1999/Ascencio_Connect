@@ -381,6 +381,8 @@ class EventoController extends Controller
             if ($canje) {
                 $data['winner'] = $canje->participante ? $canje->participante->Nombre : 'Participante Eliminado';
                 $data['winner_id'] = $canje->participante ? $canje->participante->ID : null;
+                $data['canje_id'] = $canje->ID;
+                $data['delivered'] = (bool)$canje->Entregado;
             }
 
             return $data;

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Tómbola - ' . $evento->name_evento)
 @section('page-title', 'Tómbola - ' . $evento->name_evento)
@@ -1130,13 +1130,24 @@
             const tombolaPrizes = document.getElementById('tombola-available-prizes');
             if (tombolaPrizes) {
                 tombolaPrizes.innerHTML = '';
-                // En la tómbola solo mostramos los premios destinados al azar (sorteo)
-                const sorteoPrizes = prizes.filter(p => (p.type || 'sorteo') === 'sorteo');
+                // En la tómbola solo mostramos los premios destinados al azar (sorteo) que NO estén marcados como entregados
+                const sorteoPrizes = prizes.filter(p => {
+                    if ((p.type || 'sorteo') !== 'sorteo') return false;
+                    
+                    const isDelivered = p.delivered || drawnBallsHistory.some(h => {
+                        if (p.canje_id && h.canje_id) return h.canje_id == p.canje_id && h.delivered;
+                        const hPrizeName = (typeof h.prize === 'object' && h.prize) ? h.prize.name : h.prize;
+                        const hWinnerName = h.p ? h.p.name : (h.name || '');
+                        return hPrizeName === p.name && (hWinnerName === p.winner || h.display_id == p.winner_id) && h.delivered;
+                    });
+
+                    return !isDelivered;
+                });
                 
                 if (prizeCountView) prizeCountView.innerText = sorteoPrizes.length;
 
                 if (sorteoPrizes.length === 0) {
-                    tombolaPrizes.innerHTML = '<div class="text-gray-400 text-center py-4 text-xs font-semibold">No hay premios configurados para Sorteo.</div>';
+                    tombolaPrizes.innerHTML = '<div class="text-gray-400 text-center py-4 text-xs font-semibold">No hay premios pendientes de entrega.</div>';
                 } else {
                     let nextPrizeFound = false;
                     sorteoPrizes.forEach(pr => {
@@ -1149,7 +1160,7 @@
                             nextPrizeFound = true;
                         }
 
-                        let bgColor = isWon ? 'bg-emerald-900/40 border-emerald-700/50 shadow-sm opacity-60' : 'bg-slate-800/40 border-slate-700/50';
+                        let bgColor = isWon ? 'bg-emerald-950/50 border-emerald-700/60 shadow-sm' : 'bg-slate-800/40 border-slate-700/50';
                         if (isNext) {
                             bgColor = 'bg-sky-900/80 border-sky-400 shadow-[0_0_15px_rgba(56,189,248,0.4)] transform scale-[1.02] z-10';
                         }
@@ -1159,32 +1170,56 @@
                             iconColor = 'text-sky-100 bg-sky-500';
                         }
                         
-                        let winnerHtml = '';
                         if (isWon) {
-                            winnerHtml = `<span class="font-bold text-emerald-400 text-[13px] truncate bg-emerald-900/60 px-2 py-1 rounded-md border border-emerald-800/50" title="${pr.winner} #${pr.winner_id}"><i class="fa-solid fa-check mr-1"></i>${pr.winner} <small class="text-emerald-500/70 ml-0.5">#${pr.winner_id}</small></span>`;
-                        } else if (isNext) {
-                            winnerHtml = `<span class="font-black text-sky-200 text-[10px] uppercase tracking-widest border border-sky-400/50 px-2 py-0.5 rounded-full bg-sky-800 animate-pulse"><i class="fa-solid fa-crosshairs mr-1"></i>Sorteando</span>`;
-                        } else {
-                            winnerHtml = `<span class="font-semibold text-gray-500 text-[11px] uppercase italic">Pendiente</span>`;
-                        }
-
-                        row.className = `flex items-center justify-between p-2 rounded-xl border ${bgColor} transition-all duration-300 relative group select-none`;
-                        if (!isWon) {
-                            row.setAttribute('oncontextmenu', `showPrizeMenu(event, '${pr.id}')`);
-                            row.classList.add('cursor-context-menu');
-                            row.title = "Clic derecho para cambiar el orden";
-                        }
-                        row.innerHTML = `
-                            <div class="flex items-center gap-2 w-1/2 overflow-hidden pr-2">
-                                <div class="w-7 h-7 rounded-full ${iconColor} flex items-center justify-center flex-shrink-0 shadow-inner">
-                                    <i class="fa-solid ${isWon ? 'fa-gift' : (isNext ? 'fa-star' : 'fa-box')} text-[10px]"></i>
+                            row.className = `flex flex-col gap-2 p-2.5 rounded-xl border ${bgColor} transition-all duration-300 relative group select-none`;
+                            row.innerHTML = `
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2 overflow-hidden w-1/2">
+                                        <div class="w-7 h-7 rounded-full ${iconColor} flex items-center justify-center flex-shrink-0 shadow-inner">
+                                            <i class="fa-solid fa-gift text-[10px]"></i>
+                                        </div>
+                                        <span class="font-bold text-gray-100 text-xs leading-tight truncate" title="${pr.name}">${pr.name}</span>
+                                    </div>
+                                    <div class="w-1/2 text-right overflow-hidden flex justify-end items-center">
+                                        <span class="font-bold text-emerald-400 text-[11px] truncate bg-emerald-900/60 px-2 py-0.5 rounded-md border border-emerald-800/50 flex items-center gap-1" title="${pr.winner} #${pr.winner_id}">
+                                            <i class="fa-solid fa-check text-[10px]"></i>
+                                            <span class="truncate">${pr.winner}</span>
+                                            <small class="text-emerald-500/70 font-semibold">#${pr.winner_id}</small>
+                                        </span>
+                                    </div>
                                 </div>
-                                <span class="font-bold ${isNext ? 'text-white' : 'text-gray-200'} text-xs leading-tight truncate" title="${pr.name}">${pr.name}</span>
-                            </div>
-                            <div class="w-1/2 text-right overflow-hidden flex justify-end items-center">
-                                ${winnerHtml}
-                            </div>
-                        `;
+                                <div class="flex items-center justify-end gap-2 pt-1.5 border-t border-emerald-800/40">
+                                    <button onclick="confirmToggleDeliveryByPrize(event, '${pr.id}')" class="cursor-pointer group flex items-center gap-2 bg-slate-900/60 hover:bg-slate-900 border border-slate-700/80 px-2.5 py-1 rounded-lg transition-colors select-none shadow-inner" title="Marcar como Entregado">
+                                        <span class="text-[10px] font-bold text-slate-400 group-hover:text-slate-200 uppercase tracking-wider">Entregado</span>
+                                        <div class="relative w-7 h-3.5 rounded-full transition-colors bg-slate-800 border border-slate-600">
+                                            <div class="absolute top-[1px] left-[1px] w-2.5 h-2.5 rounded-full transition-transform duration-300 bg-slate-400"></div>
+                                        </div>
+                                    </button>
+                                    <button onclick="confirmRevertWinnerByPrize(event, '${pr.id}')" class="w-7 h-7 rounded-lg bg-slate-900/60 hover:bg-red-500/20 text-slate-400 hover:text-red-400 border border-slate-700 hover:border-red-500/50 transition-all flex items-center justify-center text-xs font-bold shadow-inner" title="Revertir premio (devolver al sorteo)">
+                                        <i class="fa-solid fa-rotate-left"></i>
+                                    </button>
+                                </div>
+                            `;
+                        } else {
+                            let winnerHtml = isNext 
+                                ? `<span class="font-black text-sky-200 text-[10px] uppercase tracking-widest border border-sky-400/50 px-2 py-0.5 rounded-full bg-sky-800 animate-pulse"><i class="fa-solid fa-crosshairs mr-1"></i>Sorteando</span>` 
+                                : `<span class="font-semibold text-gray-500 text-[11px] uppercase italic">Pendiente</span>`;
+
+                            row.className = `flex items-center justify-between p-2 rounded-xl border ${bgColor} transition-all duration-300 relative group select-none cursor-context-menu`;
+                            row.setAttribute('oncontextmenu', `showPrizeMenu(event, '${pr.id}')`);
+                            row.title = "Clic derecho para cambiar el orden";
+                            row.innerHTML = `
+                                <div class="flex items-center gap-2 w-1/2 overflow-hidden pr-2">
+                                    <div class="w-7 h-7 rounded-full ${iconColor} flex items-center justify-center flex-shrink-0 shadow-inner">
+                                        <i class="fa-solid ${isNext ? 'fa-star' : 'fa-box'} text-[10px]"></i>
+                                    </div>
+                                    <span class="font-bold ${isNext ? 'text-white' : 'text-gray-200'} text-xs leading-tight truncate" title="${pr.name}">${pr.name}</span>
+                                </div>
+                                <div class="w-1/2 text-right overflow-hidden flex justify-end items-center">
+                                    ${winnerHtml}
+                                </div>
+                            `;
+                        }
                         tombolaPrizes.appendChild(row);
                     });
 
@@ -1378,6 +1413,44 @@
         }
 
         // Agregamos la función de confirmación
+        function confirmToggleDeliveryByPrize(event, prizeId) {
+            event.preventDefault();
+            const pr = prizes.find(p => p.id == prizeId);
+            if (!pr) return;
+
+            let hIndex = drawnBallsHistory.findIndex(h => {
+                if (pr.canje_id && h.canje_id) {
+                    return h.canje_id == pr.canje_id;
+                }
+                const hPrizeName = (typeof h.prize === 'object' && h.prize) ? h.prize.name : h.prize;
+                const hWinnerName = h.p ? h.p.name : (h.name || '');
+                return hPrizeName === pr.name && (hWinnerName === pr.winner || h.display_id == pr.winner_id);
+            });
+
+            if (hIndex !== -1) {
+                confirmToggleDelivery(event, hIndex);
+            }
+        }
+
+        function confirmRevertWinnerByPrize(event, prizeId) {
+            event.preventDefault();
+            const pr = prizes.find(p => p.id == prizeId);
+            if (!pr) return;
+
+            let hIndex = drawnBallsHistory.findIndex(h => {
+                if (pr.canje_id && h.canje_id) {
+                    return h.canje_id == pr.canje_id;
+                }
+                const hPrizeName = (typeof h.prize === 'object' && h.prize) ? h.prize.name : h.prize;
+                const hWinnerName = h.p ? h.p.name : (h.name || '');
+                return hPrizeName === pr.name && (hWinnerName === pr.winner || h.display_id == pr.winner_id);
+            });
+
+            if (hIndex !== -1) {
+                confirmRevertWinner(event, hIndex);
+            }
+        }
+
         function confirmToggleDelivery(event, index) {
             // Evitamos que el checkbox cambie su estado automáticamente
             event.preventDefault();
@@ -1411,6 +1484,14 @@
                 if (result.isConfirmed) {
                     const newState = !h.delivered;
                     h.delivered = newState;
+                    const hPrizeName = (typeof h.prize === 'object' && h.prize) ? h.prize.name : (h.prize || '');
+                    const matchingPrize = prizes.find(p => {
+                        if (h.canje_id && p.canje_id) return p.canje_id == h.canje_id;
+                        return p.name === hPrizeName && (p.winner === (h.p ? h.p.name : h.name) || p.winner_id == h.display_id);
+                    });
+                    if (matchingPrize) {
+                        matchingPrize.delivered = newState;
+                    }
                     updateUI(); // Se repinta la UI completa optimísticamente
 
                     if (h.canje_id) {
