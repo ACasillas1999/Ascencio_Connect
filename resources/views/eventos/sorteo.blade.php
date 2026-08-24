@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Tómbola - ' . $evento->name_evento)
 @section('page-title', 'Tómbola - ' . $evento->name_evento)
@@ -435,15 +435,15 @@
     <div id="wii-pointer" style="width: 50px; height: 50px; position: absolute; pointer-events: none; z-index: 9999; margin-top: -5px; margin-left: -20px; filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.4));">
         <div class="relative w-full h-full" style="transform: rotate(-15deg);">
             <i class="fa-solid fa-hand-pointer text-white" style="font-size: 45px; -webkit-text-stroke: 2.5px #333;"></i>
-            <div class="absolute -bottom-1 -right-1 bg-[#00a0e9] border-[2px] border-white rounded-full w-6 h-6 flex itemás-center justify-center shadow-sm" style="transform: rotate(15deg);">
+            <div class="absolute -bottom-1 -right-1 bg-[#00a0e9] border-[2px] border-white rounded-full w-6 h-6 flex items-center justify-center shadow-sm" style="transform: rotate(15deg);">
                 <span class="text-[9px] font-black text-white font-['Nunito'] tracking-tighter" style="margin-top: 1px;">P1</span>
             </div>
         </div>
     </div>
 
-    <header class="w-full bg-white/80 border-b-4 border-white shadow-sm py-4 px-6 flex justify-between itemás-center z-10">
-        <div class="flex itemás-center space-x-4">
-            <div class="bg-[#00a0e9] text-white font-bold px-4 py-2 rounded-full text-lg shadow-inner flex itemás-center gap-2">
+    <header class="w-full bg-white/80 border-b-4 border-white shadow-sm py-4 px-6 flex justify-between items-center z-10">
+        <div class="flex items-center space-x-4">
+            <div class="bg-[#00a0e9] text-white font-bold px-4 py-2 rounded-full text-lg shadow-inner flex items-center gap-2">
                 <i class="fa-solid fa-circle-nodes"></i>
                 <span>Plaza de Sorteos</span>
             </div>
@@ -451,19 +451,19 @@
         </div>
         
         <!-- Controladores y Sonido -->
-        <div class="flex itemás-center space-x-3">
+        <div class="flex items-center space-x-3">
             <!-- Botn de música -->
-            <button onclick="toggleMusic()" id="music-btn" class="wii-btn px-4 py-2 flex itemás-center gap-2 text-gray-700 font-medium text-sm">
+            <button onclick="toggleMusic()" id="music-btn" class="wii-btn px-4 py-2 flex items-center gap-2 text-gray-700 font-medium text-sm">
                 <i id="music-icon" class="fa-solid fa-volume-xmark text-red-500"></i>
                 <span id="music-text">Música: OFF</span>
             </button>
             <!-- Interruptor para cursor de mano -->
-            <button onclick="toggleWiiCursor()" class="wii-btn px-4 py-2 flex itemás-center gap-2 text-gray-700 font-medium text-sm">
+            <button onclick="toggleWiiCursor()" class="wii-btn px-4 py-2 flex items-center gap-2 text-gray-700 font-medium text-sm">
                 <i class="fa-solid fa-hand-pointer text-[#00a0e9]"></i>
                 <span>Puntero de Mano</span>
             </button>
             <!-- Botn Pantalla Completa -->
-            <button onclick="toggleFullscreen()" class="wii-btn px-4 py-2 flex itemás-center gap-2 text-gray-700 font-medium text-sm">
+            <button onclick="toggleFullscreen()" class="wii-btn px-4 py-2 flex items-center gap-2 text-gray-700 font-medium text-sm">
                 <i id="fs-icon" class="fa-solid fa-expand text-[#00a0e9]"></i>
                 <span id="fs-text">Pantalla Completa</span>
             </button>
@@ -475,11 +475,11 @@
     </header>
 
     <!-- PANTALLA PRINCIPAL DE JUEGO -->
-    <main class="flex-grow flex flex-col itemás-center justify-center p-6 w-full h-full mx-auto z-10">
+    <main class="flex-grow flex flex-col items-center justify-center p-6 w-full h-full mx-auto z-10">
         
-        <section id="tombola-view" class="w-full h-full flex flex-col itemás-center gap-6 flex-grow">
-            <div class="w-full flex justify-between itemás-center px-4">
-                <div class="flex itemás-center gap-2 bg-white/90 border-2 border-slate-200 px-4 py-2 rounded-2xl shadow-sm">
+        <section id="tombola-view" class="w-full h-full flex flex-col items-center gap-6 flex-grow">
+            <div class="w-full flex justify-between items-center px-4">
+                <div class="flex items-center gap-2 bg-white/90 border-2 border-slate-200 px-4 py-2 rounded-2xl shadow-sm">
                     <span class="w-3.5 h-3.5 bg-emerald-500 rounded-full animate-ping"></span>
                     <span class="text-sm font-bold text-gray-600 uppercase tracking-wide">Tómbola Activa</span>
                 </div>
@@ -487,7 +487,7 @@
                     <h2 class="text-3xl font-bold text-gray-800 tracking-wide">TÓMBOLA DE ASCENCIO</h2>
                     <p class="text-sm text-gray-500">Mezcla las esferas de los participantes y extrae un ganador.</p>
                 </div>
-                <button onclick="switchView('setup-view')" class="wii-btn px-6 py-2.5 font-bold text-emerald-600 flex itemás-center gap-2">
+                <button onclick="switchView('setup-view')" class="wii-btn px-6 py-2.5 font-bold text-emerald-600 flex items-center gap-2">
                     <i class="fa-solid fa-cog"></i> Configurar Sorteo
                 </button>
             </div>
@@ -495,7 +495,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 w-full flex-grow pb-4">
                 <!-- Panel Lateral Izquierdo: Lista de Participantes -->
                 <div class="wii-panel p-4 flex flex-col h-[65vh] min-h-[450px] lg:col-span-1">
-                    <h3 class="text-xl font-bold text-gray-700 border-b pb-2 mb-4 flex itemás-center justify-between">
+                    <h3 class="text-xl font-bold text-gray-700 border-b pb-2 mb-4 flex items-center justify-between">
                         <span>Participantes en Bombo</span>
                         <span id="tombola-participant-count" class="bg-[#00a0e9] text-white text-xs px-2.5 py-1 rounded-full">0</span>
                     </h3>
@@ -505,9 +505,9 @@
                 </div>
 
                 <!-- Centro: Lienzo de la Tómbola Fsica -->
-                <div class="wii-panel p-6 flex flex-col itemás-center justify-between lg:col-span-2 h-[65vh] min-h-[450px] relative">
+                <div class="wii-panel p-6 flex flex-col items-center justify-between lg:col-span-2 h-[65vh] min-h-[450px] relative">
                     <!-- Canvas de la tmbola -->
-                    <div class="relative w-full h-full flex-grow flex itemás-center justify-center">
+                    <div class="relative w-full h-full flex-grow flex items-center justify-center">
                         <canvas id="tombola-canvas" class="w-full h-full min-h-[300px] rounded-2xl bg-gradient-to-b from-sky-50 to-white border-2 border-slate-200/50 shadow-inner"></canvas>
                         
                         <!-- DEBUG OVERLAY (Removed) -->
@@ -522,11 +522,11 @@
 
                     <!-- Controles de la Tómbola -->
                     <div class="w-full flex gap-4 mt-4">
-                        <button id="btn-spin-tombola" onclick="spinTombolaManual()" class="wii-btn wii-btn-orange flex-1 py-4 font-bold text-xl flex itemás-center justify-center gap-2">
+                        <button id="btn-spin-tombola" onclick="spinTombolaManual()" class="wii-btn wii-btn-orange flex-1 py-4 font-bold text-xl flex items-center justify-center gap-2">
                             <i class="fa-solid fa-arrows-spin"></i>
                             <span>MEZCLAR BOLAS</span>
                         </button>
-                        <button id="btn-draw-ball" onclick="drawBall()" class="wii-btn wii-btn-blue flex-1 py-4 font-bold text-xl flex itemás-center justify-center gap-2">
+                        <button id="btn-draw-ball" onclick="drawBall()" class="wii-btn wii-btn-blue flex-1 py-4 font-bold text-xl flex items-center justify-center gap-2">
                             <i class="fa-solid fa-gift"></i>
                             <span>EXTRAER GANADOR!</span>
                         </button>
@@ -535,7 +535,7 @@
 
                 <!-- Panel Lateral Derecho: Tablero de Premios y Ganadores -->
                 <div class="wii-panel p-4 flex flex-col h-[65vh] min-h-[450px] lg:col-span-1">
-                    <h3 class="font-bold text-gray-700 mb-2 flex itemás-center gap-2 border-b pb-2">
+                    <h3 class="font-bold text-gray-700 mb-2 flex items-center gap-2 border-b pb-2">
                         <i class="fa-solid fa-gift text-orange-500"></i>
                         <span>Tablero de Sorteo</span>
                         <span id="tombola-prize-count-view" class="bg-orange-500 text-white text-[10px] px-2 py-0.5 rounded-full ml-auto">0</span>
@@ -556,36 +556,37 @@
 
         <!-- Menú Contextual para Reordenar Premios (Windows Style) -->
         <div id="prize-context-menu" class="hidden absolute bg-white/95 backdrop-blur-md border border-gray-200 rounded-lg shadow-lg z-[10000] w-40 text-[13px] font-sans text-gray-800 p-1">
-            <button onclick="contextMenúuUp()" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 rounded-md transition-none border-none outline-none flex itemás-center gap-2">
+            <button onclick="contextMenúuUp()" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 rounded-md transition-none border-none outline-none flex items-center gap-2">
                 <i class="fa-solid fa-arrow-up text-[10px] text-gray-500"></i> Ascender
             </button>
-            <button onclick="contextMenúuDown()" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 rounded-md transition-none border-none outline-none flex itemás-center gap-2">
+            <button onclick="contextMenúuDown()" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 rounded-md transition-none border-none outline-none flex items-center gap-2">
                 <i class="fa-solid fa-arrow-down text-[10px] text-gray-500"></i> Descender
             </button>
         </div>
 
         <!-- SECCIÓN DE CONFIGURACIÓN -->
-        <section id="setup-view" class="w-full hidden flex-col itemás-center gap-6">
-            <div class="w-full flex justify-between itemás-center px-4 max-w-5xl mb-2">
-                <button onclick="switchView('tombola-view')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 shadow-md rounded-lg px-6 py-2.5 font-medium flex itemás-center gap-2 transition-colors">
+        <!-- SECCIÓN DE CONFIGURACIÓN -->
+        <section id="setup-view" class="w-full hidden flex-col items-center gap-6 overflow-y-auto max-h-[85vh] p-2">
+            <div class="w-full flex justify-between items-center px-4 mb-2">
+                <button onclick="switchView('tombola-view')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 shadow-md rounded-lg px-6 py-2.5 font-medium flex items-center gap-2 transition-colors">
                     <i class="fa-solid fa-chevron-left"></i> Volver a la Tómbola
                 </button>
                 <div class="text-center">
                     <h2 class="text-3xl font-extrabold text-white tracking-tight drop-shadow-sm">Configuración del Sorteo</h2>
                     <p class="text-sm text-slate-400 font-medium mt-1 uppercase tracking-widest">Gestión avanzada y control interno</p>
                 </div>
-                <button onclick="resetData()" class="bg-slate-800 hover:bg-red-900/40 text-red-400 hover:text-red-300 border border-slate-700 hover:border-red-800/50 shadow-md rounded-lg px-5 py-2.5 text-sm font-bold flex itemás-center gap-2 transition-all">
+                <button onclick="resetData()" class="bg-slate-800 hover:bg-red-900/40 text-red-400 hover:text-red-300 border border-slate-700 hover:border-red-800/50 shadow-md rounded-lg px-5 py-2.5 text-sm font-bold flex items-center gap-2 transition-all">
                     <i class="fa-solid fa-arrow-rotate-left"></i> Reiniciar Todo
                 </button>
             </div>
 
-            <div class="w-full max-w-[1600px] bg-slate-900/50 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.6)] border border-slate-700/60 mx-auto flex flex-col itemás-center">
-                <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 w-full">
+            <div class="w-full bg-slate-900/50 backdrop-blur-xl p-6 rounded-[2rem] shadow-2xl border border-slate-700/60 mx-auto flex flex-col items-center">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
                 
                 <!-- COLUMNA 1: Participantes -->
                 <div class="bg-slate-900/80 backdrop-blur-md p-7 flex flex-col h-[620px] rounded-2xl shadow-2xl border border-slate-700">
-                    <h3 class="text-xl font-bold text-white mb-5 flex justify-between itemás-center border-b border-slate-700/60 pb-4">
-                        <span class="flex itemás-center gap-3"><i class="fa-solid fa-users text-indigo-400"></i> Participantes Activos</span>
+                    <h3 class="text-xl font-bold text-white mb-5 flex justify-between items-center border-b border-slate-700/60 pb-4">
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-users text-indigo-400"></i> Participantes Activos</span>
                         <span id="setup-participant-count" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs px-3 py-1 rounded-md font-bold tracking-wider">0</span>
                     </h3>
 
@@ -599,14 +600,14 @@
 
                 <!-- COLUMNA 2: Premios del Sorteo -->
                 <div class="bg-slate-900/80 backdrop-blur-md p-7 flex flex-col h-[620px] rounded-2xl shadow-2xl border border-slate-700">
-                    <h3 class="text-xl font-bold text-white mb-5 flex justify-between itemás-center border-b border-slate-700/60 pb-4">
-                        <span class="flex itemás-center gap-3"><i class="fa-solid fa-trophy text-amber-400"></i> Registro de Ganadores</span>
+                    <h3 class="text-xl font-bold text-white mb-5 flex justify-between items-center border-b border-slate-700/60 pb-4">
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-trophy text-amber-400"></i> Registro de Ganadores</span>
                         <span id="setup-winners-count" class="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs px-3 py-1 rounded-md font-bold tracking-wider">0</span>
                     </h3>
 
-                    <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 mb-5 text-xs font-medium text-slate-400 flex justify-between itemás-center shadow-inner">
+                    <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 mb-5 text-xs font-medium text-slate-400 flex justify-between items-center shadow-inner">
                         <span class="tracking-wide">Marca los premios entregados físicamente.</span>
-                        <button onclick="clearHistories()" class="bg-slate-900 hover:bg-red-900/40 text-slate-400 hover:text-red-400 border border-slate-700 hover:border-red-800/50 rounded-lg px-4 py-2 transition-all flex itemás-center font-bold tracking-wide"><i class="fa-solid fa-trash-can mr-2 text-[11px]"></i> Limpiar</button>
+                        <button onclick="clearHistories()" class="bg-slate-900 hover:bg-red-900/40 text-slate-400 hover:text-red-400 border border-slate-700 hover:border-red-800/50 rounded-lg px-4 py-2 transition-all flex items-center font-bold tracking-wide"><i class="fa-solid fa-trash-can mr-2 text-[11px]"></i> Limpiar</button>
                     </div>
 
                     <!-- Lista de Ganadores -->
@@ -617,25 +618,25 @@
 
                 <!-- COLUMNA 3: Canjes por Puntos -->
                 <div class="bg-slate-900/80 backdrop-blur-md p-7 flex flex-col h-[620px] rounded-2xl shadow-2xl border border-slate-700">
-                    <h3 class="text-xl font-bold text-white mb-5 flex justify-between itemás-center border-b border-slate-700/60 pb-4">
-                        <span class="flex itemás-center gap-3"><i class="fa-solid fa-gift text-emerald-400"></i> Premios Canjeados (Puntos)</span>
+                    <h3 class="text-xl font-bold text-white mb-5 flex justify-between items-center border-b border-slate-700/60 pb-4">
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-gift text-emerald-400"></i> Premios Canjeados (Puntos)</span>
                         <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-3 py-1 rounded-md font-bold tracking-wider">{{ count($historialPuntos) }}</span>
                     </h3>
 
-                    <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 mb-5 text-xs font-medium text-slate-400 flex justify-between itemás-center shadow-inner">
+                    <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 mb-5 text-xs font-medium text-slate-400 flex justify-between items-center shadow-inner">
                         <span class="tracking-wide">Historial de premios canjeados mediante puntos.</span>
                     </div>
 
                     <!-- Lista de Canjes -->
                     <div class="flex-grow overflow-y-auto space-y-2 pr-1">
                         @forelse($historialPuntos as $hp)
-                            <div class="flex itemás-center justify-between p-3.5 bg-slate-800/60 hover:bg-slate-700/60 rounded-xl border border-slate-700/80 shadow-sm transition-colors mb-2">
+                            <div class="flex items-center justify-between p-3.5 bg-slate-800/60 hover:bg-slate-700/60 rounded-xl border border-slate-700/80 shadow-sm transition-colors mb-2">
                                 <div class="flex flex-col truncate w-full">
-                                    <div class="flex justify-between itemás-center mb-1">
+                                    <div class="flex justify-between items-center mb-1">
                                         <span class="font-bold text-slate-100 text-[15px] tracking-wide truncate" title="{{ $hp['participante'] }}">{{ $hp['participante'] }} <span class="text-[11px] text-slate-400 font-medium ml-2">ID #{{ $hp['participante_id'] }}</span></span>
                                         <span class="text-xs text-slate-400 font-bold bg-slate-900/50 px-2 py-0.5 rounded">{{ $hp['fecha'] }}</span>
                                     </div>
-                                    <div class="flex justify-between itemás-center mt-1">
+                                    <div class="flex justify-between items-center mt-1">
                                         <span class="text-xs text-emerald-400 font-bold truncate tracking-wide"><i class="fa-solid fa-gift mr-1.5 opacity-80"></i>{{ $hp['premio'] }} <span class="text-white bg-emerald-500/30 px-1.5 py-0.5 rounded ml-1">x{{ $hp['cantidad'] }}</span></span>
                                         <span class="text-xs text-red-400 font-bold">-{{ number_format($hp['puntos'] * $hp['cantidad']) }} pts</span>
                                     </div>
@@ -654,19 +655,19 @@
     </main>
 
     <!-- MODAL DE APERTURA DE BOLA Y CELEBRACIN -->
-    <div id="sphere-opening-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex flex-col itemás-center justify-center hidden z-50">
+    <div id="sphere-opening-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex flex-col items-center justify-center hidden z-50">
         
         <!-- Contenedor de confeti de fondo -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none" id="modal-confetti" style="z-index: 2;"></div>
 
         <!-- Banner de Victoria Horizontal (Cruza por detrs de la bola) -->
-        <div id="victory-strike-banner" class="strike-banner w-full py-8 md:py-12 absolute left-0 right-0 top-1/2 -translate-y-1/2 scale-y-0 opacity-0 transition-all duration-500 flex flex-col md:flex-row justify-between itemás-center px-6 md:px-20" style="z-index: 5;">
+        <div id="victory-strike-banner" class="strike-banner w-full py-8 md:py-12 absolute left-0 right-0 top-1/2 -translate-y-1/2 scale-y-0 opacity-0 transition-all duration-500 flex flex-col md:flex-row justify-between items-center px-6 md:px-20" style="z-index: 5;">
             <!-- Franja superior de acento blanco -->
             <div class="absolute top-0 w-full h-1.5 bg-white/40"></div>
             
             <!-- Bloque Izquierdo: Datos del Ganador -->
             <div class="text-center md:text-left flex flex-col justify-center w-full md:w-1/3 mb-2 md:mb-0">
-                <span class="text-orange-400 font-black tracking-widestá text-sm md:text-xl uppercase drop-shadow animate-pulse">? ¡TENEMOS UN GANADOR! ?</span>
+                <span class="text-orange-400 font-black tracking-widest text-sm md:text-xl uppercase drop-shadow animate-pulse">¡TENEMOS UN GANADOR!</span>
                 <h2 id="strike-winner-name" class="text-white font-extrabold text-4xl md:text-6xl uppercase tracking-wide truncate drop-shadow">MATT</h2>
             </div>
             
@@ -675,7 +676,7 @@
             
             <!-- Bloque Derecho: Datos del Premio -->
             <div class="text-center md:text-right flex flex-col justify-center w-full md:w-1/3 mt-2 md:mt-0">
-                <span class="text-sky-200 font-bold tracking-widestá text-sm md:text-xl uppercase drop-shadow">PREMIO EXTRAÍDO</span>
+                <span class="text-sky-200 font-bold tracking-widest text-sm md:text-xl uppercase drop-shadow">PREMIO EXTRAÍDO</span>
                 <h3 id="strike-prize-name" class="text-yellow-300 font-black text-2xl md:text-4xl truncate drop-shadow">Premio Especial</h3>
             </div>
             
@@ -684,23 +685,23 @@
         </div>
 
         <!-- Contenido principal interactivo del sorteo -->
-        <div class="text-center flex flex-col itemás-center max-w-3xl w-full px-4 z-10 relative">
+        <div class="text-center flex flex-col items-center max-w-3xl w-full px-4 z-10 relative">
             
             <h3 id="modal-sphere-title" class="text-white text-4xl md:text-5xl font-bold mb-20 tracking-wide uppercase drop-shadow animate-pulse">
                 ¡BOLA SELECCIONADA!
             </h3>
 
             <!-- Contenedor principal de la esfera interactiva -->
-            <div id="sphere-wrapper" class="relative w-80 h-80 flex itemás-center justify-center mb-24" style="z-index: 10;">
+            <div id="sphere-wrapper" class="relative w-80 h-80 flex items-center justify-center mb-24" style="z-index: 10;">
                 
                 <!-- Papel enrollado que sale del interior -->
-                <div id="drawn-paper" class="absolute w-72 bg-gradient-to-b from-amber-50 to-orange-50 border-4 border-amber-400 rounded-2xl shadow-2xl p-6 flex flex-col itemás-center justify-center opacity-0 transform origin-top" style="z-index: 15;">
+                <div id="drawn-paper" class="absolute w-72 bg-gradient-to-b from-amber-50 to-orange-50 border-4 border-amber-400 rounded-2xl shadow-2xl p-6 flex flex-col items-center justify-center opacity-0 transform origin-top" style="z-index: 15;">
                     <!-- Avatar del ganador celebrando -->
-                    <div class="w-24 h-24 bg-white rounded-full border-4 border-amber-400 p-1 overflow-hidden shadow-md mb-3 flex itemás-center justify-center" id="paper-mii-mini">
+                    <div class="w-24 h-24 bg-white rounded-full border-4 border-amber-400 p-1 overflow-hidden shadow-md mb-3 flex items-center justify-center" id="paper-mii-mini">
                         <!-- Renderizado dinámicamente -->
                     </div>
                     
-                    <span class="text-xs text-orange-600 font-extrabold tracking-widestá uppercase animate-pulse">¡Felicidades!</span>
+                    <span class="text-xs text-orange-600 font-extrabold tracking-widest uppercase animate-pulse">¡Felicidades!</span>
                     <h3 id="paper-winner-name" class="text-3xl font-black text-slate-800 tracking-wide mt-2 mb-1 text-center truncate w-full">Nombre</h3>
                     <div class="w-full border-t-2 border-dashed border-amber-400 my-2"></div>
                     
@@ -758,27 +759,27 @@
     </div>
 
     <!-- MODAL DE ANUNCIO DE PREMIO -->
-    <div id="prize-announcement-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col itemás-center justify-center hidden z-50 transition-opacity duration-300">
-        <div class="strike-banner w-full py-12 absolute left-0 right-0 top-1/2 -translate-y-1/2 scale-y-0 opacity-0 transition-all duration-500 flex flex-col itemás-center justify-center px-6" id="prize-announcement-banner">
+    <div id="prize-announcement-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center hidden z-50 transition-opacity duration-300">
+        <div class="strike-banner w-full py-12 absolute left-0 right-0 top-1/2 -translate-y-1/2 scale-y-0 opacity-0 transition-all duration-500 flex flex-col items-center justify-center px-6" id="prize-announcement-banner">
             <div class="absolute top-0 w-full h-1.5 bg-white/40"></div>
-            <span class="text-orange-400 font-black tracking-widestá text-xl md:text-2xl uppercase drop-shadow animate-pulse mb-2">? PRÓXIMO PREMIO EN JUEGO ?</span>
+            <span class="text-orange-400 font-black tracking-widest text-xl md:text-2xl uppercase drop-shadow animate-pulse mb-2">PRÓXIMO PREMIO EN JUEGO</span>
             <h2 id="announcement-prize-name" class="text-white font-extrabold text-5xl md:text-7xl uppercase tracking-wide truncate drop-shadow text-center">TV 4K</h2>
             <div class="absolute bottom-0 w-full h-1.5 bg-white/40"></div>
         </div>
     </div>
 
     <!-- Pie de Página -->
-    <footer class="w-full bg-[#f4f7f8] border-t-4 border-white py-4 px-6 flex justify-between itemás-center z-10 text-xs text-slate-800 font-semibold">
+    <footer class="w-full bg-[#f4f7f8] border-t-4 border-white py-4 px-6 flex justify-between items-center z-10 text-xs text-slate-800 font-semibold">
         <div>
             <span>Plaza de Sorteos v1.6</span>
             <span class="mx-2">|</span>
             <span class="text-emerald-600"><i class="fa-solid fa-wifi"></i> Conexión de Tómbola Estable</span>
         </div>
-        <div class="flex itemás-center gap-4">
+        <div class="flex items-center gap-4">
             <span class="bg-gray-200 px-3 py-1 rounded-full text-gray-600">
                 <i class="fa-solid fa-gamepad mr-1"></i> Control de Sorteo [1]
             </span>
-            <span>Estilo visual deportivo retro 2006-2026</span>
+            <span>Grupo Ascencio 2026</span>
         </div>
     </footer>
 
@@ -1246,7 +1247,7 @@
             const iconClass = tools[iconIndex];
 
             return `
-                <div style="width: 100%; height: 100%; display: flex; align-itemás: center; justify-content: center; background-color: ${color}; color: white; border-radius: 50%;">
+                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background-color: ${color}; color: white; border-radius: 50%;">
                     <i class="fa-solid ${iconClass}" style="font-size: 1.5em; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);"></i>
                 </div>
             `;
@@ -1308,49 +1309,49 @@
                         if (isWon) {
                             row.className = `flex flex-col gap-2 p-2.5 rounded-xl border ${bgColor} transition-all duration-300 relative group select-none`;
                             row.innerHTML = `
-                                <div class="flex itemás-center justify-between gap-2">
-                                    <div class="flex itemás-center gap-2 overflow-hidden w-1/2">
-                                        <div class="w-7 h-7 rounded-full ${iconColor} flex itemás-center justify-center flex-shrink-0 shadow-inner">
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2 overflow-hidden w-1/2">
+                                        <div class="w-7 h-7 rounded-full ${iconColor} flex items-center justify-center flex-shrink-0 shadow-inner">
                                             <i class="fa-solid fa-gift text-[10px]"></i>
                                         </div>
                                         <span class="font-bold text-gray-100 text-xs leading-tight truncate" title="${pr.name}">${pr.name}</span>
                                     </div>
-                                    <div class="w-1/2 text-right overflow-hidden flex justify-end itemás-center">
-                                        <span class="font-bold text-emerald-400 text-[11px] truncate bg-emerald-900/60 px-2 py-0.5 rounded-md border border-emerald-800/50 flex itemás-center gap-1" title="${pr.winner} #${pr.winner_id}">
+                                    <div class="w-1/2 text-right overflow-hidden flex justify-end items-center">
+                                        <span class="font-bold text-emerald-400 text-[11px] truncate bg-emerald-900/60 px-2 py-0.5 rounded-md border border-emerald-800/50 flex items-center gap-1" title="${pr.winner} #${pr.winner_id}">
                                             <i class="fa-solid fa-check text-[10px]"></i>
                                             <span class="truncate">${pr.winner}</span>
                                             <small class="text-emerald-500/70 font-semibold">#${pr.winner_id}</small>
                                         </span>
                                     </div>
                                 </div>
-                                <div class="flex itemás-center justify-end gap-2 pt-1.5 border-t border-emerald-800/40">
-                                    <button onclick="confirmToggleDeliveryByPrize(event, '${pr.id}')" class="cursor-pointer group flex itemás-center gap-2 bg-slate-900/60 hover:bg-slate-900 border border-slate-700/80 px-2.5 py-1 rounded-lg transition-colors select-none shadow-inner" title="Marcar como Entregado">
+                                <div class="flex items-center justify-end gap-2 pt-1.5 border-t border-emerald-800/40">
+                                    <button onclick="confirmToggleDeliveryByPrize(event, '${pr.id}')" class="cursor-pointer group flex items-center gap-2 bg-slate-900/60 hover:bg-slate-900 border border-slate-700/80 px-2.5 py-1 rounded-lg transition-colors select-none shadow-inner" title="Marcar como Entregado">
                                         <span class="text-[10px] font-bold text-slate-400 group-hover:text-slate-200 uppercase tracking-wider">Entregado</span>
                                         <div class="relative w-7 h-3.5 rounded-full transition-colors bg-slate-800 border border-slate-600">
                                             <div class="absolute top-[1px] left-[1px] w-2.5 h-2.5 rounded-full transition-transform duration-300 bg-slate-400"></div>
                                         </div>
                                     </button>
-                                    <button onclick="confirmRevertWinnerByPrize(event, '${pr.id}')" class="w-7 h-7 rounded-lg bg-slate-900/60 hover:bg-red-500/20 text-slate-400 hover:text-red-400 border border-slate-700 hover:border-red-500/50 transition-all flex itemás-center justify-center text-xs font-bold shadow-inner" title="Revertir premio (devolver al sorteo)">
+                                    <button onclick="confirmRevertWinnerByPrize(event, '${pr.id}')" class="w-7 h-7 rounded-lg bg-slate-900/60 hover:bg-red-500/20 text-slate-400 hover:text-red-400 border border-slate-700 hover:border-red-500/50 transition-all flex items-center justify-center text-xs font-bold shadow-inner" title="Revertir premio (devolver al sorteo)">
                                         <i class="fa-solid fa-rotate-left"></i>
                                     </button>
                                 </div>
                             `;
                         } else {
                             let winnerHtml = isNext 
-                                ? `<span class="font-black text-sky-200 text-[10px] uppercase tracking-widestá border border-sky-400/50 px-2 py-0.5 rounded-full bg-sky-800 animate-pulse"><i class="fa-solid fa-crosshairs mr-1"></i>Sorteando</span>` 
+                                ? `<span class="font-black text-sky-200 text-[10px] uppercase tracking-widest border border-sky-400/50 px-2 py-0.5 rounded-full bg-sky-800 animate-pulse"><i class="fa-solid fa-crosshairs mr-1"></i>Sorteando</span>` 
                                 : `<span class="font-semibold text-gray-500 text-[11px] uppercase italic">Pendiente</span>`;
 
-                            row.className = `flex itemás-center justify-between p-2 rounded-xl border ${bgColor} transition-all duration-300 relative group select-none cursor-context-menu`;
+                            row.className = `flex items-center justify-between p-2 rounded-xl border ${bgColor} transition-all duration-300 relative group select-none cursor-context-menu`;
                             row.setAttribute('oncontextmenu', `showPrizeMenúu(event, '${pr.id}')`);
                             row.title = "Clic derecho para cambiar el orden";
                             row.innerHTML = `
-                                <div class="flex itemás-center gap-2 w-1/2 overflow-hidden pr-2">
-                                    <div class="w-7 h-7 rounded-full ${iconColor} flex itemás-center justify-center flex-shrink-0 shadow-inner">
+                                <div class="flex items-center gap-2 w-1/2 overflow-hidden pr-2">
+                                    <div class="w-7 h-7 rounded-full ${iconColor} flex items-center justify-center flex-shrink-0 shadow-inner">
                                         <i class="fa-solid ${isNext ? 'fa-star' : 'fa-box'} text-[10px]"></i>
                                     </div>
                                     <span class="font-bold ${isNext ? 'text-white' : 'text-gray-200'} text-xs leading-tight truncate" title="${pr.name}">${pr.name}</span>
                                 </div>
-                                <div class="w-1/2 text-right overflow-hidden flex justify-end itemás-center">
+                                <div class="w-1/2 text-right overflow-hidden flex justify-end items-center">
                                     ${winnerHtml}
                                 </div>
                             `;
@@ -1364,7 +1365,7 @@
                         allWonMsg.className = "mt-4 p-5 rounded-2xl bg-gradient-to-b from-emerald-900/40 to-emerald-950/40 border-2 border-emerald-500/50 text-center shadow-lg";
                         allWonMsg.innerHTML = `
                             <div class="text-emerald-400 text-4xl mb-3 drop-shadow-[0_0_10px_rgba(52,211,153,0.5)]"><i class="fa-solid fa-trophy"></i></div>
-                            <h4 class="font-black text-white text-[13px] uppercase tracking-widest">¡Sorteo Finalizado!</h4>
+                            <h4 class="font-black text-white text-[13px] uppercase tracking-widest Finalizado!</h4>
                             <p class="text-emerald-200/80 text-xs mt-1 font-semibold">Todos los premios han sido entregados.</p>
                         `;
                         tombolaPrizes.appendChild(allWonMsg);
@@ -1403,7 +1404,7 @@
                 
                 toRender.forEach(p => {
                     const card = document.createElement('div');
-                    card.className = "flex itemás-center gap-3 p-2 bg-white rounded-xl border-2 border-slate-200/80 shadow-xs transition-all";
+                    card.className = "flex items-center gap-3 p-2 bg-white rounded-xl border-2 border-slate-200/80 shadow-xs transition-all";
                     card.innerHTML = `
                         <div class="w-12 h-12 bg-slate-50 rounded-full border border-slate-200 p-0.5 overflow-hidden flex-shrink-0">
                             ${generateMiiSVG(p.color, p.face)}
@@ -1464,23 +1465,23 @@
             const renderLimitSetup = 150; // Límite de optimizacin de UI
             groupedParticipants.slice(0, renderLimitSetup).forEach(p => {
                 const row = document.createElement('div');
-                row.className = "flex itemás-center justify-between p-3.5 bg-slate-800/60 hover:bg-slate-700/60 rounded-xl border border-slate-700/80 shadow-sm transition-colors mb-2";
+                row.className = "flex items-center justify-between p-3.5 bg-slate-800/60 hover:bg-slate-700/60 rounded-xl border border-slate-700/80 shadow-sm transition-colors mb-2";
                 row.innerHTML = `
-                    <div class="flex itemás-center gap-4">
-                        <div class="w-12 h-12 bg-slate-900/50 border-2 border-slate-700 rounded-full overflow-hidden flex-shrink-0 flex itemás-center justify-center shadow-inner">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-slate-900/50 border-2 border-slate-700 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center shadow-inner">
                             <div class="w-[120%] h-[120%] mt-2 ml-1" style="transform: scale(0.8)">
                                 ${generateMiiSVG(p.color, p.face)}
                             </div>
                         </div>
                         <div class="flex flex-col">
                             <span class="font-bold text-slate-100 text-[15px] tracking-wide">${p.name}</span>
-                            <div class="flex itemás-center gap-2 mt-1">
+                            <div class="flex items-center gap-2 mt-1">
                                 <span class="text-[11px] text-slate-400 font-medium">ID #${p.display_id}</span>
                                 ${p.count > 1 ? `<span class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-md font-bold tracking-wide"><i class="fa-solid fa-ticket mr-1"></i>${p.count} Boletos</span>` : ''}
                             </div>
                         </div>
                     </div>
-                    <button onclick="removeParticipant('${p.id}')" class="w-9 h-9 rounded-lg bg-slate-900/40 hover:bg-red-500/20 text-slate-500 hover:text-red-400 border border-slate-700 hover:border-red-500/50 transition-all flex itemás-center justify-center font-bold" title="Eliminar todos los boletos de este participante">
+                    <button onclick="removeParticipant('${p.id}')" class="w-9 h-9 rounded-lg bg-slate-900/40 hover:bg-red-500/20 text-slate-500 hover:text-red-400 border border-slate-700 hover:border-red-500/50 transition-all flex items-center justify-center font-bold" title="Eliminar todos los boletos de este participante">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
                 `;
@@ -1503,7 +1504,7 @@
                 } else {
                     drawnBallsHistory.forEach((h, index) => {
                         const row = document.createElement('div');
-                        row.className = "flex itemás-center justify-between p-3.5 bg-slate-800/60 hover:bg-slate-700/60 rounded-xl border border-slate-700/80 shadow-sm transition-colors mb-2";
+                        row.className = "flex items-center justify-between p-3.5 bg-slate-800/60 hover:bg-slate-700/60 rounded-xl border border-slate-700/80 shadow-sm transition-colors mb-2";
                         const isDelivered = h.delivered ? 'checked' : '';
                         
                         const pColor = h.p ? h.p.color : (h.color || '#00a0e9');
@@ -1513,9 +1514,9 @@
                         const pPrize = h.prize && typeof h.prize === 'object' ? h.prize.name : (h.prize || 'Sorteo');
 
                         row.innerHTML = `
-                            <div class="flex itemás-center justify-between w-full gap-4">
-                                <div class="flex itemás-center gap-4 overflow-hidden flex-grow">
-                                    <div class="w-12 h-12 rounded-full flex-shrink-0 overflow-hidden bg-slate-900/50 flex itemás-center justify-center border-2 border-slate-700 shadow-inner">
+                            <div class="flex items-center justify-between w-full gap-4">
+                                <div class="flex items-center gap-4 overflow-hidden flex-grow">
+                                    <div class="w-12 h-12 rounded-full flex-shrink-0 overflow-hidden bg-slate-900/50 flex items-center justify-center border-2 border-slate-700 shadow-inner">
                                         <div class="w-[120%] h-[120%] mt-2 ml-1" style="transform: scale(0.8)">
                                             ${generateMiiSVG(pColor, pFace)}
                                         </div>
@@ -1526,14 +1527,14 @@
                                     </div>
                                 </div>
                                 
-                                <div class="flex itemás-center flex-shrink-0 gap-2">
-                                    <div class="cursor-pointer group flex itemás-center gap-2.5 bg-slate-900/40 hover:bg-slate-900/80 border border-slate-700/80 px-3.5 py-2 rounded-lg transition-colors select-none shadow-inner" onclick="confirmToggleDelivery(event, ${index})">
+                                <div class="flex items-center flex-shrink-0 gap-2">
+                                    <div class="cursor-pointer group flex items-center gap-2.5 bg-slate-900/40 hover:bg-slate-900/80 border border-slate-700/80 px-3.5 py-2 rounded-lg transition-colors select-none shadow-inner" onclick="confirmToggleDelivery(event, ${index})">
                                         <span class="text-[10px] font-bold ${h.delivered ? 'text-emerald-400' : 'text-slate-400 group-hover:text-slate-300'} uppercase tracking-wider transition-colors">Entregado</span>
                                         <div class="relative w-8 h-4 rounded-full transition-colors ${h.delivered ? 'bg-emerald-500/30 border border-emerald-500/50' : 'bg-slate-800 border border-slate-600'}">
                                             <div class="absolute top-[1px] left-[1px] w-3 h-3 rounded-full transition-transform duration-300 ease-out ${h.delivered ? 'transform translate-x-4 bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : 'bg-slate-400'}"></div>
                                         </div>
                                     </div>
-                                    <button onclick="confirmRevertWinner(event, ${index})" class="w-9 h-9 rounded-lg bg-slate-900/40 hover:bg-red-500/20 text-slate-500 hover:text-red-400 border border-slate-700 hover:border-red-500/50 transition-all flex itemás-center justify-center font-bold" title="Revertir premio (devolver al sorteo)">
+                                    <button onclick="confirmRevertWinner(event, ${index})" class="w-9 h-9 rounded-lg bg-slate-900/40 hover:bg-red-500/20 text-slate-500 hover:text-red-400 border border-slate-700 hover:border-red-500/50 transition-all flex items-center justify-center font-bold" title="Revertir premio (devolver al sorteo)">
                                         <i class="fa-solid fa-rotate-left"></i>
                                     </button>
                                 </div>
@@ -1720,7 +1721,7 @@
             } else {
                 drawnBallsHistory.forEach(b => {
                     const badge = document.createElement('div');
-                    badge.className = "flex itemás-center gap-2 bg-sky-100 border-2 border-sky-300 text-sky-800 px-3 py-1.5 rounded-full font-bold text-sm whitespace-nowrap flex-shrink-0 animate-fade-in";
+                    badge.className = "flex items-center gap-2 bg-sky-100 border-2 border-sky-300 text-sky-800 px-3 py-1.5 rounded-full font-bold text-sm whitespace-nowrap flex-shrink-0 animate-fade-in";
                     badge.innerHTML = `
                         <div class="w-4 h-4 rounded-full" style="background-color: ${b.color}"></div>
                         <span>?? ${b.name} (${b.prize})</span>
@@ -2397,10 +2398,10 @@
             strikeBanner.classList.remove('scale-y-100', 'opacity-100');
 
             // Resetear contenedores de la esfera
-            wrapper.className = "relative w-80 h-80 flex itemás-center justify-center mb-24";
+            wrapper.className = "relative w-80 h-80 flex items-center justify-center mb-24";
             topHalf.className = "absolute inset-0 z-20 pointer-events-none transition-transform duration-500";
             bottomHalf.className = "absolute inset-0 z-10 pointer-events-none transition-transform duration-500";
-            paper.className = "absolute w-72 bg-gradient-to-b from-amber-50 to-orange-50 border-4 border-amber-400 rounded-2xl shadow-2xl p-6 flex flex-col itemás-center justify-center opacity-0 transform origin-top";
+            paper.className = "absolute w-72 bg-gradient-to-b from-amber-50 to-orange-50 border-4 border-amber-400 rounded-2xl shadow-2xl p-6 flex flex-col items-center justify-center opacity-0 transform origin-top";
             
             actionBtn.classList.add('opacity-0', 'translate-y-4');
             actionBtn.classList.remove('opacity-100', 'translate-y-0');
