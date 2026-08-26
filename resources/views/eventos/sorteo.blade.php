@@ -1322,7 +1322,8 @@
             }
 
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            fetch('{{ route("eventos.sorteo.dia-premio", $evento->ID) }}', {
+                        const saveDayUrl = '{{ \Route::has("eventos.sorteo.dia-premio") ? route("eventos.sorteo.dia-premio", $evento->ID) : url("/eventos/" . $evento->ID . "/sorteo/dia-premio") }}';
+            fetch(saveDayUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -2761,18 +2762,24 @@
             }
         }
 
-        function showCustomToast(title, bodyText) {
+                function showCustomToast(title, bodyText) {
             const toast = document.createElement('div');
-            toast.className = "fixed bottom-12 right-12 wii-panel p-4 max-w-sm flex flex-col gap-1 border-l-8 border-l-[#f47c20] shadow-2xl z-50 animate-bounce";
+            toast.className = "fixed bottom-8 right-8 bg-slate-900/95 backdrop-blur-xl border-2 border-sky-400 text-white p-4 rounded-2xl max-w-sm flex items-center gap-3.5 shadow-[0_10px_35px_rgba(0,160,233,0.4)] z-[100000] animate-bounce transition-all duration-300";
             toast.innerHTML = `
-                <h4 class="font-bold text-gray-800 text-base">${title}</h4>
-                <p class="text-xs text-gray-500">${bodyText}</p>
+                <div class="w-10 h-10 rounded-full bg-sky-500/20 border border-sky-400 flex items-center justify-center text-sky-300 text-lg flex-shrink-0 shadow-inner">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </div>
+                <div class="flex flex-col">
+                    <h4 class="font-extrabold text-white text-sm tracking-wide drop-shadow-sm">${title}</h4>
+                    <p class="text-xs font-semibold text-sky-200 mt-0.5 leading-snug">${bodyText}</p>
+                </div>
             `;
             document.body.appendChild(toast);
             setTimeout(() => {
-                toast.classList.add('opacity-0', 'transition-all', 'duration-500');
+                toast.classList.remove('animate-bounce');
+                toast.classList.add('opacity-0', 'translate-y-4', 'transition-all', 'duration-500');
                 setTimeout(() => toast.remove(), 500);
-            }, 3000);
+            }, 3500);
         }
 
         // --- MANEJADOR DE PANTALLA COMPLETA ---
