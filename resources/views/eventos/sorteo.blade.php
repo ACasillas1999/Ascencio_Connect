@@ -291,13 +291,68 @@
         /* ================================================= */
         /* FULLSCREEN & MODO CLARO OVERRIDES                 */
         /* ================================================= */
-        .tombola-container:fullscreen {
+                .tombola-container:fullscreen {
             background-color: var(--bg-primary, #f1f5f9) !important;
             width: 100vw !important;
             height: 100vh !important;
-            padding: 1.25rem !important;
-            overflow-y: auto !important;
+            padding: 0.75rem 1.25rem !important;
+            overflow: hidden !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
             box-sizing: border-box !important;
+        }
+
+        .tombola-container:fullscreen header {
+            padding-top: 0.4rem !important;
+            padding-bottom: 0.4rem !important;
+            margin-bottom: 0.25rem !important;
+            border-radius: 1.25rem !important;
+            flex-shrink: 0 !important;
+        }
+
+        .tombola-container:fullscreen main {
+            padding: 0 !important;
+            flex-grow: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            height: calc(100vh - 80px) !important;
+            overflow: hidden !important;
+        }
+
+        .tombola-container:fullscreen #tombola-view {
+            height: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+        }
+
+        .tombola-container:fullscreen #tombola-view > div:first-child {
+            margin-bottom: 0.25rem !important;
+            flex-shrink: 0 !important;
+        }
+
+        .tombola-container:fullscreen #tombola-view > .grid {
+            flex-grow: 1 !important;
+            height: calc(100vh - 145px) !important;
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
+        }
+
+        .tombola-container:fullscreen .wii-panel {
+            height: 100% !important;
+            border-radius: 1.5rem !important;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .tombola-container:fullscreen #tombola-miis-list {
+            max-height: calc(100vh - 230px) !important;
+            height: 100% !important;
+        }
+
+        .tombola-container:fullscreen #tombola-available-prizes {
+            max-height: calc(100vh - 230px) !important;
+            height: 100% !important;
         }
 
         /* Fondo punteado en Pantalla Completa segn tema */
@@ -342,24 +397,67 @@
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
         }
 
+                /* ================================================= */
+        /* TABLERO DE PREMIOS EN MODO CLARO ([data-theme="light"]) */
+        /* ================================================= */
         [data-theme="light"] #tombola-available-prizes .bg-slate-800\/40 {
             background-color: #f8fafc !important;
             border-color: #e2e8f0 !important;
             color: #0f172a !important;
         }
 
-        [data-theme="light"] #tombola-available-prizes .bg-slate-800\/40 span {
-            color: #1e293b !important;
+        [data-theme="light"] #tombola-available-prizes .bg-slate-800 {
+            background-color: #e0f2fe !important;
+            color: #00a0e9 !important;
+        }
+        [data-theme="light"] #tombola-available-prizes .bg-slate-800 i {
+            color: #00a0e9 !important;
+        }
+
+        [data-theme="light"] #tombola-available-prizes .font-bold.text-gray-200,
+        [data-theme="light"] #tombola-available-prizes .font-bold.text-white {
+            color: #0f172a !important;
         }
 
         [data-theme="light"] #tombola-available-prizes .bg-sky-900\/80 {
             background-color: #e0f2fe !important;
-            border-color: #38bdf8 !important;
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.25) !important;
+            border-color: #00a0e9 !important;
+            box-shadow: 0 4px 15px rgba(0, 160, 233, 0.2) !important;
         }
 
-        [data-theme="light"] #tombola-available-prizes .bg-sky-900\/80 span {
-            color: #0369a1 !important;
+        [data-theme="light"] #tombola-available-prizes .bg-sky-500 {
+            background-color: #00a0e9 !important;
+            color: #ffffff !important;
+        }
+        [data-theme="light"] #tombola-available-prizes .bg-sky-500 i {
+            color: #ffffff !important;
+        }
+
+        [data-theme="light"] #tombola-available-prizes .bg-sky-500.animate-pulse,
+        [data-theme="light"] #tombola-available-prizes span.bg-sky-500,
+        [data-theme="light"] #tombola-available-prizes span.bg-sky-800 {
+            background-color: #00a0e9 !important;
+            border-color: #0284c7 !important;
+            color: #ffffff !important;
+        }
+        [data-theme="light"] #tombola-available-prizes .bg-sky-500.animate-pulse *,
+        [data-theme="light"] #tombola-available-prizes span.bg-sky-500 * {
+            color: #ffffff !important;
+        }
+
+        [data-theme="light"] #tombola-available-prizes .bg-sky-900\/60,
+        [data-theme="light"] .bg-sky-900\/60 {
+            background-color: #00a0e9 !important;
+            border-color: #0284c7 !important;
+            color: #ffffff !important;
+        }
+        [data-theme="light"] #tombola-available-prizes .bg-sky-900\/60 span,
+        [data-theme="light"] .bg-sky-900\/60 span {
+            color: #ffffff !important;
+        }
+
+        [data-theme="light"] #tombola-available-prizes .text-gray-500 {
+            color: #64748b !important;
         }
 
         [data-theme="light"] #tombola-available-prizes .bg-emerald-950\/50 {
@@ -459,6 +557,43 @@
         }
         [data-theme="light"] .custom-toast-notification .toast-body {
             color: #0369a1 !important;
+        }
+                    /* ================================================= */
+        /* MENÚ CONTEXTUAL LIMPIO Y ELEGANTE                 */
+        /* ================================================= */
+        #prize-context-menu {
+            background-color: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
+            border-radius: 0.75rem !important;
+        }
+
+        #prize-context-menu button {
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            color: #1e293b !important;
+        }
+
+        #prize-context-menu button:hover {
+            background-color: #f1f5f9 !important;
+            color: #00a0e9 !important;
+        }
+
+        [data-theme="dark"] #prize-context-menu {
+            background-color: #0f172a !important;
+            border: 1px solid #334155 !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        [data-theme="dark"] #prize-context-menu button {
+            color: #f1f5f9 !important;
+        }
+
+        [data-theme="dark"] #prize-context-menu button:hover {
+            background-color: #1e293b !important;
+            color: #38bdf8 !important;
         }
     </style>
 @endpush
@@ -603,23 +738,31 @@
         </section>
 
         <!-- Menú Contextual para Reordenar Premios (Windows Style) -->
-                <div id="prize-context-menu" class="hidden absolute bg-white/95 backdrop-blur-md border border-gray-200 rounded-lg shadow-lg z-[10000] w-48 text-[13px] font-sans text-gray-800 p-1">
-            <button onclick="contextMenuUp()" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 rounded-md transition-none border-none outline-none flex items-center gap-2">
-                <i class="fa-solid fa-arrow-up text-[10px] text-gray-500"></i> Mover Arriba (Ascender)
+                                <div id="prize-context-menu" class="hidden absolute border rounded-xl shadow-xl z-[100000] w-52 p-1.5 text-xs font-sans transition-all duration-150">
+            <button onclick="contextMenuUp()" class="w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5 transition-colors font-medium">
+                <i class="fa-solid fa-arrow-up text-sky-500 text-xs w-4 text-center"></i>
+                <span>Mover Arriba</span>
             </button>
-            <button onclick="contextMenuDown()" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 rounded-md transition-none border-none outline-none flex items-center gap-2">
-                <i class="fa-solid fa-arrow-down text-[10px] text-gray-500"></i> Mover Abajo (Descender)
+            <button onclick="contextMenuDown()" class="w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5 transition-colors font-medium">
+                <i class="fa-solid fa-arrow-down text-sky-500 text-xs w-4 text-center"></i>
+                <span>Mover Abajo</span>
             </button>
-            <div class="border-t border-gray-200 my-1"></div>
-            <div class="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Asignar a Jornada</div>
-            <button onclick="setPrizeDayFromMenu(1)" class="w-full text-left px-3 py-1.5 hover:bg-sky-50 rounded-md flex items-center gap-2 text-xs font-semibold text-slate-700">
-                <i class="fa-solid fa-calendar-day text-sky-500"></i> Asignar a Día 1
+
+            <div class="my-1 border-t border-slate-200 dark:border-slate-700/60"></div>
+
+            <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Asignar a Jornada</div>
+
+            <button onclick="setPrizeDayFromMenu(1)" class="w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5 transition-colors font-medium">
+                <i class="fa-solid fa-calendar-day text-sky-500 text-xs w-4 text-center"></i>
+                <span>Asignar a Día 1</span>
             </button>
-            <button onclick="setPrizeDayFromMenu(2)" class="w-full text-left px-3 py-1.5 hover:bg-sky-50 rounded-md flex items-center gap-2 text-xs font-semibold text-slate-700">
-                <i class="fa-solid fa-calendar-day text-emerald-500"></i> Asignar a Día 2
+            <button onclick="setPrizeDayFromMenu(2)" class="w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5 transition-colors font-medium">
+                <i class="fa-solid fa-calendar-day text-emerald-500 text-xs w-4 text-center"></i>
+                <span>Asignar a Día 2</span>
             </button>
-            <button onclick="setPrizeDayFromMenu(3)" class="w-full text-left px-3 py-1.5 hover:bg-sky-50 rounded-md flex items-center gap-2 text-xs font-semibold text-slate-700">
-                <i class="fa-solid fa-calendar-day text-purple-500"></i> Asignar a Día 3
+            <button onclick="setPrizeDayFromMenu(3)" class="w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5 transition-colors font-medium">
+                <i class="fa-solid fa-calendar-day text-purple-500 text-xs w-4 text-center"></i>
+                <span>Asignar a Día 3</span>
             </button>
         </div>
 
@@ -1505,8 +1648,8 @@
                                 </div>
                             `;
                         } else {
-                            let winnerHtml = isNext 
-                                ? `<span class="font-black text-sky-200 text-[10px] uppercase tracking-widest border border-sky-400/50 px-2 py-0.5 rounded-full bg-sky-800 animate-pulse"><i class="fa-solid fa-crosshairs mr-1"></i>Sorteando</span>` 
+                                                        let winnerHtml = isNext 
+                                ? `<span class="font-black text-white text-[10px] uppercase tracking-widest border border-sky-300/60 px-2.5 py-0.5 rounded-full bg-sky-500 shadow-sm animate-pulse flex items-center gap-1"><i class="fa-solid fa-crosshairs text-[9px]"></i>SORTEANDO</span>` 
                                 : `<span class="font-semibold text-gray-500 text-[11px] uppercase italic">Pendiente</span>`;
 
                             row.className = `flex items-center justify-between p-2 rounded-xl border ${bgColor} transition-all duration-300 relative group select-none cursor-context-menu`;
@@ -2797,16 +2940,34 @@
             }
         }
 
-                        function showCustomToast(title, bodyText) {
+                                function showCustomToast(title, bodyText) {
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
             const toast = document.createElement('div');
-            toast.className = "fixed bottom-8 right-8 custom-toast-notification backdrop-blur-xl p-4 rounded-2xl max-w-sm flex items-center gap-3.5 z-[100000] animate-bounce transition-all duration-300";
+            
+            const bgClass = isLight 
+                ? "bg-white border-2 border-[#00a0e9] text-slate-800 shadow-[0_10px_30px_rgba(0,160,233,0.25)]" 
+                : "bg-slate-900/95 border-2 border-sky-400 text-white shadow-[0_10px_35px_rgba(0,160,233,0.4)]";
+
+            const iconBgClass = isLight 
+                ? "bg-sky-100 border border-[#00a0e9] text-[#00a0e9]" 
+                : "bg-sky-500/20 border border-sky-400 text-sky-300";
+
+            const titleClass = isLight 
+                ? "text-slate-900 font-extrabold" 
+                : "text-white font-extrabold";
+
+            const bodyClass = isLight 
+                ? "text-sky-700 font-bold" 
+                : "text-sky-200 font-semibold";
+
+            toast.className = `fixed bottom-8 right-8 ${bgClass} backdrop-blur-xl p-4 rounded-2xl max-w-sm flex items-center gap-3.5 z-[100000] animate-bounce transition-all duration-300`;
             toast.innerHTML = `
-                <div class="w-10 h-10 rounded-full toast-icon-bg flex items-center justify-center text-lg flex-shrink-0 shadow-inner">
+                <div class="w-10 h-10 rounded-full ${iconBgClass} flex items-center justify-center text-lg flex-shrink-0 shadow-inner">
                     <i class="fa-solid fa-calendar-check"></i>
                 </div>
                 <div class="flex flex-col">
-                    <h4 class="font-extrabold text-sm tracking-wide toast-title">${title}</h4>
-                    <p class="text-xs font-semibold mt-0.5 leading-snug toast-body">${bodyText}</p>
+                    <h4 class="text-sm tracking-wide ${titleClass}">${title}</h4>
+                    <p class="text-xs mt-0.5 leading-snug ${bodyClass}">${bodyText}</p>
                 </div>
             `;
             document.body.appendChild(toast);
