@@ -595,6 +595,41 @@
             background-color: #1e293b !important;
             color: #38bdf8 !important;
         }
+            /* ================================================= */
+        /* SWEETALERT2 MODALES ADAPTABLES AL TEMA            */
+        /* ================================================= */
+        .swal2-popup {
+            border-radius: 1.25rem !important;
+        }
+
+        [data-theme="light"] .swal2-popup {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        [data-theme="light"] .swal2-popup .swal2-title {
+            color: #0f172a !important;
+        }
+
+        [data-theme="light"] .swal2-popup .swal2-html-container {
+            color: #334155 !important;
+        }
+
+        [data-theme="light"] .swal2-popup .swal2-html-container b {
+            color: #00a0e9 !important;
+        }
+
+        [data-theme="light"] .swal2-popup .text-slate-400,
+        [data-theme="light"] .swal2-popup .text-slate-300 {
+            color: #64748b !important;
+        }
+
+        [data-theme="light"] .swal2-popup .swal2-cancel {
+            background-color: #cbd5e1 !important;
+            color: #1e293b !important;
+        }
     </style>
 @endpush
 
@@ -1916,18 +1951,22 @@
             }
         }
 
-        function confirmToggleDelivery(event, index) {
-            // Evitamos que el checkbox cambie su estado automticamente
+                function confirmToggleDelivery(event, index) {
             event.preventDefault();
-            
             const h = drawnBallsHistory[index];
             if (!h) return;
             
-            const isDelivered = h.delivered;
-            const actionText = isDelivered ? '<span class="text-red-400">Desmarcar</span>' : '<span class="text-emerald-400">Marcar</span>';
+            const isDelivered = h.delivered ? true : false;
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            const actionText = isDelivered 
+                ? (isLight ? '<b style="color: #dc2626;">Desmarcar</b>' : '<span class="text-red-400">Desmarcar</span>') 
+                : (isLight ? '<b style="color: #16a34a;">Marcar</b>' : '<span class="text-emerald-400">Marcar</span>');
             const statusText = isDelivered ? 'NO ENTREGADO' : 'ENTREGADO';
             const pName = h.p ? h.p.name : (h.name || 'Desconocido');
             const pPrize = h.prize && typeof h.prize === 'object' ? h.prize.name : (h.prize || 'el premio');
+
+            const swalBg = isLight ? '#ffffff' : '#1e293b';
+            const swalColor = isLight ? '#0f172a' : '#f8fafc';
 
             Swal.fire({
                 title: '¿Confirmar entrega?',
@@ -1935,15 +1974,15 @@
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3b82f6',
-                cancelButtonColor: '#64748b',
-                confirmButtonText: 'S, confirmar',
+                cancelButtonColor: isLight ? '#94a3b8' : '#64748b',
+                confirmButtonText: 'Sí, confirmar',
                 cancelButtonText: 'Cancelar',
-                background: '#1e293b',
-                color: '#f8fafc',
+                background: swalBg,
+                color: swalColor,
                 customClass: {
-                    popup: 'border border-slate-700 rounded-2xl shadow-2xl',
-                    title: 'text-white',
-                    htmlContainer: 'text-slate-300'
+                    popup: isLight ? 'border border-slate-300 rounded-2xl shadow-2xl' : 'border border-slate-700 rounded-2xl shadow-2xl',
+                    title: isLight ? 'text-slate-900 font-extrabold' : 'text-white',
+                    htmlContainer: isLight ? 'text-slate-700' : 'text-slate-300'
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -1976,7 +2015,7 @@
             });
         }
 
-        function confirmRevertWinner(event, index) {
+                function confirmRevertWinner(event, index) {
             event.preventDefault();
             const h = drawnBallsHistory[index];
             if (!h) return;
@@ -1984,21 +2023,26 @@
             const pName = h.p ? h.p.name : (h.name || 'Desconocido');
             const pPrize = h.prize && typeof h.prize === 'object' ? h.prize.name : (h.prize || 'el premio');
 
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            const swalBg = isLight ? '#ffffff' : '#1e293b';
+            const swalColor = isLight ? '#0f172a' : '#f8fafc';
+            const subtextClass = isLight ? 'text-slate-500 font-semibold' : 'text-slate-400';
+
             Swal.fire({
                 title: '¿Revertir premio?',
-                html: `¿Estás seguro de que quieres anular el premio <b>${pPrize}</b> a <b>${pName}</b>? <br><br> <span class="text-xs text-slate-400">El premio volver a estar disponible para sortear.</span>`,
+                html: `¿Estás seguro de que quieres anular el premio <b>${pPrize}</b> a <b>${pName}</b>? <br><br> <span class="text-xs ${subtextClass}">El premio volverá a estar disponible para sortear.</span>`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#64748b',
-                confirmButtonText: 'S, revertir',
+                cancelButtonColor: isLight ? '#94a3b8' : '#64748b',
+                confirmButtonText: 'Sí, revertir',
                 cancelButtonText: 'Cancelar',
-                background: '#1e293b',
-                color: '#f8fafc',
+                background: swalBg,
+                color: swalColor,
                 customClass: {
-                    popup: 'border border-slate-700 rounded-2xl shadow-2xl',
-                    title: 'text-white',
-                    htmlContainer: 'text-slate-300'
+                    popup: isLight ? 'border border-slate-300 rounded-2xl shadow-2xl' : 'border border-slate-700 rounded-2xl shadow-2xl',
+                    title: isLight ? 'text-slate-900 font-extrabold' : 'text-white',
+                    htmlContainer: isLight ? 'text-slate-700' : 'text-slate-300'
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -2019,7 +2063,7 @@
                                     icon: 'success',
                                     title: 'Revertido',
                                     text: 'Premio devuelto al sorteo. Recargando...',
-                                    background: '#1e293b', color: '#f8fafc',
+                                    background: (document.documentElement.getAttribute('data-theme') === 'light' ? '#ffffff' : '#1e293b'), color: (document.documentElement.getAttribute('data-theme') === 'light' ? '#0f172a' : '#f8fafc'),
                                     timer: 1500, showConfirmButton: false
                                 }).then(() => {
                                     window.location.reload();
