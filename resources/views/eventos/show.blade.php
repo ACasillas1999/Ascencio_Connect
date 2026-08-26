@@ -1634,7 +1634,7 @@
                     </div>
 
                     <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
-                        <button type="button" class="btn btn-sm btn-secondary" style="font-size:11px; padding:5px 9px; border-radius:6px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);" onclick="editPremio({{ $premio->ID }}, '{{ addslashes($premio->NombrePremio) }}', '{{ $premio->TipoPremio ?? 'sorteo' }}', {{ $premio->PuntosNecesarios }}, {{ $premio->Disponible }})" title="Editar">
+                        <button type="button" class="btn btn-sm btn-secondary" style="font-size:11px; padding:5px 9px; border-radius:6px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);" onclick="editPremio({{ $premio->ID }}, '{{ addslashes($premio->NombrePremio) }}', '{{ $premio->TipoPremio ?? 'sorteo' }}', {{ $premio->PuntosNecesarios }}, {{ $premio->dia_sorteo ?? 1 }})" title="Editar">
                             <i class="bi bi-pencil" style="color:var(--accent-gold);"></i>
                         </button>
                         <form action="{{ route('premios.destroy', $premio) }}" method="POST" style="display:inline;" class="delete-form" data-message="¿Eliminar el premio '{{ $premio->NombrePremio }}'?">

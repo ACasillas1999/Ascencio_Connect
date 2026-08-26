@@ -359,7 +359,8 @@ class EventoController extends Controller
                 'prize' => $canje->premio ? $canje->premio->NombrePremio : 'Premio Eliminado',
                 'delivered' => (bool)$canje->Entregado,
                 'color' => '#00a0e9',
-                'face' => 'excited'
+                'face' => 'excited',
+                'dia_sorteo' => (int)($canje->premio ? ($canje->premio->dia_sorteo ?? 1) : 1)
             ];
         });
 
@@ -375,7 +376,8 @@ class EventoController extends Controller
                 'id' => 'pr_' . $pr->ID,
                 'name' => $pr->NombrePremio,
                 'color' => $colors[array_rand($colors)],
-                'type' => $pr->TipoPremio ?? 'sorteo'
+                'type' => $pr->TipoPremio ?? 'sorteo',
+                'dia_sorteo' => (int)($pr->dia_sorteo ?? 1)
             ];
 
             if ($canje) {
@@ -1061,5 +1063,18 @@ class EventoController extends Controller
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
             'Cache-Control' => 'max-age=0',
         ]);
+    }
+
+    public function actualizarDiaPremio(Request $request, Evento $evento)
+    {
+        $premioId = $request->input('premio_id');
+        $dia = (int)$request->input('dia', 1);
+        $dbId = (int)preg_replace('/[^0-9]/', '', $premioId);
+
+        \App\Models\PremioEvento::where('ID', $dbId)
+            ->where('ID_Evento', $evento->ID)
+            ->update(['dia_sorteo' => $dia]);
+
+        return response()->json(['ok' => true, 'dia' => $dia]);
     }
 }

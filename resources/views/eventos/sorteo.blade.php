@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('title', 'Tómbola - ' . $evento->name_evento)
 @section('page-title', 'Tómbola - ' . $evento->name_evento)
@@ -477,11 +477,23 @@
     <!-- PANTALLA PRINCIPAL DE JUEGO -->
     <main class="flex-grow flex flex-col items-center justify-center p-6 w-full h-full mx-auto z-10">
         
-        <section id="tombola-view" class="w-full h-full flex flex-col items-center gap-6 flex-grow">
-            <div class="w-full flex justify-between items-center px-4">
-                <div class="flex items-center gap-2 bg-white/90 border-2 border-slate-200 px-4 py-2 rounded-2xl shadow-sm">
-                    <span class="w-3.5 h-3.5 bg-emerald-500 rounded-full animate-ping"></span>
-                    <span class="text-sm font-bold text-gray-600 uppercase tracking-wide">Tómbola Activa</span>
+                <section id="tombola-view" class="w-full h-full flex flex-col items-center gap-6 flex-grow">
+            <div class="w-full flex flex-wrap justify-between items-center px-4 gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 bg-white/90 border-2 border-slate-200 px-4 py-2 rounded-2xl shadow-sm">
+                        <span class="w-3.5 h-3.5 bg-emerald-500 rounded-full animate-ping"></span>
+                        <span class="text-sm font-bold text-gray-600 uppercase tracking-wide">Tómbola Activa</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-white/90 border-2 border-sky-300 px-3 py-1.5 rounded-2xl shadow-sm">
+                        <i class="fa-solid fa-calendar-day text-sky-500 text-sm"></i>
+                        <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">Jornada:</span>
+                        <select id="tombola-day-select" onchange="changeTombolaDay(this.value)" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold rounded-xl px-3 py-1 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shadow-inner">
+                            <option value="1">Día 1</option>
+                            <option value="2">Día 2</option>
+                            <option value="3">Día 3</option>
+                            <option value="0">Todos los Días</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="text-center">
                     <h2 class="text-3xl font-bold text-gray-800 tracking-wide">TÓMBOLA DE ASCENCIO</h2>
@@ -504,7 +516,7 @@
                     </div>
                 </div>
 
-                <!-- Centro: Lienzo de la Tómbola Fsica -->
+                <!-- Centro: Lienzo de la Tómbola Física -->
                 <div class="wii-panel p-6 flex flex-col items-center justify-between lg:col-span-2 h-[65vh] min-h-[450px] relative">
                     <!-- Canvas de la tmbola -->
                     <div class="relative w-full h-full flex-grow flex items-center justify-center">
@@ -535,9 +547,10 @@
 
                 <!-- Panel Lateral Derecho: Tablero de Premios y Ganadores -->
                 <div class="wii-panel p-4 flex flex-col h-[65vh] min-h-[450px] lg:col-span-1">
-                    <h3 class="font-bold text-gray-700 mb-2 flex items-center gap-2 border-b pb-2">
+                                        <h3 class="font-bold text-gray-700 mb-2 flex items-center gap-2 border-b pb-2">
                         <i class="fa-solid fa-gift text-orange-500"></i>
                         <span>Tablero de Sorteo</span>
+                        <span id="tombola-day-badge" class="bg-sky-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider">Día 1</span>
                         <span id="tombola-prize-count-view" class="bg-orange-500 text-white text-[10px] px-2 py-0.5 rounded-full ml-auto">0</span>
                     </h3>
                     
@@ -555,19 +568,30 @@
         </section>
 
         <!-- Menú Contextual para Reordenar Premios (Windows Style) -->
-        <div id="prize-context-menu" class="hidden absolute bg-white/95 backdrop-blur-md border border-gray-200 rounded-lg shadow-lg z-[10000] w-40 text-[13px] font-sans text-gray-800 p-1">
-            <button onclick="contextMenúuUp()" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 rounded-md transition-none border-none outline-none flex items-center gap-2">
-                <i class="fa-solid fa-arrow-up text-[10px] text-gray-500"></i> Ascender
+                <div id="prize-context-menu" class="hidden absolute bg-white/95 backdrop-blur-md border border-gray-200 rounded-lg shadow-lg z-[10000] w-48 text-[13px] font-sans text-gray-800 p-1">
+            <button onclick="contextMenuUp()" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 rounded-md transition-none border-none outline-none flex items-center gap-2">
+                <i class="fa-solid fa-arrow-up text-[10px] text-gray-500"></i> Mover Arriba (Ascender)
             </button>
-            <button onclick="contextMenúuDown()" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 rounded-md transition-none border-none outline-none flex items-center gap-2">
-                <i class="fa-solid fa-arrow-down text-[10px] text-gray-500"></i> Descender
+            <button onclick="contextMenuDown()" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 rounded-md transition-none border-none outline-none flex items-center gap-2">
+                <i class="fa-solid fa-arrow-down text-[10px] text-gray-500"></i> Mover Abajo (Descender)
+            </button>
+            <div class="border-t border-gray-200 my-1"></div>
+            <div class="px-3 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Asignar a Jornada</div>
+            <button onclick="setPrizeDayFromMenu(1)" class="w-full text-left px-3 py-1.5 hover:bg-sky-50 rounded-md flex items-center gap-2 text-xs font-semibold text-slate-700">
+                <i class="fa-solid fa-calendar-day text-sky-500"></i> Asignar a Día 1
+            </button>
+            <button onclick="setPrizeDayFromMenu(2)" class="w-full text-left px-3 py-1.5 hover:bg-sky-50 rounded-md flex items-center gap-2 text-xs font-semibold text-slate-700">
+                <i class="fa-solid fa-calendar-day text-emerald-500"></i> Asignar a Día 2
+            </button>
+            <button onclick="setPrizeDayFromMenu(3)" class="w-full text-left px-3 py-1.5 hover:bg-sky-50 rounded-md flex items-center gap-2 text-xs font-semibold text-slate-700">
+                <i class="fa-solid fa-calendar-day text-purple-500"></i> Asignar a Día 3
             </button>
         </div>
 
         <!-- SECCIÓN DE CONFIGURACIÓN -->
         <!-- SECCIÓN DE CONFIGURACIÓN -->
         <section id="setup-view" class="w-full hidden flex-col items-center gap-6 overflow-y-auto max-h-[85vh] p-2">
-            <div class="w-full flex justify-between items-center px-4 mb-2">
+                        <div class="w-full flex flex-wrap justify-between items-center px-4 mb-2 gap-4">
                 <button onclick="switchView('tombola-view')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 shadow-md rounded-lg px-6 py-2.5 font-medium flex items-center gap-2 transition-colors">
                     <i class="fa-solid fa-chevron-left"></i> Volver a la Tómbola
                 </button>
@@ -575,9 +599,21 @@
                     <h2 class="text-3xl font-extrabold text-white tracking-tight drop-shadow-sm">Configuración del Sorteo</h2>
                     <p class="text-sm text-slate-400 font-medium mt-1 uppercase tracking-widest">Gestión avanzada y control interno</p>
                 </div>
-                <button onclick="resetData()" class="bg-slate-800 hover:bg-red-900/40 text-red-400 hover:text-red-300 border border-slate-700 hover:border-red-800/50 shadow-md rounded-lg px-5 py-2.5 text-sm font-bold flex items-center gap-2 transition-all">
-                    <i class="fa-solid fa-arrow-rotate-left"></i> Reiniciar Todo
-                </button>
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 bg-slate-800/80 border border-slate-700 px-3.5 py-2 rounded-xl shadow-md">
+                        <i class="fa-solid fa-calendar-day text-sky-400 text-sm"></i>
+                        <span class="text-xs font-bold text-slate-300 uppercase tracking-wide">Jornada:</span>
+                        <select id="setup-day-select" onchange="changeTombolaDay(this.value)" class="bg-slate-900 text-sky-300 text-xs font-extrabold rounded-lg px-3 py-1 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer">
+                            <option value="1">Día 1</option>
+                            <option value="2">Día 2</option>
+                            <option value="3">Día 3</option>
+                            <option value="0">Todos los Días</option>
+                        </select>
+                    </div>
+                    <button onclick="resetData()" class="bg-slate-800 hover:bg-red-900/40 text-red-400 hover:text-red-300 border border-slate-700 hover:border-red-800/50 shadow-md rounded-lg px-5 py-2.5 text-sm font-bold flex items-center gap-2 transition-all">
+                        <i class="fa-solid fa-arrow-rotate-left"></i> Reiniciar Todo
+                    </button>
+                </div>
             </div>
 
             <div class="w-full bg-slate-900/50 backdrop-blur-xl p-6 rounded-[2rem] shadow-2xl border border-slate-700/60 mx-auto flex flex-col items-center">
@@ -1089,13 +1125,19 @@
         ];
 
         // Lista de premios preestablecidos (Genricos)
-        const defaultPrizes = [
-            { id: 'p1', name: '?? Gran Trofeo de Oro', color: '#ffeb3b', type: 'sorteo' },
-            { id: 'p2', name: '?? Remera de Campen de Sorteos', color: '#00a0e9', type: 'sorteo' },
-            { id: 'p3', name: '?? Gran Pizza Party de Celebracin', color: '#ff9500', type: 'sorteo' },
-            { id: 'p4', name: '?? Raqueta Profesional de Tenis', color: '#76c336', type: 'sorteo' },
-            { id: 'p5', name: '??? 500 Puntos de Regalo', color: '#9c27b0', type: 'puntos' }
+                const defaultPrizes = [
+            { id: 'p1', name: '🏆 Gran Trofeo de Oro', color: '#ffeb3b', type: 'sorteo', dia_sorteo: 1 },
+            { id: 'p2', name: '👕 Remera de Campeón de Sorteos', color: '#00a0e9', type: 'sorteo', dia_sorteo: 1 },
+            { id: 'p3', name: '🍕 Gran Pizza Party de Celebración', color: '#ff9500', type: 'sorteo', dia_sorteo: 1 },
+            { id: 'p4', name: '🎾 Raqueta Profesional de Tenis', color: '#76c336', type: 'sorteo', dia_sorteo: 1 },
+            { id: 'p5', name: '🎁 500 Puntos de Regalo', color: '#9c27b0', type: 'puntos', dia_sorteo: 1 }
         ];
+
+                function saveToStorage() {
+            try {
+                localStorage.setItem('sorteo_prizes_{{ $evento->ID }}', JSON.stringify(prizes));
+            } catch(e) {}
+        }
 
         function initData() {
             const backendParticipants = @json($participantes ?? []);
@@ -1103,14 +1145,40 @@
             const backendHistorial = @json($historial ?? []);
 
             participants = backendParticipants || [];
-            prizes = backendPrizes || [];
             drawnBallsHistory = backendHistorial || [];
-            
-            updateUI();
-        }
 
-        function saveToStorage() {
-            // Ya no se usa localStorage, se sincroniza con la BD
+            if (backendPrizes && backendPrizes.length > 0) {
+                prizes = backendPrizes;
+                try {
+                    const savedLocal = localStorage.getItem('sorteo_prizes_{{ $evento->ID }}');
+                    if (savedLocal) {
+                        const localArr = JSON.parse(savedLocal);
+                        prizes.forEach(p => {
+                            const found = localArr.find(lp => lp.id === p.id);
+                            if (found && found.dia_sorteo) {
+                                p.dia_sorteo = found.dia_sorteo;
+                            }
+                        });
+                    }
+                } catch(e) {}
+            } else {
+                try {
+                    const savedLocal = localStorage.getItem('sorteo_prizes_{{ $evento->ID }}');
+                    if (savedLocal) {
+                        prizes = JSON.parse(savedLocal);
+                    } else {
+                        prizes = [...defaultPrizes];
+                    }
+                } catch(e) {
+                    prizes = [...defaultPrizes];
+                }
+            }
+
+                        prizes.forEach(p => {
+                if (!p.dia_sorteo) p.dia_sorteo = 1;
+            });
+
+            updateUI();
         }
 
         function syncPrizeOrderToDB() {
@@ -1165,10 +1233,30 @@
             }
         }
 
-        // --- MANEJO DEL MEN CONTEXTUAL (CLIC DERECHO) ---
-        let currentContextMenúuId = null;
+                // --- MANEJO DE JORNADA / DÍA DE SORTIEO ---
+        let currentTombolaDay = 1;
 
-        function showPrizeMenúu(e, prizeId) {
+                function changeTombolaDay(val) {
+            currentTombolaDay = parseInt(val);
+            const badge = document.getElementById('tombola-day-badge');
+            if (badge) {
+                badge.innerText = currentTombolaDay === 0 ? 'Todos los Días' : `Día ${currentTombolaDay}`;
+            }
+            const s1 = document.getElementById('tombola-day-select');
+            const s2 = document.getElementById('setup-day-select');
+            if (s1 && s1.value != val) s1.value = val;
+            if (s2 && s2.value != val) s2.value = val;
+                        prizes.forEach(p => {
+                if (!p.dia_sorteo) p.dia_sorteo = 1;
+            });
+
+            updateUI();
+        }
+
+        // --- MANEJO DEL MENÚ CONTEXTUAL (CLIC DERECHO) ---
+        let currentContextMenuId = null;
+
+        function showPrizeMenu(e, prizeId) {
             e.preventDefault(); // Ocultar el men por defecto del navegador
             e.stopPropagation(); // Evitar que el clic llegue al document y lo cierre
             
@@ -1176,7 +1264,7 @@
             const container = document.querySelector('.tombola-container');
             if (!menu || !container) return;
             
-            currentContextMenúuId = prizeId;
+            currentContextMenuId = prizeId;
             menu.classList.remove('hidden');
             menu.style.display = 'block';
             
@@ -1208,11 +1296,43 @@
             }
         });
 
-        function contextMenúuUp() {
-            if (currentContextMenúuId) movePrizeUp(currentContextMenúuId);
+        function contextMenuUp() {
+            if (currentContextMenuId) movePrizeUp(currentContextMenuId);
         }
-        function contextMenúuDown() {
-            if (currentContextMenúuId) movePrizeDown(currentContextMenúuId);
+        function contextMenuDown() {
+            if (currentContextMenuId) movePrizeDown(currentContextMenuId);
+        }
+
+                        function setPrizeDayFromMenu(dia) {
+            if (!currentContextMenuId) return;
+            const targetPrize = prizes.find(p => p.id === currentContextMenuId);
+            if (targetPrize) {
+                targetPrize.dia_sorteo = dia;
+                saveToStorage();
+                updateUI();
+                if (typeof showCustomToast === 'function') {
+                    showCustomToast("Jornada Asignada", `"${targetPrize.name}" asignado al Día ${dia}`);
+                }
+            }
+
+            const menu = document.getElementById('prize-context-menu');
+            if (menu) {
+                menu.classList.add('hidden');
+                menu.style.display = 'none';
+            }
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            fetch('{{ route("eventos.sorteo.dia-premio", $evento->ID) }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    premio_id: currentContextMenuId,
+                    dia: dia
+                })
+            }).catch(err => console.error("Error al guardar día del premio:", err));
         }
 
         function resetData() {
@@ -1267,9 +1387,14 @@
             if (tombolaPrizes) {
                 tombolaPrizes.innerHTML = '';
                 // En la tmbola solo mostramos los premios destinados al azar (sorteo) que NO están marcados como entregados
-                const sorteoPrizes = prizes.filter(p => {
+                                const sorteoPrizes = prizes.filter(p => {
                     if ((p.type || 'sorteo') !== 'sorteo') return false;
                     
+                    const pDay = parseInt(p.dia_sorteo || 1);
+                    if (currentTombolaDay !== 0 && pDay !== currentTombolaDay) {
+                        return false;
+                    }
+
                     const isDelivered = p.delivered || drawnBallsHistory.some(h => {
                         if (p.canje_id && h.canje_id) return h.canje_id == p.canje_id && h.delivered;
                         const hPrizeName = (typeof h.prize === 'object' && h.prize) ? h.prize.name : h.prize;
@@ -1282,8 +1407,15 @@
                 
                 if (prizeCountView) prizeCountView.innerText = sorteoPrizes.length;
 
-                if (sorteoPrizes.length === 0) {
-                    tombolaPrizes.innerHTML = '<div class="text-gray-400 text-center py-4 text-xs font-semibold">No hay premios pendientes de entrega.</div>';
+                                if (sorteoPrizes.length === 0) {
+                    const dayInfo = currentTombolaDay === 0 ? "" : ` para el Día ${currentTombolaDay}`;
+                    tombolaPrizes.innerHTML = `
+                        <div class="text-gray-400 text-center py-6 text-xs font-semibold flex flex-col items-center gap-2">
+                            <i class="fa-solid fa-gift text-2xl opacity-40"></i>
+                            <span>No hay premios pendientes${dayInfo}.</span>
+                            ${currentTombolaDay !== 0 ? `<button onclick="changeTombolaDay(0)" class="mt-1 text-sky-400 hover:text-sky-300 underline font-bold text-xs">Ver todos los días</button>` : ''}
+                        </div>
+                    `;
                 } else {
                     let nextPrizeFound = false;
                     sorteoPrizes.forEach(pr => {
@@ -1342,14 +1474,17 @@
                                 : `<span class="font-semibold text-gray-500 text-[11px] uppercase italic">Pendiente</span>`;
 
                             row.className = `flex items-center justify-between p-2 rounded-xl border ${bgColor} transition-all duration-300 relative group select-none cursor-context-menu`;
-                            row.setAttribute('oncontextmenu', `showPrizeMenúu(event, '${pr.id}')`);
+                            row.setAttribute('oncontextmenu', `showPrizeMenu(event, '${pr.id}')`);
                             row.title = "Clic derecho para cambiar el orden";
                             row.innerHTML = `
                                 <div class="flex items-center gap-2 w-1/2 overflow-hidden pr-2">
                                     <div class="w-7 h-7 rounded-full ${iconColor} flex items-center justify-center flex-shrink-0 shadow-inner">
                                         <i class="fa-solid ${isNext ? 'fa-star' : 'fa-box'} text-[10px]"></i>
                                     </div>
-                                    <span class="font-bold ${isNext ? 'text-white' : 'text-gray-200'} text-xs leading-tight truncate" title="${pr.name}">${pr.name}</span>
+                                                                        <span class="font-bold ${isNext ? 'text-white' : 'text-gray-200'} text-xs leading-tight truncate flex items-center gap-1.5" title="${pr.name}">
+                                        <span>${pr.name}</span>
+                                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-sky-900/60 text-sky-300 border border-sky-700/50">Día ${pr.dia_sorteo || 1}</span>
+                                    </span>
                                 </div>
                                 <div class="w-1/2 text-right overflow-hidden flex justify-end items-center">
                                     ${winnerHtml}
@@ -1496,22 +1631,33 @@
 
             // Actualizar vista de Ganadores en Setup
             const setupWinnersList = document.getElementById('setup-winners-list');
-            if (setupWinnersList) {
+                        if (setupWinnersList) {
                 setupWinnersList.innerHTML = '';
-                document.getElementById('setup-winners-count').innerText = drawnBallsHistory.length;
-                if (drawnBallsHistory.length === 0) {
-                    setupWinnersList.innerHTML = '<div class="text-slate-500 text-center py-10 text-sm font-medium"><i class="fa-solid fa-inbox text-2xl mb-2 block opacity-50"></i>Aún no hay ganadores registrados.</div>';
+                
+                const filteredHistory = drawnBallsHistory.filter(h => {
+                    const pDay = parseInt(h.dia_sorteo || (h.prize && typeof h.prize === 'object' ? h.prize.dia_sorteo : 1) || 1);
+                    if (currentTombolaDay !== 0 && pDay !== currentTombolaDay) {
+                        return false;
+                    }
+                    return true;
+                });
+
+                document.getElementById('setup-winners-count').innerText = filteredHistory.length;
+                if (filteredHistory.length === 0) {
+                    const dayLabel = currentTombolaDay === 0 ? "" : ` para el Día ${currentTombolaDay}`;
+                    setupWinnersList.innerHTML = `<div class="text-slate-500 text-center py-10 text-sm font-medium"><i class="fa-solid fa-inbox text-2xl mb-2 block opacity-50"></i>Aún no hay ganadores registrados${dayLabel}.</div>`;
                 } else {
-                    drawnBallsHistory.forEach((h, index) => {
+                    filteredHistory.forEach((h) => {
+                        const index = drawnBallsHistory.indexOf(h);
                         const row = document.createElement('div');
                         row.className = "flex items-center justify-between p-3.5 bg-slate-800/60 hover:bg-slate-700/60 rounded-xl border border-slate-700/80 shadow-sm transition-colors mb-2";
-                        const isDelivered = h.delivered ? 'checked' : '';
                         
                         const pColor = h.p ? h.p.color : (h.color || '#00a0e9');
                         const pFace = h.p ? h.p.face : (h.face || 'happy');
                         const pName = h.p ? h.p.name : (h.name || 'Desconocido');
                         const pId = h.p ? h.p.display_id : (h.display_id || '--');
                         const pPrize = h.prize && typeof h.prize === 'object' ? h.prize.name : (h.prize || 'Sorteo');
+                        const hDay = h.dia_sorteo || 1;
 
                         row.innerHTML = `
                             <div class="flex items-center justify-between w-full gap-4">
@@ -1522,7 +1668,11 @@
                                         </div>
                                     </div>
                                     <div class="flex flex-col truncate">
-                                        <span class="font-bold text-slate-100 text-[15px] tracking-wide truncate" title="${pName}">${pName} <span class="text-[11px] text-slate-400 font-medium ml-2">ID #${pId}</span></span>
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-bold text-slate-100 text-[15px] tracking-wide truncate" title="${pName}">${pName}</span>
+                                            <span class="text-[11px] text-slate-400 font-medium">ID #${pId}</span>
+                                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-sky-900/60 text-sky-300 border border-sky-700/50">Día ${hDay}</span>
+                                        </div>
                                         <span class="text-xs text-amber-400 font-bold truncate mt-1 tracking-wide"><i class="fa-solid fa-gift mr-1.5 opacity-80"></i>${pPrize}</span>
                                     </div>
                                 </div>
@@ -1830,6 +1980,10 @@
             prizes.push(newPrize);
             nameInput.value = '';
             saveToStorage();
+                        prizes.forEach(p => {
+                if (!p.dia_sorteo) p.dia_sorteo = 1;
+            });
+
             updateUI();
         }
 
@@ -1837,6 +1991,10 @@
             playSoundClick();
             prizes = prizes.filter(p => p.id !== id);
             saveToStorage();
+                        prizes.forEach(p => {
+                if (!p.dia_sorteo) p.dia_sorteo = 1;
+            });
+
             updateUI();
         }
     </script>
@@ -2243,9 +2401,23 @@
             drawBtn.disabled = true;
             drawBtn.classList.add('opacity-50');
 
-            // Determinar el premio antes de empezar
-            // Filtramos premios que son para 'sorteo' y que an no tengan ganador
-            let availablePrizes = prizes.filter(p => (p.type || 'sorteo') === 'sorteo' && !p.winner);
+                        // Determinar el premio antes de empezar
+            // Filtramos premios para la jornada seleccionada que sean de sorteo y no tengan ganador
+            let availablePrizes = prizes.filter(p => {
+                if ((p.type || 'sorteo') !== 'sorteo') return false;
+                if (p.winner) return false;
+                const pDay = parseInt(p.dia_sorteo || 1);
+                if (currentTombolaDay !== 0 && pDay !== currentTombolaDay) return false;
+                return true;
+            });
+
+            if (availablePrizes.length === 0) {
+                const dayText = currentTombolaDay === 0 ? "en general" : `para el Día ${currentTombolaDay}`;
+                showCustomToast("¡Sin premios!", `No hay premios pendientes de sorteo ${dayText}.`);
+                drawBtn.disabled = false;
+                drawBtn.classList.remove('opacity-50');
+                return;
+            }
             
             let winningPrizeName = "¡Premio Sorpresa!";
             let prizeIndex = -1;
@@ -2335,13 +2507,14 @@
                 
                 playSoundBallDrop();
 
-                const newHistoryItem = {
+                                const newHistoryItem = {
                     name: winnerMii.name,
                     color: winnerMii.color,
                     face: winnerMii.face,
                     display_id: winnerMii.display_id,
                     prize: winningPrizeName,
-                    delivered: false
+                    delivered: false,
+                    dia_sorteo: currentTombolaDay || 1
                 };
                 drawnBallsHistory.unshift(newHistoryItem);
 
@@ -2374,8 +2547,12 @@
 
                     // Iniciar la cinemática integrada de la bola abriéndose
                     triggerSphereOpeningAnimation(winnerMii, winningPrizeName, winnerIndex);
-                    updateUI();
-                }, 1800);
+                                prizes.forEach(p => {
+                if (!p.dia_sorteo) p.dia_sorteo = 1;
+            });
+
+            updateUI();
+        }, 1800);
                 
             }, 1800); // Tiempo girando la tmbola
         }

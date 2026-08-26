@@ -19,6 +19,7 @@ class PremioController extends Controller
             'TipoPremio'       => 'required|in:sorteo,puntos',
             'PuntosNecesarios' => 'nullable|integer|min:0',
             'Disponible'       => 'required|integer|min:0',
+            'dia_sorteo'       => 'nullable|integer|min:1',
         ]);
 
         $data['ID_Evento'] = $evento->ID;
@@ -51,6 +52,7 @@ class PremioController extends Controller
             'TipoPremio'       => 'required|in:sorteo,puntos',
             'PuntosNecesarios' => 'nullable|integer|min:0',
             'Disponible'       => 'required|integer|min:0',
+            'dia_sorteo'       => 'nullable|integer|min:1',
         ]);
 
         try {

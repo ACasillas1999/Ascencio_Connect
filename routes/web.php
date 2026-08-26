@@ -189,6 +189,7 @@ Route::middleware('auth')->group(function () {
         Route::post('eventos/{evento}/sorteo/ganador', [EventoController::class, 'registrarGanador'])->name('eventos.sorteo.ganador');
         Route::post('eventos/{evento}/sorteo/revertir-ganador', [EventoController::class, 'revertirGanador'])->name('eventos.sorteo.revertir-ganador');
         Route::post('eventos/{evento}/sorteo/toggle-delivery', [EventoController::class, 'toggleDelivery'])->name('eventos.sorteo.toggle-delivery');
+        Route::post('eventos/{evento}/sorteo/dia-premio', [EventoController::class, 'actualizarDiaPremio'])->name('eventos.sorteo.dia-premio');
         
         /* AJAX Asistencia y Scanner QR */
         Route::match(['get', 'post'], 'actividades/{actividad}/buscar', [\App\Http\Controllers\ActividadController::class, 'buscarParticipantes'])->name('actividades.buscar');
