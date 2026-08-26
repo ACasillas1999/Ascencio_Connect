@@ -425,7 +425,42 @@
             border-color: #0284c7 !important;
             color: #0284c7 !important;
         }
-</style>
+        /* Estilos Adaptables para Notificación Emergente (Toast) en Tema Oscuro y Claro */
+        .custom-toast-notification {
+            background-color: rgba(15, 23, 42, 0.95);
+            border: 2px solid #38bdf8;
+            box-shadow: 0 10px 35px rgba(0, 160, 233, 0.4);
+        }
+        .custom-toast-notification .toast-icon-bg {
+            background-color: rgba(56, 189, 248, 0.2);
+            border: 1px solid #38bdf8;
+            color: #38bdf8;
+        }
+        .custom-toast-notification .toast-title {
+            color: #ffffff;
+        }
+        .custom-toast-notification .toast-body {
+            color: #bae6fd;
+        }
+
+        /* Override para Tema Claro (data-theme="light") */
+        [data-theme="light"] .custom-toast-notification {
+            background-color: #ffffff !important;
+            border: 2px solid #00a0e9 !important;
+            box-shadow: 0 10px 30px rgba(0, 160, 233, 0.25) !important;
+        }
+        [data-theme="light"] .custom-toast-notification .toast-icon-bg {
+            background-color: #e0f2fe !important;
+            border: 1px solid #00a0e9 !important;
+            color: #00a0e9 !important;
+        }
+        [data-theme="light"] .custom-toast-notification .toast-title {
+            color: #0f172a !important;
+        }
+        [data-theme="light"] .custom-toast-notification .toast-body {
+            color: #0369a1 !important;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -2762,16 +2797,16 @@
             }
         }
 
-                function showCustomToast(title, bodyText) {
+                        function showCustomToast(title, bodyText) {
             const toast = document.createElement('div');
-            toast.className = "fixed bottom-8 right-8 bg-slate-900/95 backdrop-blur-xl border-2 border-sky-400 text-white p-4 rounded-2xl max-w-sm flex items-center gap-3.5 shadow-[0_10px_35px_rgba(0,160,233,0.4)] z-[100000] animate-bounce transition-all duration-300";
+            toast.className = "fixed bottom-8 right-8 custom-toast-notification backdrop-blur-xl p-4 rounded-2xl max-w-sm flex items-center gap-3.5 z-[100000] animate-bounce transition-all duration-300";
             toast.innerHTML = `
-                <div class="w-10 h-10 rounded-full bg-sky-500/20 border border-sky-400 flex items-center justify-center text-sky-300 text-lg flex-shrink-0 shadow-inner">
+                <div class="w-10 h-10 rounded-full toast-icon-bg flex items-center justify-center text-lg flex-shrink-0 shadow-inner">
                     <i class="fa-solid fa-calendar-check"></i>
                 </div>
                 <div class="flex flex-col">
-                    <h4 class="font-extrabold text-white text-sm tracking-wide drop-shadow-sm">${title}</h4>
-                    <p class="text-xs font-semibold text-sky-200 mt-0.5 leading-snug">${bodyText}</p>
+                    <h4 class="font-extrabold text-sm tracking-wide toast-title">${title}</h4>
+                    <p class="text-xs font-semibold mt-0.5 leading-snug toast-body">${bodyText}</p>
                 </div>
             `;
             document.body.appendChild(toast);
