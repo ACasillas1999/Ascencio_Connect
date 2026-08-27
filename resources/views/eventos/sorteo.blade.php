@@ -1,3 +1,17 @@
+@php
+    $totalDias = 3;
+    if (isset($evento->duracion) && is_numeric($evento->duracion) && $evento->duracion > 0) {
+        $totalDias = (int)$evento->duracion;
+    } elseif (!empty($evento->fecha_inicio) && !empty($evento->fecha_fin)) {
+        try {
+            $start = \Carbon\Carbon::parse($evento->fecha_inicio);
+            $end = \Carbon\Carbon::parse($evento->fecha_fin);
+            $totalDias = max(1, (int)$start->diffInDays($end) + 1);
+        } catch (\Exception $e) {
+            $totalDias = 3;
+        }
+    }
+@endphp
 @extends('layouts.app')
 
 @section('title', 'Tómbola - ' . $evento->name_evento)
@@ -291,19 +305,57 @@
         /* ================================================= */
         /* FULLSCREEN & MODO CLARO OVERRIDES                 */
         /* ================================================= */
-                .tombola-container:fullscreen {
-            background-color: var(--bg-primary, #f1f5f9) !important;
+                        /* ================================================= */
+        /* OPTIMIZACIÓN DE PANTALLA COMPLETA (DOCUMENT)      */
+        /* ================================================= */
+        :fullscreen .sidebar,
+        html:fullscreen .sidebar,
+        body:fullscreen .sidebar,
+        :fullscreen #sidebar,
+        html:fullscreen #sidebar,
+        body:fullscreen #sidebar,
+        :fullscreen .topbar,
+        html:fullscreen .topbar,
+        body:fullscreen .topbar,
+        :fullscreen #sidebar-overlay,
+        html:fullscreen #sidebar-overlay,
+        body:fullscreen #sidebar-overlay {
+            display: none !important;
+        }
+
+        :fullscreen .main,
+        html:fullscreen .main,
+        body:fullscreen .main,
+        :fullscreen .page-content,
+        html:fullscreen .page-content,
+        body:fullscreen .page-content {
+            margin: 0 !important;
+            padding: 0 !important;
             width: 100vw !important;
             height: 100vh !important;
-            padding: 0.75rem 1.25rem !important;
+            max-width: 100vw !important;
+            max-height: 100vh !important;
             overflow: hidden !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: space-between !important;
+        }
+
+        :fullscreen .tombola-container,
+        html:fullscreen .tombola-container,
+        body:fullscreen .tombola-container,
+        .tombola-container:fullscreen {
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: 100vw !important;
+            max-height: 100vh !important;
+            border-radius: 0 !important;
+            border: none !important;
+            margin: 0 !important;
+            padding: 0.75rem 1.25rem !important;
             box-sizing: border-box !important;
         }
 
-        .tombola-container:fullscreen header {
+        :fullscreen header,
+        html:fullscreen header,
+        body:fullscreen header {
             padding-top: 0.4rem !important;
             padding-bottom: 0.4rem !important;
             margin-bottom: 0.25rem !important;
@@ -311,7 +363,9 @@
             flex-shrink: 0 !important;
         }
 
-        .tombola-container:fullscreen main {
+        :fullscreen main,
+        html:fullscreen main,
+        body:fullscreen main {
             padding: 0 !important;
             flex-grow: 1 !important;
             display: flex !important;
@@ -320,39 +374,79 @@
             overflow: hidden !important;
         }
 
-        .tombola-container:fullscreen #tombola-view {
+        :fullscreen #tombola-view,
+        html:fullscreen #tombola-view,
+        body:fullscreen #tombola-view {
             height: 100% !important;
             display: flex !important;
             flex-direction: column !important;
             gap: 0.5rem !important;
         }
 
-        .tombola-container:fullscreen #tombola-view > div:first-child {
+        :fullscreen #tombola-view > div:first-child,
+        html:fullscreen #tombola-view > div:first-child,
+        body:fullscreen #tombola-view > div:first-child {
             margin-bottom: 0.25rem !important;
             flex-shrink: 0 !important;
         }
 
-        .tombola-container:fullscreen #tombola-view > .grid {
+        :fullscreen #tombola-view > .grid,
+        html:fullscreen #tombola-view > .grid,
+        body:fullscreen #tombola-view > .grid {
             flex-grow: 1 !important;
             height: calc(100vh - 145px) !important;
             margin-bottom: 0 !important;
             padding-bottom: 0 !important;
         }
 
-        .tombola-container:fullscreen .wii-panel {
+        :fullscreen .wii-panel,
+        html:fullscreen .wii-panel,
+        body:fullscreen .wii-panel {
             height: 100% !important;
             border-radius: 1.5rem !important;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
         }
 
-        .tombola-container:fullscreen #tombola-miis-list {
+        :fullscreen #tombola-miis-list,
+        html:fullscreen #tombola-miis-list,
+        body:fullscreen #tombola-miis-list,
+        :fullscreen #tombola-available-prizes,
+        html:fullscreen #tombola-available-prizes,
+        body:fullscreen #tombola-available-prizes {
             max-height: calc(100vh - 230px) !important;
             height: 100% !important;
         }
 
-        .tombola-container:fullscreen #tombola-available-prizes {
-            max-height: calc(100vh - 230px) !important;
+        /* Configuración del Sorteo en Pantalla Completa y Normal */
+        #setup-view {
+            width: 100% !important;
             height: 100% !important;
+            min-height: 400px !important;
+            flex-grow: 1 !important;
+            overflow-y: auto !important;
+        }
+
+        #setup-view.hidden {
+            display: none !important;
+        }
+
+        :fullscreen #setup-view,
+        html:fullscreen #setup-view,
+        body:fullscreen #setup-view {
+            height: calc(100vh - 90px) !important;
+            max-height: calc(100vh - 90px) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            overflow-y: auto !important;
+            flex-grow: 1 !important;
+            width: 100% !important;
+            padding-bottom: 2rem !important;
+        }
+
+        :fullscreen #setup-view.hidden,
+        html:fullscreen #setup-view.hidden,
+        body:fullscreen #setup-view.hidden {
+            display: none !important;
         }
 
         /* Fondo punteado en Pantalla Completa segn tema */
@@ -630,6 +724,26 @@
             background-color: #cbd5e1 !important;
             color: #1e293b !important;
         }
+            /* SweetAlert container z-index max priority */
+        .swal2-container {
+            z-index: 200000 !important;
+        }
+
+        /* Configuración del Sorteo en Pantalla Completa */
+        .tombola-container:fullscreen #setup-view {
+            height: calc(100vh - 90px) !important;
+            max-height: calc(100vh - 90px) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            overflow-y: auto !important;
+            flex-grow: 1 !important;
+            width: 100% !important;
+            padding-bottom: 2rem !important;
+        }
+
+        .tombola-container:fullscreen #setup-view.hidden {
+            display: none !important;
+        }
     </style>
 @endpush
 
@@ -637,7 +751,7 @@
 <div class="tombola-container wii-bg-grid flex flex-col justify-between overflow-hidden relative">
 
     <!-- Puntero de Mano (P1) -->
-    <div id="wii-pointer" style="width: 50px; height: 50px; position: absolute; pointer-events: none; z-index: 9999; margin-top: -5px; margin-left: -20px; filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.4));">
+    <div id="wii-pointer" style="width: 50px; height: 50px; position: fixed; pointer-events: none; z-index: 999999; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.5)); display: none;">
         <div class="relative w-full h-full" style="transform: rotate(-15deg);">
             <i class="fa-solid fa-hand-pointer text-white" style="font-size: 45px; -webkit-text-stroke: 2.5px #333;"></i>
             <div class="absolute -bottom-1 -right-1 bg-[#00a0e9] border-[2px] border-white rounded-full w-6 h-6 flex items-center justify-center shadow-sm" style="transform: rotate(15deg);">
@@ -693,11 +807,11 @@
                         <i class="fa-solid fa-calendar-day text-sky-500 text-sm"></i>
                         <span class="text-xs font-bold text-gray-700 uppercase tracking-wide">Jornada:</span>
                         <select id="tombola-day-select" onchange="changeTombolaDay(this.value)" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold rounded-xl px-3 py-1 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shadow-inner">
-                            <option value="1">Día 1</option>
-                            <option value="2">Día 2</option>
-                            <option value="3">Día 3</option>
-                            <option value="0">Todos los Días</option>
-                        </select>
+                        @for ($d = 1; $d <= $totalDias; $d++)
+                            <option value="{{ $d }}">Día {{ $d }}</option>
+                        @endfor
+                        <option value="0">Todos los Días</option>
+                    </select>
                     </div>
                 </div>
                 <div class="text-center">
@@ -787,23 +901,17 @@
 
             <div class="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Asignar a Jornada</div>
 
-            <button onclick="setPrizeDayFromMenu(1)" class="w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5 transition-colors font-medium">
+            @for ($d = 1; $d <= $totalDias; $d++)
+            <button onclick="setPrizeDayFromMenu({{ $d }})" class="w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5 transition-colors font-medium">
                 <i class="fa-solid fa-calendar-day text-sky-500 text-xs w-4 text-center"></i>
-                <span>Asignar a Día 1</span>
+                <span>Asignar a Día {{ $d }}</span>
             </button>
-            <button onclick="setPrizeDayFromMenu(2)" class="w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5 transition-colors font-medium">
-                <i class="fa-solid fa-calendar-day text-emerald-500 text-xs w-4 text-center"></i>
-                <span>Asignar a Día 2</span>
-            </button>
-            <button onclick="setPrizeDayFromMenu(3)" class="w-full text-left px-3 py-2 rounded-lg flex items-center gap-2.5 transition-colors font-medium">
-                <i class="fa-solid fa-calendar-day text-purple-500 text-xs w-4 text-center"></i>
-                <span>Asignar a Día 3</span>
-            </button>
+            @endfor
         </div>
 
         <!-- SECCIÓN DE CONFIGURACIÓN -->
         <!-- SECCIÓN DE CONFIGURACIÓN -->
-        <section id="setup-view" class="w-full hidden flex-col items-center gap-6 overflow-y-auto max-h-[85vh] p-2">
+        <section id="setup-view" class="w-full h-full flex-grow hidden flex flex-col items-center gap-6 overflow-y-auto p-2">
                         <div class="w-full flex flex-wrap justify-between items-center px-4 mb-2 gap-4">
                 <button onclick="switchView('tombola-view')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 shadow-md rounded-lg px-6 py-2.5 font-medium flex items-center gap-2 transition-colors">
                     <i class="fa-solid fa-chevron-left"></i> Volver a la Tómbola
@@ -817,9 +925,9 @@
                         <i class="fa-solid fa-calendar-day text-sky-400 text-sm"></i>
                         <span class="text-xs font-bold text-slate-300 uppercase tracking-wide">Jornada:</span>
                         <select id="setup-day-select" onchange="changeTombolaDay(this.value)" class="bg-slate-900 text-sky-300 text-xs font-extrabold rounded-lg px-3 py-1 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer">
-                            <option value="1">Día 1</option>
-                            <option value="2">Día 2</option>
-                            <option value="3">Día 3</option>
+                            @for ($d = 1; $d <= $totalDias; $d++)
+                                <option value="{{ $d }}">Día {{ $d }}</option>
+                            @endfor
                             <option value="0">Todos los Días</option>
                         </select>
                     </div>
@@ -830,7 +938,7 @@
             </div>
 
             <div class="w-full bg-slate-900/50 backdrop-blur-xl p-6 rounded-[2rem] shadow-2xl border border-slate-700/60 mx-auto flex flex-col items-center">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                 
                 <!-- COLUMNA 1: Participantes -->
                 <div class="bg-slate-900/80 backdrop-blur-md p-7 flex flex-col h-[620px] rounded-2xl shadow-2xl border border-slate-700">
@@ -865,38 +973,7 @@
                     </div>
                 </div>
 
-                <!-- COLUMNA 3: Canjes por Puntos -->
-                <div class="bg-slate-900/80 backdrop-blur-md p-7 flex flex-col h-[620px] rounded-2xl shadow-2xl border border-slate-700">
-                    <h3 class="text-xl font-bold text-white mb-5 flex justify-between items-center border-b border-slate-700/60 pb-4">
-                        <span class="flex items-center gap-3"><i class="fa-solid fa-gift text-emerald-400"></i> Premios Canjeados (Puntos)</span>
-                        <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs px-3 py-1 rounded-md font-bold tracking-wider">{{ count($historialPuntos) }}</span>
-                    </h3>
-
-                    <div class="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 mb-5 text-xs font-medium text-slate-400 flex justify-between items-center shadow-inner">
-                        <span class="tracking-wide">Historial de premios canjeados mediante puntos.</span>
-                    </div>
-
-                    <!-- Lista de Canjes -->
-                    <div class="flex-grow overflow-y-auto space-y-2 pr-1">
-                        @forelse($historialPuntos as $hp)
-                            <div class="flex items-center justify-between p-3.5 bg-slate-800/60 hover:bg-slate-700/60 rounded-xl border border-slate-700/80 shadow-sm transition-colors mb-2">
-                                <div class="flex flex-col truncate w-full">
-                                    <div class="flex justify-between items-center mb-1">
-                                        <span class="font-bold text-slate-100 text-[15px] tracking-wide truncate" title="{{ $hp['participante'] }}">{{ $hp['participante'] }} <span class="text-[11px] text-slate-400 font-medium ml-2">ID #{{ $hp['participante_id'] }}</span></span>
-                                        <span class="text-xs text-slate-400 font-bold bg-slate-900/50 px-2 py-0.5 rounded">{{ $hp['fecha'] }}</span>
-                                    </div>
-                                    <div class="flex justify-between items-center mt-1">
-                                        <span class="text-xs text-emerald-400 font-bold truncate tracking-wide"><i class="fa-solid fa-gift mr-1.5 opacity-80"></i>{{ $hp['premio'] }} <span class="text-white bg-emerald-500/30 px-1.5 py-0.5 rounded ml-1">x{{ $hp['cantidad'] }}</span></span>
-                                        <span class="text-xs text-red-400 font-bold">-{{ number_format($hp['puntos'] * $hp['cantidad']) }} pts</span>
-                                    </div>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="text-slate-500 text-center py-10 text-sm font-medium"><i class="fa-solid fa-inbox text-2xl mb-2 block opacity-50"></i>No hay canjes registrados.</div>
-                        @endforelse
-                    </div>
-                </div>
-
+                
                 </div>
             </div>
         </section>
@@ -904,7 +981,7 @@
     </main>
 
     <!-- MODAL DE APERTURA DE BOLA Y CELEBRACIN -->
-    <div id="sphere-opening-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex flex-col items-center justify-center hidden z-50">
+    <div id="sphere-opening-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex flex-col items-center justify-center hidden z-[100000]">
         
         <!-- Contenedor de confeti de fondo -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none" id="modal-confetti" style="z-index: 2;"></div>
@@ -1318,38 +1395,13 @@
     </script>
 
     <script>
-        // --- BASE DE DATOS Y ESTADO DE LA APLICACIN ---
-        let participants = [];
-        let prizes = [];
-        let drawnBallsHistory = [];
-        
-        let currentAnimWinnerMii = null;
-        let currentAnimWinningPrizeName = "";
 
-        // Lista de personajes preestablecidos (Sin nombres del elenco original de la consola)
-        const defaultMiis = [
-            { id: '1', display_id: 101, name: 'Carlos', color: '#ff9500', face: 'cool' },
-            { id: '2', display_id: 102, name: 'Sofía', color: '#e91e63', face: 'happy' },
-            { id: '3', display_id: 103, name: 'Beto', color: '#76c336', face: 'excited' },
-            { id: '4', display_id: 104, name: 'Ana', color: '#00a0e9', face: 'happy' },
-            { id: '5', display_id: 105, name: 'Tomás', color: '#9c27b0', face: 'surprised' },
-            { id: '6', display_id: 106, name: 'Lucía', color: '#e60012', face: 'cool' },
-            { id: '7', display_id: 107, name: 'Silvia', color: '#ffeb3b', face: 'excited' }
-        ];
-
-        // Lista de premios preestablecidos (Genricos)
-                const defaultPrizes = [
-            { id: 'p1', name: '🏆 Gran Trofeo de Oro', color: '#ffeb3b', type: 'sorteo', dia_sorteo: 1 },
-            { id: 'p2', name: '👕 Remera de Campeón de Sorteos', color: '#00a0e9', type: 'sorteo', dia_sorteo: 1 },
-            { id: 'p3', name: '🍕 Gran Pizza Party de Celebración', color: '#ff9500', type: 'sorteo', dia_sorteo: 1 },
-            { id: 'p4', name: '🎾 Raqueta Profesional de Tenis', color: '#76c336', type: 'sorteo', dia_sorteo: 1 },
-            { id: 'p5', name: '🎁 500 Puntos de Regalo', color: '#9c27b0', type: 'puntos', dia_sorteo: 1 }
-        ];
-
-                function saveToStorage() {
+        function saveToStorage() {
             try {
                 localStorage.setItem('sorteo_prizes_{{ $evento->ID }}', JSON.stringify(prizes));
-            } catch(e) {}
+            } catch(e) {
+                console.error("Error al guardar en localStorage:", e);
+            }
         }
 
         function initData() {
@@ -1983,7 +2035,9 @@
                     popup: isLight ? 'border border-slate-300 rounded-2xl shadow-2xl' : 'border border-slate-700 rounded-2xl shadow-2xl',
                     title: isLight ? 'text-slate-900 font-extrabold' : 'text-white',
                     htmlContainer: isLight ? 'text-slate-700' : 'text-slate-300'
-                }
+                },
+                didOpen: () => restoreWiiPointerIfNeeded(),
+                didClose: () => restoreWiiPointerIfNeeded()
             }).then((result) => {
                 if (result.isConfirmed) {
                     const newState = !h.delivered;
@@ -2016,7 +2070,7 @@
         }
 
                 function confirmRevertWinner(event, index) {
-            event.preventDefault();
+            if (event && event.preventDefault) event.preventDefault();
             const h = drawnBallsHistory[index];
             if (!h) return;
             
@@ -2043,9 +2097,42 @@
                     popup: isLight ? 'border border-slate-300 rounded-2xl shadow-2xl' : 'border border-slate-700 rounded-2xl shadow-2xl',
                     title: isLight ? 'text-slate-900 font-extrabold' : 'text-white',
                     htmlContainer: isLight ? 'text-slate-700' : 'text-slate-300'
-                }
+                },
+                didOpen: () => restoreWiiPointerIfNeeded(),
+                didClose: () => restoreWiiPointerIfNeeded()
             }).then((result) => {
                 if (result.isConfirmed) {
+                    const doLocalRevert = () => {
+                        const winnerName = h.p ? h.p.name : (h.name || '');
+                        if (winnerName && !participants.some(p => p.name === winnerName)) {
+                            participants.push({
+                                id: String(h.display_id || Date.now()),
+                                display_id: h.display_id || Date.now(),
+                                name: winnerName,
+                                color: h.color || '#ff9500',
+                                face: h.face || 'happy'
+                            });
+                        }
+
+                        const hPrizeName = (typeof h.prize === 'object' && h.prize) ? h.prize.name : (h.prize || '');
+                        const matchingPrize = prizes.find(p => {
+                            if (h.canje_id && p.canje_id) return p.canje_id == h.canje_id;
+                            return p.name === hPrizeName;
+                        });
+                        if (matchingPrize) {
+                            delete matchingPrize.winner;
+                            delete matchingPrize.winner_id;
+                            delete matchingPrize.canje_id;
+                            matchingPrize.delivered = false;
+                        }
+
+                        drawnBallsHistory.splice(index, 1);
+                        saveToStorage();
+                        updateUI();
+                        showCustomToast("Premio Revertido", "El premio ha sido devuelto al sorteo correctamente.");
+                        restoreWiiPointerIfNeeded();
+                    };
+
                     if (h.canje_id) {
                         fetch(`{{ route('eventos.sorteo.revertir-ganador', $evento) }}`, {
                             method: 'POST',
@@ -2056,28 +2143,16 @@
                             body: JSON.stringify({ canje_id: h.canje_id })
                         }).then(r => r.json()).then(data => {
                             if (data.ok) {
-                                // Devolver participante a la lista activa
-                                // Recargar la pgina es la manera más segura de asegurar que los premios disponibles se actualicen en JS
-                                // Pero si queremos hacerlo con SPA:
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Revertido',
-                                    text: 'Premio devuelto al sorteo. Recargando...',
-                                    background: (document.documentElement.getAttribute('data-theme') === 'light' ? '#ffffff' : '#1e293b'), color: (document.documentElement.getAttribute('data-theme') === 'light' ? '#0f172a' : '#f8fafc'),
-                                    timer: 1500, showConfirmButton: false
-                                }).then(() => {
-                                    window.location.reload();
-                                });
+                                doLocalRevert();
                             } else {
-                                Swal.fire('Error', 'No se pudo revertir', 'error');
+                                showCustomToast("Error", "No se pudo revertir el premio.");
                             }
-                        }).catch(e => console.error(e));
+                        }).catch(e => {
+                            console.error(e);
+                            doLocalRevert();
+                        });
                     } else {
-                        // Si no hay canje_id, solo lo quitamos localmente (aunque no debera pasar)
-                        drawnBallsHistory.splice(index, 1);
-                        saveToStorage();
-                        updateUI();
-                        window.location.reload();
+                        doLocalRevert();
                     }
                 }
             });
@@ -2621,8 +2696,8 @@
             }
 
             const drawBtn = document.getElementById('btn-draw-ball');
-            drawBtn.disabled = true;
-            drawBtn.classList.add('opacity-50');
+            if (drawBtn) drawBtn.disabled = true;
+            if (drawBtn) drawBtn.classList.add('opacity-50');
 
                         // Determinar el premio antes de empezar
             // Filtramos premios para la jornada seleccionada que sean de sorteo y no tengan ganador
@@ -2637,8 +2712,8 @@
             if (availablePrizes.length === 0) {
                 const dayText = currentTombolaDay === 0 ? "en general" : `para el Día ${currentTombolaDay}`;
                 showCustomToast("¡Sin premios!", `No hay premios pendientes de sorteo ${dayText}.`);
-                drawBtn.disabled = false;
-                drawBtn.classList.remove('opacity-50');
+                if (drawBtn) drawBtn.disabled = false;
+                if (drawBtn) drawBtn.classList.remove('opacity-50');
                 return;
             }
             
@@ -2685,7 +2760,7 @@
             }, 2500); // 2.5 segundos de visualización
         }
 
-        function executeDrawSequence(winningPrizeName, prizeIndex) {
+                function executeDrawSequence(winningPrizeName, prizeIndex) {
             isSpinningTombola = true;
             playSoundRoll(true);
 
@@ -2711,8 +2786,6 @@
                     droppingBallObj = tombolaBalls[winningBallIndex];
                     tombolaBalls.splice(winningBallIndex, 1);
                 } else {
-                    // Si la bola no estaba renderizada por el límite de máximo de bolas, 
-                    // creamos una instancia fresca de la nada solo para la animacin de expulsión
                     droppingBallObj = new PhysicalBall(
                         winnerMii.name, 
                         winnerMii.color, 
@@ -2730,7 +2803,7 @@
                 
                 playSoundBallDrop();
 
-                                const newHistoryItem = {
+                const newHistoryItem = {
                     name: winnerMii.name,
                     color: winnerMii.color,
                     face: winnerMii.face,
@@ -2761,29 +2834,35 @@
                 })
                 .catch(e => console.error(e));
 
-                // Esperar a que termine la animacin de caída antes de mostrar la celebración
+                // Esperar a que termine la animación de caída antes de mostrar la celebración
                 setTimeout(() => {
                     droppingBallObj = null; // Quitarla de la pantalla principal
                     const drawBtn = document.getElementById('btn-draw-ball');
-                    drawBtn.disabled = false;
-                    drawBtn.classList.remove('opacity-50');
+                    if (drawBtn) drawBtn.disabled = false;
+                    if (drawBtn) drawBtn.classList.remove('opacity-50');
 
                     // Iniciar la cinemática integrada de la bola abriéndose
                     triggerSphereOpeningAnimation(winnerMii, winningPrizeName, winnerIndex);
-                                prizes.forEach(p => {
-                if (!p.dia_sorteo) p.dia_sorteo = 1;
-            });
+                    prizes.forEach(p => {
+                        if (!p.dia_sorteo) p.dia_sorteo = 1;
+                    });
 
-            updateUI();
-        }, 1800);
+                    updateUI();
+                }, 1800);
                 
-            }, 1800); // Tiempo girando la tmbola
+            }, 1800); // Tiempo girando la tómbola
         }
 
-        // Ejecucin de la cinemática detallada de la esfera física del bingo
+        // Ejecución de la cinemática detallada de la esfera física del bingo
         function triggerSphereOpeningAnimation(winnerMii, winningPrizeName, winnerIndex) {
             currentAnimWinnerMii = winnerMii;
             currentAnimWinningPrizeName = winningPrizeName;
+
+            const wiiPointer = document.getElementById('wii-pointer');
+            const tombolaContainer = document.querySelector('.tombola-container');
+            if (wiiPointer) wiiPointer.style.display = 'none';
+            document.body.style.cursor = 'auto';
+            if (tombolaContainer) tombolaContainer.style.cursor = 'auto';
 
             const wrapper = document.getElementById('sphere-wrapper');
             const topHalf = document.getElementById('sphere-top');
@@ -2920,13 +2999,32 @@
             confettiInterval = setInterval(dropBatch, 400);
         }
 
+        function restoreWiiPointerIfNeeded() {
+            const wiiPointer = document.getElementById('wii-pointer');
+            const tombolaContainer = document.querySelector('.tombola-container');
+            if (wiiCursorActive && !isConfigMode) {
+                document.body.style.cursor = 'none';
+                if (tombolaContainer) tombolaContainer.style.cursor = 'none';
+                if (wiiPointer) {
+                    wiiPointer.style.display = 'block';
+                    wiiPointer.style.zIndex = '300000';
+                }
+            } else {
+                document.body.style.cursor = 'auto';
+                if (tombolaContainer) tombolaContainer.style.cursor = 'auto';
+                if (wiiPointer) wiiPointer.style.display = 'none';
+            }
+        }
+
         function closeVictoryModal() {
             playSoundClick();
-            document.getElementById('sphere-opening-modal').classList.add('hidden');
+            const sphereModal = document.getElementById('sphere-opening-modal');
+            if (sphereModal) sphereModal.classList.add('hidden');
             if (confettiInterval) {
                 clearInterval(confettiInterval);
                 confettiInterval = null;
             }
+            restoreWiiPointerIfNeeded();
         }
 
         let wiiCursorActive = true;
@@ -2936,30 +3034,53 @@
 
         function switchView(viewId) {
             playSoundClick();
-            document.getElementById('tombola-view').classList.add('hidden');
-            document.getElementById('setup-view').classList.add('hidden');
-            document.getElementById(viewId).classList.remove('hidden');
+            const tombolaV = document.getElementById('tombola-view');
+            const setupV = document.getElementById('setup-view');
+            const wiiPtr = document.getElementById('wii-pointer');
+            const container = document.querySelector('.tombola-container');
 
-            if (viewId === 'tombola-view') {
+            if (viewId === 'setup-view') {
+                if (tombolaV) {
+                    tombolaV.classList.add('hidden');
+                    tombolaV.style.setProperty('display', 'none', 'important');
+                }
+                if (setupV) {
+                    setupV.classList.remove('hidden');
+                    setupV.style.setProperty('display', 'flex', 'important');
+                }
+                isConfigMode = true;
+                document.body.style.cursor = 'auto';
+                if (container) container.style.cursor = 'auto';
+                if (wiiPtr) wiiPtr.style.display = 'none';
+            } else {
+                if (setupV) {
+                    setupV.classList.add('hidden');
+                    setupV.style.setProperty('display', 'none', 'important');
+                }
+                if (tombolaV) {
+                    tombolaV.classList.remove('hidden');
+                    tombolaV.style.setProperty('display', 'flex', 'important');
+                }
                 isConfigMode = false;
                 initTombolaPhysics();
                 if (wiiCursorActive) {
-                    tombolaContainer.style.cursor = 'none';
-                    wiiPointer.style.display = 'block';
+                    document.body.style.cursor = 'none';
+                    if (container) container.style.cursor = 'none';
+                    if (wiiPtr) wiiPtr.style.display = 'block';
                 }
-            } else if (viewId === 'setup-view') {
-                isConfigMode = true;
-                tombolaContainer.style.cursor = 'auto';
-                wiiPointer.style.display = 'none';
             }
         }
 
-        tombolaContainer.addEventListener('mousemove', (e) => {
+        window.addEventListener('mousemove', (e) => {
+            const wiiPtr = document.getElementById('wii-pointer');
             if (wiiCursorActive && !isConfigMode) {
-                wiiPointer.style.display = 'block';
-                const rect = tombolaContainer.getBoundingClientRect();
-                wiiPointer.style.left = `${e.clientX - rect.left}px`;
-                wiiPointer.style.top = `${e.clientY - rect.top}px`;
+                if (wiiPtr) {
+                    wiiPtr.style.display = 'block';
+                    wiiPtr.style.left = `${e.clientX - 8}px`;
+                    wiiPtr.style.top = `${e.clientY - 4}px`;
+                }
+            } else {
+                if (wiiPtr) wiiPtr.style.display = 'none';
             }
         });
 
@@ -3014,7 +3135,8 @@
                     <p class="text-xs mt-0.5 leading-snug ${bodyClass}">${bodyText}</p>
                 </div>
             `;
-            document.body.appendChild(toast);
+            const targetContainer = document.fullscreenElement || document.body;
+            targetContainer.appendChild(toast);
             setTimeout(() => {
                 toast.classList.remove('animate-bounce');
                 toast.classList.add('opacity-0', 'translate-y-4', 'transition-all', 'duration-500');
@@ -3023,43 +3145,63 @@
         }
 
         // --- MANEJADOR DE PANTALLA COMPLETA ---
-        function toggleFullscreen() {
+                function toggleFullscreen() {
             playSoundClick();
-            if (!document.fullscreenElement) {
-                tombolaContainer.requestFullscreen().catch(err => {
-                    alert(`No se pudo iniciar el modo pantalla completa: ${err.message}`);
-                });
+            const elem = document.documentElement;
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                }
             } else {
-                document.exitFullscreen();
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
             }
         }
 
-        document.addEventListener('fullscreenchange', () => {
+                document.addEventListener('fullscreenchange', () => {
             const fsIcon = document.getElementById('fs-icon');
             const fsText = document.getElementById('fs-text');
             if (document.fullscreenElement) {
-                fsIcon.classList.replace('fa-expand', 'fa-compress');
-                fsText.textContent = 'Salir de Pantalla';
+                if (fsIcon) fsIcon.classList.replace('fa-expand', 'fa-compress');
+                if (fsText) fsText.textContent = 'Salir de Pantalla';
             } else {
-                fsIcon.classList.replace('fa-compress', 'fa-expand');
-                fsText.textContent = 'Pantalla Completa';
+                if (fsIcon) fsIcon.classList.replace('fa-compress', 'fa-expand');
+                if (fsText) fsText.textContent = 'Pantalla Completa';
             }
+            setTimeout(() => {
+                if (typeof resizeTombolaCanvas === 'function') resizeTombolaCanvas();
+            }, 100);
         });
 
         // --- INICIALIZADORES AL CARGAR LA PÁGINA ---
-        window.onload = function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            const wiiPtr = document.getElementById('wii-pointer');
+            if (wiiPtr && wiiPtr.parentElement !== document.body) {
+                document.body.appendChild(wiiPtr);
+            }
             initData();
 
             // Reloj en tiempo real
             setInterval(() => {
                 const clock = document.getElementById('wii-clock');
-                const now = new Date();
-                let hours = now.getHours();
-                const ampm = hours >= 12 ? 'PM' : 'AM';
-                hours = hours % 12;
-                hours = hours ? hours : 12;
-                const minutes = now.getMinutes().toString().padStart(2, '0');
-                clock.innerText = `${hours}:${minutes} ${ampm}`;
+                if (clock) {
+                    const now = new Date();
+                    let hours = now.getHours();
+                    const ampm = hours >= 12 ? 'PM' : 'AM';
+                    hours = hours % 12;
+                    hours = hours ? hours : 12;
+                    const minutes = now.getMinutes().toString().padStart(2, '0');
+                    clock.innerText = `${hours}:${minutes} ${ampm}`;
+                }
             }, 1000);
 
             initTombolaPhysics();
@@ -3070,7 +3212,7 @@
                     audioCtx.resume();
                 }
             }, { once: true });
-        }
+        });
     </script>
 </div>
 @endsection
