@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 
 class ProveedorController extends Controller
 {
@@ -20,12 +21,15 @@ class ProveedorController extends Controller
         $usuario = Auth::user()->username;
         
         // Obtener todos los eventos en los que este proveedor está asignado
-        $eventos_asignados = DB::table('proveedor_evento')
-            ->join('evento', 'evento.ID', '=', 'proveedor_evento.ID_Evento')
-            ->where('proveedor_evento.NombreProveedor', $usuario)
-            ->where('proveedor_evento.Activo', 1)
-            ->select('proveedor_evento.Puntos', 'evento.name_evento', 'evento.ID as ID_Evento')
-            ->get();
+        $eventos_asignados = collect();
+        if (Schema::hasTable('proveedor_evento')) {
+            $eventos_asignados = DB::table('proveedor_evento')
+                ->join('evento', 'evento.ID', '=', 'proveedor_evento.ID_Evento')
+                ->where('proveedor_evento.NombreProveedor', $usuario)
+                ->where('proveedor_evento.Activo', 1)
+                ->select('proveedor_evento.Puntos', 'evento.name_evento', 'evento.ID as ID_Evento')
+                ->get();
+        }
 
         $selected_evento_id = $request->query('evento_id');
         
@@ -44,18 +48,36 @@ class ProveedorController extends Controller
                 $historial = collect();
         $total_puntos_entregados = 0;
         $total_escaneos = 0;
+        $total_prospectos = 0;
 
-        if ($id_evento) {
+        if ($id_evento && Schema::hasTable('puntos_proveedor')) {
+            // Intento de auto-migración segura
+            if (!Schema::hasColumn('puntos_proveedor', 'es_prospecto')) {
+                try {
+                    DB::statement("ALTER TABLE `puntos_proveedor` ADD COLUMN `es_prospecto` TINYINT(1) NOT NULL DEFAULT 0");
+                } catch (\Exception $e) {}
+            }
+
+            $hasProspectoCol = Schema::hasColumn('puntos_proveedor', 'es_prospecto');
+            $prospectoField = $hasProspectoCol ? 'puntos_proveedor.es_prospecto' : DB::raw('0 as es_prospecto');
+            $rfcField = Schema::hasColumn('participante', 'RFC') ? 'participante.RFC' : DB::raw("'' as RFC");
+            $empresaField = Schema::hasColumn('participante', 'Empresa') ? 'participante.Empresa as participante_empresa' : DB::raw("'' as participante_empresa");
+            $telefonoField = Schema::hasColumn('participante', 'Telefono') ? 'participante.Telefono as participante_telefono' : DB::raw("'' as participante_telefono");
+
             $historial = DB::table('puntos_proveedor')
                 ->join('participante', 'participante.ID', '=', 'puntos_proveedor.id_participante')
                 ->where('puntos_proveedor.usuario', $usuario)
                 ->where('puntos_proveedor.id_evento', $id_evento)
                 ->select(
+                    'puntos_proveedor.ID as id_registro',
                     'puntos_proveedor.id_participante',
                     'puntos_proveedor.puntos',
                     'puntos_proveedor.fecha',
+                    $prospectoField,
                     'participante.Nombre as participante_nombre',
-                    'participante.RFC'
+                    $rfcField,
+                    $empresaField,
+                    $telefonoField
                 )
                 ->orderBy('puntos_proveedor.fecha', 'desc')
                 ->take(50)
@@ -70,11 +92,17 @@ class ProveedorController extends Controller
                 ->where('usuario', $usuario)
                 ->where('id_evento', $id_evento)
                 ->count();
+
+            $total_prospectos = $hasProspectoCol ? DB::table('puntos_proveedor')
+                ->where('usuario', $usuario)
+                ->where('id_evento', $id_evento)
+                ->where('es_prospecto', 1)
+                ->count() : 0;
         }
 
         return view('proveedor.index', compact(
             'usuario', 'puntos', 'evento_nombre', 'id_evento', 'eventos_asignados',
-            'historial', 'total_puntos_entregados', 'total_escaneos'
+            'historial', 'total_puntos_entregados', 'total_escaneos', 'total_prospectos'
         ));
     }
 
@@ -287,5 +315,110 @@ class ProveedorController extends Controller
         $usuario->save();
 
         return redirect()->back()->with('success', 'Cuenta de proveedor actualizada correctamente.');
+    }
+
+    /**
+     * Alterna el estado de prospecto para un registro de punto otorgado.
+     */
+    public function toggleProspecto(Request $request)
+    {
+        $usuario = Auth::user()->username;
+        $id_registro = $request->input('id_registro');
+
+        if (!Schema::hasColumn('puntos_proveedor', 'es_prospecto')) {
+            try {
+                DB::statement("ALTER TABLE `puntos_proveedor` ADD COLUMN `es_prospecto` TINYINT(1) NOT NULL DEFAULT 0");
+            } catch (\Exception $e) {}
+        }
+
+        if (!$id_registro) {
+            return response()->json(['ok' => false, 'message' => 'ID de registro inválido.'], 400);
+        }
+
+        $registro = DB::table('puntos_proveedor')
+            ->where('ID', $id_registro)
+            ->where('usuario', $usuario)
+            ->first();
+
+        if (!$registro) {
+            return response()->json(['ok' => false, 'message' => 'Registro no encontrado o sin permisos.'], 404);
+        }
+
+        $nuevoEstado = !((bool)$registro->es_prospecto);
+
+        DB::table('puntos_proveedor')
+            ->where('ID', $id_registro)
+            ->update(['es_prospecto' => $nuevoEstado ? 1 : 0]);
+
+        return response()->json([
+            'ok' => true,
+            'es_prospecto' => $nuevoEstado,
+            'message' => $nuevoEstado ? 'Marcado como prospecto' : 'Desmarcado de prospectos'
+        ]);
+    }
+
+    /**
+     * Obtiene el detalle de prospectos y métricas de un proveedor para un evento.
+     */
+    public function getProspectosProveedor(Request $request, Evento $evento, $usuario)
+    {
+        if (!Schema::hasTable('puntos_proveedor')) {
+            return response()->json([
+                'ok' => true,
+                'usuario' => $usuario,
+                'evento_nombre' => $evento->name_evento,
+                'total_escaneos' => 0,
+                'total_puntos' => 0,
+                'total_prospectos' => 0,
+                'tasa_conversion' => 0,
+                'prospectos' => [],
+                'todos' => []
+            ]);
+        }
+
+        $hasProspectoCol = Schema::hasColumn('puntos_proveedor', 'es_prospecto');
+        $prospectoField = $hasProspectoCol ? 'puntos_proveedor.es_prospecto' : DB::raw('0 as es_prospecto');
+
+        $rfcField = Schema::hasColumn('participante', 'RFC') ? 'participante.RFC' : DB::raw("'' as RFC");
+        $telefonoField = Schema::hasColumn('participante', 'Telefono') ? 'participante.Telefono' : DB::raw("'' as Telefono");
+        $sucursalField = Schema::hasColumn('participante', 'Sucursal') ? 'participante.Sucursal' : DB::raw("'' as Sucursal");
+
+        $registros = DB::table('puntos_proveedor')
+            ->join('participante', 'participante.ID', '=', 'puntos_proveedor.id_participante')
+            ->where('puntos_proveedor.usuario', $usuario)
+            ->where('puntos_proveedor.id_evento', $evento->ID)
+            ->select(
+                'puntos_proveedor.ID as id_registro',
+                'puntos_proveedor.id_participante',
+                'puntos_proveedor.puntos',
+                'puntos_proveedor.fecha',
+                $prospectoField,
+                'participante.Nombre as participante_nombre',
+                $rfcField,
+                $telefonoField,
+                $sucursalField
+            )
+            ->orderBy('puntos_proveedor.fecha', 'desc')
+            ->get();
+
+        $prospectos = $registros->filter(function($r) {
+            return !empty($r->es_prospecto);
+        })->values();
+
+        $totalPuntos = $registros->sum('puntos');
+        $totalEscaneos = $registros->count();
+        $totalProspectos = $prospectos->count();
+
+        return response()->json([
+            'ok' => true,
+            'usuario' => $usuario,
+            'evento_nombre' => $evento->name_evento,
+            'total_escaneos' => $totalEscaneos,
+            'total_puntos' => $totalPuntos,
+            'total_prospectos' => $totalProspectos,
+            'tasa_conversion' => $totalEscaneos > 0 ? round(($totalProspectos / $totalEscaneos) * 100, 1) : 0,
+            'prospectos' => $prospectos,
+            'todos' => $registros
+        ]);
     }
 }

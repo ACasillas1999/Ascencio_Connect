@@ -168,6 +168,206 @@
     @endif
 </div>
 @endif
+
+<!-- MODAL DE PROSPECTOS Y ESTADÍSTICAS DEL PROVEEDOR -->
+<div id="modal-prospectos-proveedor" class="modal-backdrop" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.85); backdrop-filter:blur(10px); z-index:99999; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:#0f172a; border:1px solid rgba(255,255,255,0.12); width:100%; max-width:750px; max-height:90vh; border-radius:14px; box-shadow:0 20px 40px rgba(0,0,0,0.5); display:flex; flex-direction:column; overflow:hidden;">
+        
+        <!-- Modal Header -->
+        <div style="padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center; background:rgba(15,23,42,0.95);">
+            <div>
+                <div style="font-size:11px; text-transform:uppercase; color:#d97706; font-weight:800; letter-spacing:0.5px; display:flex; align-items:center; gap:5px;">
+                    <i class="bi bi-person-star-fill"></i> Métricas & Prospectos de Proveedor
+                </div>
+                <h3 style="margin:2px 0 0 0; font-size:18px; font-weight:900; color:#ffffff;" id="modalProvName">Proveedor: --</h3>
+            </div>
+            <button type="button" onclick="closeModal('modal-prospectos-proveedor')" style="background:transparent; border:none; color:#94a3b8; font-size:20px; cursor:pointer;"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <!-- Strip de Métricas -->
+        <div style="padding:14px 20px; background:rgba(30,41,59,0.5); border-bottom:1px solid rgba(255,255,255,0.08); display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;">
+            <div style="text-align:center; padding:8px; background:rgba(15,23,42,0.6); border-radius:8px; border:1px solid rgba(255,255,255,0.06);">
+                <div style="font-size:10px; color:#94a3b8; font-weight:700; text-transform:uppercase;">Escaneos Totales</div>
+                <div style="font-size:18px; font-weight:900; color:#0284c7;" id="modalProvEscaneos">0</div>
+            </div>
+            <div style="text-align:center; padding:8px; background:rgba(15,23,42,0.6); border-radius:8px; border:1px solid rgba(255,255,255,0.06);">
+                <div style="font-size:10px; color:#94a3b8; font-weight:700; text-transform:uppercase;">Prospectos Marcados</div>
+                <div style="font-size:18px; font-weight:900; color:#d97706;" id="modalProvProspectos">0</div>
+            </div>
+            <div style="text-align:center; padding:8px; background:rgba(15,23,42,0.6); border-radius:8px; border:1px solid rgba(255,255,255,0.06);">
+                <div style="font-size:10px; color:#94a3b8; font-weight:700; text-transform:uppercase;">Tasa Conversión</div>
+                <div style="font-size:18px; font-weight:900; color:#16a34a;" id="modalProvTasa">0%</div>
+            </div>
+        </div>
+
+        <!-- Filtros y Exportar -->
+        <div style="padding:14px 20px 0 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div style="display:flex; gap:6px;">
+                <button type="button" id="tabProvProspectosBtn" onclick="switchProvModalTab('prospectos')" style="background:#d97706; color:#ffffff; border:none; font-weight:800; font-size:11.5px; padding:6px 14px; border-radius:6px; cursor:pointer;">
+                    ⭐ Prospectos (<span id="modalProspectosCount">0</span>)
+                </button>
+                <button type="button" id="tabProvTodosBtn" onclick="switchProvModalTab('todos')" style="background:rgba(255,255,255,0.05); color:#94a3b8; border:1px solid rgba(255,255,255,0.12); font-weight:800; font-size:11.5px; padding:6px 14px; border-radius:6px; cursor:pointer;">
+                    📋 Todos los Atendidos (<span id="modalTodosCount">0</span>)
+                </button>
+            </div>
+            <button type="button" onclick="exportProspectsCSV()" class="btn btn-sm btn-secondary" style="font-size:11.5px; font-weight:800; padding:6px 14px; border-radius:6px; display:inline-flex; align-items:center; gap:6px; color:#4ade80; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3);">
+                <i class="bi bi-file-earmark-spreadsheet-fill"></i> Exportar CSV
+            </button>
+        </div>
+
+        <!-- Lista Contenedor -->
+        <div style="padding:14px 20px 20px 20px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:8px;" id="modalProvListContainer">
+            <!-- Carga dinámica por JS -->
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentProvModalData = null;
+    let currentProvModalTab = 'prospectos';
+
+    function verProspectosProveedor(nombreProveedor) {
+        const modal = document.getElementById('modal-prospectos-proveedor');
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+
+        const container = document.getElementById('modalProvListContainer');
+        if (container) {
+            container.innerHTML = '<div style="text-align:center; padding:30px; color:#94a3b8; font-weight:700;"><i class="bi bi-arrow-repeat spin" style="font-size:24px; color:#d97706; display:block; margin-bottom:8px;"></i> Cargando información del proveedor...</div>';
+        }
+
+        document.getElementById('modalProvName').innerText = 'Proveedor: ' + nombreProveedor;
+
+        const url = "{{ url('/eventos') }}/{{ $evento->ID }}/proveedores/" + encodeURIComponent(nombreProveedor) + "/prospectos";
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                if (data.ok) {
+                    currentProvModalData = data;
+                    document.getElementById('modalProvEscaneos').innerText = data.total_escaneos;
+                    document.getElementById('modalProvProspectos').innerText = data.total_prospectos;
+                    document.getElementById('modalProvTasa').innerText = data.tasa_conversion + '%';
+
+                    document.getElementById('modalProspectosCount').innerText = data.total_prospectos;
+                    document.getElementById('modalTodosCount').innerText = data.total_escaneos;
+
+                    switchProvModalTab('prospectos');
+                } else {
+                    if (container) container.innerHTML = '<div style="text-align:center; padding:20px; color:#ef4444;">Error al cargar datos.</div>';
+                }
+            })
+            .catch(err => {
+                console.error("Error al obtener prospectos del proveedor:", err);
+                if (container) container.innerHTML = '<div style="text-align:center; padding:20px; color:#ef4444;">Error de comunicación con el servidor.</div>';
+            });
+    }
+
+    function switchProvModalTab(tab) {
+        currentProvModalTab = tab;
+        const btnProspects = document.getElementById('tabProvProspectosBtn');
+        const btnTodos = document.getElementById('tabProvTodosBtn');
+        const container = document.getElementById('modalProvListContainer');
+
+        if (tab === 'prospectos') {
+            if (btnProspects) { btnProspects.style.background = '#d97706'; btnProspects.style.color = '#ffffff'; btnProspects.style.border = 'none'; }
+            if (btnTodos) { btnTodos.style.background = 'rgba(255,255,255,0.05)'; btnTodos.style.color = '#94a3b8'; btnTodos.style.border = '1px solid rgba(255,255,255,0.12)'; }
+
+            renderProvModalList(currentProvModalData ? currentProvModalData.prospectos : [], true);
+        } else {
+            if (btnProspects) { btnProspects.style.background = 'rgba(255,255,255,0.05)'; btnProspects.style.color = '#94a3b8'; btnProspects.style.border = '1px solid rgba(255,255,255,0.12)'; }
+            if (btnTodos) { btnTodos.style.background = '#d97706'; btnTodos.style.color = '#ffffff'; btnTodos.style.border = 'none'; }
+
+            renderProvModalList(currentProvModalData ? currentProvModalData.todos : [], false);
+        }
+    }
+
+    function renderProvModalList(list, isOnlyProspects) {
+        const container = document.getElementById('modalProvListContainer');
+        if (!container) return;
+
+        if (!list || list.length === 0) {
+            container.innerHTML = `
+                <div style="text-align:center; padding:36px 20px; color:#94a3b8; background:rgba(30,41,59,0.3); border-radius:10px; border:1px dashed rgba(255,255,255,0.1);">
+                    <i class="bi bi-person-exclamation" style="font-size:32px; color:#d97706; display:block; margin-bottom:8px;"></i>
+                    <div style="font-size:14px; font-weight:800; color:#ffffff;">${isOnlyProspects ? 'Este proveedor aún no ha marcado prospectos' : 'Aún no hay escaneos registrados'}</div>
+                    <div style="font-size:12px; margin-top:4px;">${isOnlyProspects ? 'Cuando el proveedor marque un cliente como prospecto en su panel, aparecerá en este listado.' : ''}</div>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        list.forEach(item => {
+            const isP = !emptyValue(item.es_prospecto);
+            const initials = getInitials(item.participante_nombre);
+            const dateStr = item.fecha ? item.fecha : '';
+
+            html += `
+                <div style="background:${isP ? 'rgba(217,119,6,0.1)' : 'rgba(30,41,59,0.6)'}; border:1px solid ${isP ? 'rgba(217,119,6,0.4)' : 'rgba(255,255,255,0.06)'}; border-radius:8px; padding:12px 14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:200px;">
+                        <div style="width:36px; height:36px; border-radius:6px; background:${isP ? 'linear-gradient(135deg, rgba(217,119,6,0.3), rgba(251,191,36,0.15))' : 'rgba(255,255,255,0.05)'}; border:1px solid ${isP ? '#d97706' : 'rgba(255,255,255,0.1)'}; display:flex; align-items:center; justify-content:center; color:${isP ? '#d97706' : '#94a3b8'}; font-size:13px; font-weight:900;">
+                            ${initials}
+                        </div>
+                        <div>
+                            <div style="font-size:14px; font-weight:800; color:#ffffff; display:flex; align-items:center; gap:6px;">
+                                <span>${item.participante_nombre}</span>
+                                ${isP ? '<span style="background:rgba(217,119,6,0.2); border:1px solid #d97706; color:#d97706; font-size:9.5px; font-weight:900; padding:1px 6px; border-radius:4px; text-transform:uppercase;"><i class="bi bi-star-fill"></i> Prospecto</span>' : ''}
+                            </div>
+                            <div style="font-size:11.5px; color:#94a3b8; margin-top:2px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                <span>ID: #${item.id_participante}</span>
+                                ${item.RFC ? '<span>•</span><span>RFC: ' + item.RFC + '</span>' : ''}
+                                ${item.Telefono ? '<span>•</span><span>Tel: ' + item.Telefono + '</span>' : ''}
+                                <span>•</span>
+                                <span><i class="bi bi-clock"></i> ${dateStr}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <span style="background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.3); color:#4ade80; font-weight:800; font-size:11.5px; padding:4px 10px; border-radius:4px;">
+                            +${item.puntos} PTS
+                        </span>
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    function emptyValue(v) {
+        return !v || v === 0 || v === '0' || v === false;
+    }
+
+    function getInitials(name) {
+        if (!name) return 'P';
+        const parts = name.trim().split(' ');
+        return (parts[0] ? parts[0][0] : '') + (parts[1] ? parts[1][0] : '');
+    }
+
+    function exportProspectsCSV() {
+        if (!currentProvModalData || !currentProvModalData.prospectos || currentProvModalData.prospectos.length === 0) {
+            Swal.fire({ icon: 'info', title: 'Sin Prospectos', text: 'No hay prospectos marcados para exportar.' });
+            return;
+        }
+
+        let csv = 'ID Participante,Nombre,RFC,Telefono,Puntos Otorgados,Fecha Escaneo\n';
+        currentProvModalData.prospectos.forEach(p => {
+            csv += `"${p.id_participante}","${p.participante_nombre || ''}","${p.RFC || ''}","${p.Telefono || ''}","${p.puntos}","${p.fecha || ''}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "prospectos_" + currentProvModalData.usuario + ".csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+
 @endsection
 
 @section('topbar-actions')
@@ -1524,6 +1724,24 @@
                 </div>
 
                 <!-- Footer Toolbar: Botones distribuidos a lo ancho -->
+                <!-- Strip Mótricas Rápidas -->
+                <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(15,23,42,0.5); padding:8px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05); font-size:11.5px;">
+                    <div style="color:var(--text-muted); font-weight:700; display:flex; align-items:center; gap:5px;">
+                        <i class="bi bi-qr-code-scan" style="color:#0284c7;"></i> Escaneos: <strong style="color:var(--text-primary);">{{ $prov->total_escaneos ?? 0 }}</strong>
+                    </div>
+                    <div style="color:#d97706; font-weight:800; display:flex; align-items:center; gap:5px; background:rgba(217,119,6,0.12); padding:2px 8px; border-radius:4px; border:1px solid rgba(217,119,6,0.3);">
+                        <i class="bi bi-person-star-fill"></i> Prospectos: {{ $prov->total_prospectos ?? 0 }}
+                    </div>
+                </div>
+
+                <!-- Botón Principal: Ver Prospectos y Estadísticas -->
+                <div>
+                    <button type="button" onclick="verProspectosProveedor('{{ addslashes($prov->NombreProveedor) }}')" style="width:100%; background:linear-gradient(135deg, #d97706, #b45309); color:#ffffff; font-weight:800; font-size:12.5px; padding:9px 14px; border-radius:8px; border:none; display:inline-flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 3px 12px rgba(217,119,6,0.35); cursor:pointer;">
+                        <i class="bi bi-person-star-fill" style="font-size:14px;"></i> Ver Prospectos y Estadísticas ({{ $prov->total_prospectos ?? 0 }})
+                    </button>
+                </div>
+
+                <!-- Footer Toolbar -->
                 <div style="display:flex; gap:8px; align-items:center; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.06); padding-top:10px;">
                     @if(isset($prov->usuario_id) && $prov->usuario_id)
                     <button type="button" class="btn btn-sm btn-secondary" style="flex:1; justify-content:center; font-weight:600; font-size:12px; padding:7px 12px; border-radius:8px; display:inline-flex; align-items:center; gap:6px;" onclick="openEditModalInEvent({{ $prov->usuario_id }}, '{{ addslashes($prov->NombreProveedor) }}', '{{ addslashes($prov->password_visible) }}')">

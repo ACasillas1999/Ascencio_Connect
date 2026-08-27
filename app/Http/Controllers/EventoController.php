@@ -125,6 +125,25 @@ class EventoController extends Controller
             ->select('proveedor_evento.*', 'usuarios.ID as usuario_id', 'usuarios.password_visible')
             ->get();
 
+        foreach ($proveedores as $prov) {
+            if (\Illuminate\Support\Facades\Schema::hasTable('puntos_proveedor')) {
+                $prov->total_escaneos = \DB::table('puntos_proveedor')
+                    ->where('usuario', $prov->NombreProveedor)
+                    ->where('id_evento', $evento->ID)
+                    ->count();
+
+                $hasProspectoCol = \Illuminate\Support\Facades\Schema::hasColumn('puntos_proveedor', 'es_prospecto');
+                $prov->total_prospectos = $hasProspectoCol ? \DB::table('puntos_proveedor')
+                    ->where('usuario', $prov->NombreProveedor)
+                    ->where('id_evento', $evento->ID)
+                    ->where('es_prospecto', 1)
+                    ->count() : 0;
+            } else {
+                $prov->total_escaneos = 0;
+                $prov->total_prospectos = 0;
+            }
+        }
+
         $cuentasProveedores = \App\Models\Usuario::whereIn('Rol', ['proveedor', 'Proveedor'])->orderBy('username')->get();
         
         // Generar previsualización del gafete y horario

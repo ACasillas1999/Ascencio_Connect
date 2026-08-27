@@ -155,6 +155,7 @@ Route::middleware('auth')->group(function () {
         Route::post('premios/{premio}/stock', [\App\Http\Controllers\PremioController::class, 'updateStock'])->name('premios.stock');
         Route::resource('eventos.agenda', \App\Http\Controllers\AgendaController::class)->shallow();
         Route::resource('eventos.proveedores', \App\Http\Controllers\ProveedorEventoController::class)->only(['store', 'update', 'destroy'])->shallow();
+        Route::get('eventos/{evento}/proveedores/{usuario}/prospectos', [\App\Http\Controllers\ProveedorController::class, 'getProspectosProveedor'])->name('eventos.proveedores.prospectos');
 
         /* Canjes de Premios */
         Route::get('eventos/{evento}/canjes', [\App\Http\Controllers\CanjeController::class, 'index'])->name('eventos.canjes.index');
@@ -203,6 +204,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:Administrador,Proveedor')->group(function () {
         Route::get('/proveedor', [ProveedorController::class, 'index'])->name('proveedor.index');
         Route::post('/proveedor/asignar-puntos', [ProveedorController::class, 'asignarPuntos'])->name('proveedor.asignar-puntos');
+        Route::post('/proveedor/toggle-prospecto', [ProveedorController::class, 'toggleProspecto'])->name('proveedor.toggle-prospecto');
     });
 
 });
