@@ -360,6 +360,9 @@ class ProveedorController extends Controller
     /**
      * Obtiene el detalle de prospectos y métricas de un proveedor para un evento.
      */
+        /**
+     * Obtiene el detalle de prospectos y métricas de un proveedor para un evento con todos los campos.
+     */
     public function getProspectosProveedor(Request $request, Evento $evento, $usuario)
     {
         if (!Schema::hasTable('puntos_proveedor')) {
@@ -379,25 +382,31 @@ class ProveedorController extends Controller
         $hasProspectoCol = Schema::hasColumn('puntos_proveedor', 'es_prospecto');
         $prospectoField = $hasProspectoCol ? 'puntos_proveedor.es_prospecto' : DB::raw('0 as es_prospecto');
 
-        $rfcField = Schema::hasColumn('participante', 'RFC') ? 'participante.RFC' : DB::raw("'' as RFC");
-        $telefonoField = Schema::hasColumn('participante', 'Telefono') ? 'participante.Telefono' : DB::raw("'' as Telefono");
-        $sucursalField = Schema::hasColumn('participante', 'Sucursal') ? 'participante.Sucursal' : DB::raw("'' as Sucursal");
+        $partCols = Schema::getColumnListing('participante');
+        $selectFields = [
+            'puntos_proveedor.ID as id_registro',
+            'puntos_proveedor.id_participante',
+            'puntos_proveedor.puntos as puntos_otorgados',
+            'puntos_proveedor.fecha as fecha_escaneo',
+            $prospectoField,
+            'participante.Nombre as participante_nombre',
+            'participante.Puntos as participante_puntos_totales'
+        ];
+
+        $extraCols = ['RFC', 'Empresa', 'Telefono', 'Sucursal', 'Vendedor', 'Proveedor', 'QR_Code'];
+        foreach ($extraCols as $col) {
+            if (in_array($col, $partCols)) {
+                $selectFields[] = 'participante.' . $col;
+            } else {
+                $selectFields[] = DB::raw("'' as " . $col);
+            }
+        }
 
         $registros = DB::table('puntos_proveedor')
             ->join('participante', 'participante.ID', '=', 'puntos_proveedor.id_participante')
             ->where('puntos_proveedor.usuario', $usuario)
             ->where('puntos_proveedor.id_evento', $evento->ID)
-            ->select(
-                'puntos_proveedor.ID as id_registro',
-                'puntos_proveedor.id_participante',
-                'puntos_proveedor.puntos',
-                'puntos_proveedor.fecha',
-                $prospectoField,
-                'participante.Nombre as participante_nombre',
-                $rfcField,
-                $telefonoField,
-                $sucursalField
-            )
+            ->select($selectFields)
             ->orderBy('puntos_proveedor.fecha', 'desc')
             ->get();
 
@@ -405,7 +414,7 @@ class ProveedorController extends Controller
             return !empty($r->es_prospecto);
         })->values();
 
-        $totalPuntos = $registros->sum('puntos');
+        $totalPuntos = $registros->sum('puntos_otorgados');
         $totalEscaneos = $registros->count();
         $totalProspectos = $prospectos->count();
 

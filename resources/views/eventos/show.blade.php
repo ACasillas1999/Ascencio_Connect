@@ -151,6 +151,76 @@
             }
         }
     });
+
+    function toggleProvLayout(mode) {
+        const tableView = document.getElementById('view-proveedores-tabla');
+        const cardsView = document.getElementById('view-proveedores-tarjetas');
+        const btnTable = document.getElementById('btnViewProvTable');
+        const btnCards = document.getElementById('btnViewProvCards');
+
+        if (mode === 'cards') {
+            if (tableView) tableView.style.display = 'none';
+            if (cardsView) cardsView.style.display = 'grid';
+
+            if (btnTable) { btnTable.style.background = 'transparent'; btnTable.style.color = 'var(--text-muted)'; }
+            if (btnCards) { btnCards.style.background = 'var(--accent-gold)'; btnCards.style.color = '#0f172a'; }
+            
+            try { localStorage.setItem('proveedores_view_mode_' + '{{ $evento->ID }}', 'cards'); } catch(e){}
+        } else {
+            if (tableView) tableView.style.display = 'block';
+            if (cardsView) cardsView.style.display = 'none';
+
+            if (btnTable) { btnTable.style.background = 'var(--accent-gold)'; btnTable.style.color = '#0f172a'; }
+            if (btnCards) { btnCards.style.background = 'transparent'; btnCards.style.color = 'var(--text-muted)'; }
+
+            try { localStorage.setItem('proveedores_view_mode_' + '{{ $evento->ID }}', 'table'); } catch(e){}
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        try {
+            const savedMode = localStorage.getItem('proveedores_view_mode_' + '{{ $evento->ID }}');
+            if (savedMode === 'cards') {
+                toggleProvLayout('cards');
+            }
+        } catch(e){}
+    });
+
+
+    function toggleActividadesLayout(mode) {
+        const tableView = document.getElementById('view-actividades-tabla');
+        const cardsView = document.getElementById('view-actividades-tarjetas');
+        const btnTable = document.getElementById('btnViewActTable');
+        const btnCards = document.getElementById('btnViewActCards');
+
+        if (mode === 'cards') {
+            if (tableView) tableView.style.display = 'none';
+            if (cardsView) cardsView.style.display = 'grid';
+
+            if (btnTable) { btnTable.style.background = 'transparent'; btnTable.style.color = 'var(--text-muted)'; }
+            if (btnCards) { btnCards.style.background = 'var(--accent-gold)'; btnCards.style.color = '#0f172a'; }
+            
+            try { localStorage.setItem('actividades_view_mode_' + '{{ $evento->ID }}', 'cards'); } catch(e){}
+        } else {
+            if (tableView) tableView.style.display = 'block';
+            if (cardsView) cardsView.style.display = 'none';
+
+            if (btnTable) { btnTable.style.background = 'var(--accent-gold)'; btnTable.style.color = '#0f172a'; }
+            if (btnCards) { btnCards.style.background = 'transparent'; btnCards.style.color = 'var(--text-muted)'; }
+
+            try { localStorage.setItem('actividades_view_mode_' + '{{ $evento->ID }}', 'table'); } catch(e){}
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        try {
+            const savedActMode = localStorage.getItem('actividades_view_mode_' + '{{ $evento->ID }}');
+            if (savedActMode === 'cards') {
+                toggleActividadesLayout('cards');
+            }
+        } catch(e){}
+    });
+
 </script>
 @if(auth()->check() && auth()->user()->Rol !== 'Evento')
 <!-- TABS NAV - hidden on mobile (shown in sticky-tabs-bar instead) -->
@@ -283,7 +353,7 @@
         }
     }
 
-    function renderProvModalList(list, isOnlyProspects) {
+        function renderProvModalList(list, isOnlyProspects) {
         const container = document.getElementById('modalProvListContainer');
         if (!container) return;
 
@@ -292,7 +362,7 @@
                 <div style="text-align:center; padding:36px 20px; color:#94a3b8; background:rgba(30,41,59,0.3); border-radius:10px; border:1px dashed rgba(255,255,255,0.1);">
                     <i class="bi bi-person-exclamation" style="font-size:32px; color:#d97706; display:block; margin-bottom:8px;"></i>
                     <div style="font-size:14px; font-weight:800; color:#ffffff;">${isOnlyProspects ? 'Este proveedor aún no ha marcado prospectos' : 'Aún no hay escaneos registrados'}</div>
-                    <div style="font-size:12px; margin-top:4px;">${isOnlyProspects ? 'Cuando el proveedor marque un cliente como prospecto en su panel, aparecerá en este listado.' : ''}</div>
+                    <div style="font-size:12px; margin-top:4px;">${isOnlyProspects ? 'Cuando el proveedor marque un cliente como prospecto en su panel, aparecerá en este listado con su información completa.' : ''}</div>
                 </div>
             `;
             return;
@@ -302,32 +372,61 @@
         list.forEach(item => {
             const isP = !emptyValue(item.es_prospecto);
             const initials = getInitials(item.participante_nombre);
-            const dateStr = item.fecha ? item.fecha : '';
+            const fechaStr = item.fecha_escaneo ? item.fecha_escaneo : (item.fecha ? item.fecha : '');
+            const puntosOtorgados = item.puntos_otorgados !== undefined ? item.puntos_otorgados : (item.puntos || 0);
 
             html += `
-                <div style="background:${isP ? 'rgba(217,119,6,0.1)' : 'rgba(30,41,59,0.6)'}; border:1px solid ${isP ? 'rgba(217,119,6,0.4)' : 'rgba(255,255,255,0.06)'}; border-radius:8px; padding:12px 14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                    <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:200px;">
-                        <div style="width:36px; height:36px; border-radius:6px; background:${isP ? 'linear-gradient(135deg, rgba(217,119,6,0.3), rgba(251,191,36,0.15))' : 'rgba(255,255,255,0.05)'}; border:1px solid ${isP ? '#d97706' : 'rgba(255,255,255,0.1)'}; display:flex; align-items:center; justify-content:center; color:${isP ? '#d97706' : '#94a3b8'}; font-size:13px; font-weight:900;">
-                            ${initials}
+                <div style="background:${isP ? 'rgba(217,119,6,0.1)' : 'rgba(30,41,59,0.6)'}; border:1px solid ${isP ? 'rgba(217,119,6,0.45)' : 'rgba(255,255,255,0.08)'}; border-radius:10px; padding:14px 16px; display:flex; flex-direction:column; gap:10px;">
+                    <!-- Fila 1: Nombre + Badges + Puntos -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="width:38px; height:38px; border-radius:8px; background:${isP ? 'linear-gradient(135deg, rgba(217,119,6,0.3), rgba(251,191,36,0.15))' : 'rgba(255,255,255,0.05)'}; border:1px solid ${isP ? '#d97706' : 'rgba(255,255,255,0.1)'}; display:flex; align-items:center; justify-content:center; color:${isP ? '#d97706' : '#94a3b8'}; font-size:14px; font-weight:900; flex-shrink:0;">
+                                ${initials}
+                            </div>
+                            <div>
+                                <div style="font-size:15px; font-weight:900; color:#ffffff; display:flex; align-items:center; gap:8px;">
+                                    <span>${item.participante_nombre || 'Participante'}</span>
+                                    ${isP ? '<span style="background:rgba(217,119,6,0.2); border:1px solid #d97706; color:#d97706; font-size:10px; font-weight:900; padding:2px 7px; border-radius:4px; text-transform:uppercase;"><i class="bi bi-star-fill"></i> Prospecto ⭐</span>' : ''}
+                                </div>
+                                <div style="font-size:11.5px; color:#94a3b8; font-weight:700; margin-top:2px;">
+                                    ID / Folio: <span style="color:#ffffff;">#${item.id_participante}</span>
+                                </div>
+                            </div>
                         </div>
+
                         <div>
-                            <div style="font-size:14px; font-weight:800; color:#ffffff; display:flex; align-items:center; gap:6px;">
-                                <span>${item.participante_nombre}</span>
-                                ${isP ? '<span style="background:rgba(217,119,6,0.2); border:1px solid #d97706; color:#d97706; font-size:9.5px; font-weight:900; padding:1px 6px; border-radius:4px; text-transform:uppercase;"><i class="bi bi-star-fill"></i> Prospecto</span>' : ''}
-                            </div>
-                            <div style="font-size:11.5px; color:#94a3b8; margin-top:2px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                                <span>ID: #${item.id_participante}</span>
-                                ${item.RFC ? '<span>•</span><span>RFC: ' + item.RFC + '</span>' : ''}
-                                ${item.Telefono ? '<span>•</span><span>Tel: ' + item.Telefono + '</span>' : ''}
-                                <span>•</span>
-                                <span><i class="bi bi-clock"></i> ${dateStr}</span>
-                            </div>
+                            <span style="background:rgba(34,197,94,0.16); border:1px solid rgba(34,197,94,0.35); color:#4ade80; font-weight:900; font-size:12px; padding:5px 12px; border-radius:6px; display:inline-flex; align-items:center; gap:4px;">
+                                +${puntosOtorgados} PTS
+                            </span>
                         </div>
                     </div>
-                    <div>
-                        <span style="background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.3); color:#4ade80; font-weight:800; font-size:11.5px; padding:4px 10px; border-radius:4px;">
-                            +${item.puntos} PTS
-                        </span>
+
+                    <!-- Fila 2: Grid de Detalles Completos -->
+                    <div style="background:rgba(15,23,42,0.6); padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05); display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:8px; font-size:11.5px;">
+                        <div>
+                            <span style="color:#94a3b8; font-weight:600; display:block;">RFC / Tax ID:</span>
+                            <strong style="color:#ffffff;">${item.RFC || 'N/A'}</strong>
+                        </div>
+                        <div>
+                            <span style="color:#94a3b8; font-weight:600; display:block;">Empresa / Negocio:</span>
+                            <strong style="color:#f97316;">${item.Empresa || 'N/A'}</strong>
+                        </div>
+                        <div>
+                            <span style="color:#94a3b8; font-weight:600; display:block;">Teléfono:</span>
+                            <strong style="color:#38bdf8;">${item.Telefono || 'N/A'}</strong>
+                        </div>
+                        <div>
+                            <span style="color:#94a3b8; font-weight:600; display:block;">Sucursal:</span>
+                            <strong style="color:#ffffff;">${item.Sucursal || 'N/A'}</strong>
+                        </div>
+                        <div>
+                            <span style="color:#94a3b8; font-weight:600; display:block;">Vendedor Asignado:</span>
+                            <strong style="color:#ffffff;">${item.Vendedor || 'N/A'}</strong>
+                        </div>
+                        <div>
+                            <span style="color:#94a3b8; font-weight:600; display:block;">Fecha de Atención:</span>
+                            <strong style="color:#ffffff;"><i class="bi bi-clock"></i> ${fechaStr}</strong>
+                        </div>
                     </div>
                 </div>
             `;
@@ -347,24 +446,56 @@
     }
 
     function exportProspectsCSV() {
-        if (!currentProvModalData || !currentProvModalData.prospectos || currentProvModalData.prospectos.length === 0) {
-            Swal.fire({ icon: 'info', title: 'Sin Prospectos', text: 'No hay prospectos marcados para exportar.' });
+        if (!currentProvModalData) {
+            Swal.fire({ icon: 'info', title: 'Sin Registros', text: 'No hay datos cargados para exportar.' });
             return;
         }
 
-        let csv = 'ID Participante,Nombre,RFC,Telefono,Puntos Otorgados,Fecha Escaneo\n';
-        currentProvModalData.prospectos.forEach(p => {
-            csv += `"${p.id_participante}","${p.participante_nombre || ''}","${p.RFC || ''}","${p.Telefono || ''}","${p.puntos}","${p.fecha || ''}"\n`;
+        const isProspectTab = currentProvModalTab === 'prospectos';
+        const list = isProspectTab ? currentProvModalData.prospectos : currentProvModalData.todos;
+
+        if (!list || list.length === 0) {
+            Swal.fire({ icon: 'info', title: 'Sin Registros', text: 'No hay datos en este listado para exportar.' });
+            return;
+        }
+
+        let csvContent = "\uFEFF"; // UTF-8 BOM para soporte correcto de acentos en Excel
+        csvContent += "ID Participante,Nombre Completo,RFC,Empresa,Teléfono,Sucursal,Vendedor,Proveedor Atendió,Es Prospecto,Puntos Otorgados Escaneo,Puntos Totales Participante,Fecha Escaneo\n";
+
+        list.forEach(p => {
+            const nombre = (p.participante_nombre || '').replace(/"/g, '""');
+            const rfc = (p.RFC || '').replace(/"/g, '""');
+            const empresa = (p.Empresa || '').replace(/"/g, '""');
+            const telefono = (p.Telefono || '').replace(/"/g, '""');
+            const sucursal = (p.Sucursal || '').replace(/"/g, '""');
+            const vendedor = (p.Vendedor || '').replace(/"/g, '""');
+            const proveedor = (currentProvModalData.usuario || '').replace(/"/g, '""');
+            const esProspecto = p.es_prospecto ? 'SÍ' : 'NO';
+            const ptsOtorgados = p.puntos_otorgados !== undefined ? p.puntos_otorgados : (p.puntos || 0);
+            const ptsTotales = p.participante_puntos_totales || 0;
+            const fecha = (p.fecha_escaneo || p.fecha || '').replace(/"/g, '""');
+
+            csvContent += `"${p.id_participante}","${nombre}","${rfc}","${empresa}","${telefono}","${sucursal}","${vendedor}","${proveedor}","${esProspecto}","${ptsOtorgados}","${ptsTotales}","${fecha}"\n`;
         });
 
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const filename = (isProspectTab ? "prospectos_" : "escaneos_") + (currentProvModalData.usuario || "proveedor") + "_" + (currentProvModalData.evento_nombre || "evento").replace(/[^a-zA-Z0-9]/g, '_') + ".csv";
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         const url = URL.createObjectURL(blob);
         link.setAttribute("href", url);
-        link.setAttribute("download", "prospectos_" + currentProvModalData.usuario + ".csv");
+        link.setAttribute("download", filename);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+
+        Swal.fire({
+            icon: 'success',
+            title: '📥 Exportación Completada',
+            text: 'Se ha descargado el archivo CSV con la información completa.',
+            timer: 2000,
+            showConfirmButton: false
+        });
     }
 </script>
 
@@ -1569,15 +1700,29 @@
 <!-- TAB 3: ACTIVIDADES -->
 <div id="tab-actividades" class="tab-pane" style="display:none;">
     <div class="card">
-        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center; flex-wrap:wrap; gap:10px;">
+        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <span class="card-title" style="display:flex; align-items:center; gap:8px;">
                 <i class="bi bi-tags-fill" style="color:var(--accent-gold); font-size:18px;"></i>
                 <span>Catálogo de Actividades</span>
             </span>
-            <button type="button" class="btn btn-sm btn-primary" onclick="openAddActividadModal()" style="font-weight:700; border-radius:8px;">
-                <i class="bi bi-plus-lg"></i> Agregar Actividad
-            </button>
+
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <!-- Conmutador de Vista (Tabla / Tarjetas) -->
+                <div style="display:flex; align-items:center; gap:4px; background:rgba(15,23,42,0.5); padding:3px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+                    <button type="button" id="btnViewActTable" onclick="toggleActividadesLayout('table')" class="btn btn-sm" style="font-size:12px; font-weight:800; padding:5px 12px; border-radius:6px; border:none; cursor:pointer; transition:all 0.2s; background:var(--accent-gold); color:#0f172a;">
+                        <i class="bi bi-table"></i> Vista Tabla
+                    </button>
+                    <button type="button" id="btnViewActCards" onclick="toggleActividadesLayout('cards')" class="btn btn-sm" style="font-size:12px; font-weight:800; padding:5px 12px; border-radius:6px; border:none; cursor:pointer; transition:all 0.2s; background:transparent; color:var(--text-muted);">
+                        <i class="bi bi-grid-fill"></i> Vista Tarjetas
+                    </button>
+                </div>
+
+                <button type="button" class="btn btn-sm btn-primary" onclick="openAddActividadModal()" style="font-weight:700; border-radius:8px;">
+                    <i class="bi bi-plus-lg"></i> Agregar Actividad
+                </button>
+            </div>
         </div>
+
         <div style="padding:14px 16px; background:rgba(10,15,30,0.3); border-bottom:1px solid rgba(255,255,255,0.08); display:flex; gap:12px; align-items:center;">
             <div style="position:relative; flex:1;">
                 <i class="bi bi-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:13px;"></i>
@@ -1585,8 +1730,76 @@
             </div>
         </div>
 
-        <!-- VISTA TARJETAS COMPLETA (UTILIZANDO EL 100% DEL ESPACIO DE IZQUIERDA A DERECHA) -->
-        <div style="padding:16px; display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:16px;">
+        <!-- VISTA TABLA (POR DEFECTO) -->
+        <div id="view-actividades-tabla" class="table-wrapper" style="display:block;">
+            <table id="table-actividades" class="table align-middle" style="margin:0;">
+                <thead>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.08); font-size:11.5px; text-transform:uppercase; color:var(--text-muted);">
+                        <th style="padding:12px 16px;">Actividad / Descripción</th>
+                        <th style="padding:12px 16px;">Tipo</th>
+                        <th style="padding:12px 16px; text-align:center;">Capacidad</th>
+                        <th style="padding:12px 16px; text-align:center;">Puntos</th>
+                        <th style="padding:12px 16px; text-align:right;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($actividades as $act)
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05); font-size:13px;">
+                        <td style="padding:12px 16px;">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div style="width:36px; height:36px; border-radius:8px; background:rgba(212,175,55,0.12); border:1px solid rgba(212,175,55,0.3); display:flex; align-items:center; justify-content:center; color:var(--accent-gold); font-size:16px; flex-shrink:0;">
+                                    <i class="bi bi-card-checklist"></i>
+                                </div>
+                                <div>
+                                    <a href="{{ route('actividades.show', $act->ID) }}?from_tab=tab-actividades" style="font-weight:800; color:var(--text-primary); text-decoration:none;" title="{{ $act->Actividad }}">
+                                        {{ $act->Actividad }}
+                                    </a>
+                                    <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">{{ Str::limit($act->Descripcion, 45) ?: 'Actividad de evento' }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding:12px 16px;">
+                            <span class="badge" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:var(--text-secondary); font-size:11px; padding:4px 8px; border-radius:6px;">
+                                {{ $act->Exclusiva ? 'Exclusiva' : 'Pública' }}
+                            </span>
+                        </td>
+                        <td style="padding:12px 16px; text-align:center;">
+                            <span style="font-weight:700; color:var(--text-primary);"><i class="bi bi-people-fill" style="color:var(--accent-gold);"></i> {{ number_format($act->capacidad) }} pers.</span>
+                        </td>
+                        <td style="padding:12px 16px; text-align:center;">
+                            <span style="font-weight:800; color:var(--accent-gold); background:rgba(212,175,55,0.12); border:1px solid rgba(212,175,55,0.3); padding:4px 10px; border-radius:6px;">
+                                <i class="bi bi-star-fill"></i> {{ number_format($act->Puntos_Default) }} pts
+                            </span>
+                        </td>
+                        <td style="padding:12px 16px; text-align:right;">
+                            <div style="display:flex; justify-content:flex-end; align-items:center; gap:6px;">
+                                <a href="{{ route('actividades.show', $act->ID) }}?from_tab=tab-actividades" class="btn btn-sm btn-primary" style="font-weight:700; font-size:11.5px; padding:6px 12px; border-radius:6px; display:inline-flex; align-items:center; gap:5px; text-decoration:none;">
+                                    <i class="bi bi-bar-chart-line-fill"></i> Estadísticas
+                                </a>
+
+                                <button type="button" class="btn btn-sm btn-secondary" style="padding:6px 10px; border-radius:6px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);" onclick="editActividad({{ $act->ID }}, '{{ addslashes($act->Actividad) }}', '{{ addslashes($act->Descripcion) }}', {{ $act->capacidad }}, {{ $act->Puntos_Default }}, {{ $act->Exclusiva ? 1 : 0 }})" title="Editar">
+                                    <i class="bi bi-pencil" style="color:var(--accent-gold);"></i>
+                                </button>
+
+                                <form action="{{ route('actividades.destroy', $act) }}" method="POST" style="display:inline;" class="delete-form" data-message="¿Eliminar la actividad '{{ $act->Actividad }}'?">
+                                    @csrf @method('DELETE')
+                                    <input type="hidden" name="active_tab" value="tab-actividades">
+                                    <button type="submit" class="btn btn-sm btn-secondary btn-delete" style="color:#ef4444; padding:6px 10px; border-radius:6px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2);" title="Eliminar"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" style="text-align:center; padding:32px; color:var(--text-muted); font-size:13px;">No hay actividades registradas.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <!-- VISTA TARJETAS ACTIVIDADES (SECUNDARIA) -->
+        <div id="view-actividades-tarjetas" style="padding:16px; display:none; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:16px;">
             @forelse($actividades as $act)
             <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-left:4px solid var(--accent-gold); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px; box-shadow:0 4px 14px rgba(0,0,0,0.25); transition:transform 0.2s ease;">
                 <!-- Header: Icono + Titular a la izquierda, Badge a la derecha -->
@@ -1603,7 +1816,7 @@
                         </div>
                     </div>
                     <span class="badge" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:var(--text-secondary); font-size:11px; padding:4px 8px; border-radius:6px; flex-shrink:0;">
-                        {{ $act->Exclusiva ? '🌐 Exclusiva' : '🌐 Pública' }}
+                        {{ $act->Exclusiva ? 'Exclusiva' : 'Pública' }}
                     </span>
                 </div>
 
@@ -1649,14 +1862,27 @@
 
 <div id="tab-proveedores" class="tab-pane" style="display:none;">
     <div class="card">
-        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center; flex-wrap:wrap; gap:10px;">
+        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <span class="card-title" style="font-size:16px; font-weight:700; display:flex; align-items:center; gap:8px;">
                 <i class="bi bi-building-gear" style="color:var(--accent-gold);"></i>
                 <span>Proveedores Asignados a este Evento</span>
             </span>
-            <button type="button" class="btn btn-sm btn-primary" onclick="openModal('modal-proveedor')" style="font-size:13px; font-weight:700; display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:8px;">
-                <i class="bi bi-plus-circle"></i> Asignar Proveedor al Evento
-            </button>
+
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <!-- Conmutador de Vista (Tabla / Tarjetas) -->
+                <div style="display:flex; align-items:center; gap:4px; background:rgba(15,23,42,0.5); padding:3px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+                    <button type="button" id="btnViewProvTable" onclick="toggleProvLayout('table')" class="btn btn-sm" style="font-size:12px; font-weight:800; padding:5px 12px; border-radius:6px; border:none; cursor:pointer; transition:all 0.2s; background:var(--accent-gold); color:#0f172a;">
+                        <i class="bi bi-table"></i> Vista Tabla
+                    </button>
+                    <button type="button" id="btnViewProvCards" onclick="toggleProvLayout('cards')" class="btn btn-sm" style="font-size:12px; font-weight:800; padding:5px 12px; border-radius:6px; border:none; cursor:pointer; transition:all 0.2s; background:transparent; color:var(--text-muted);">
+                        <i class="bi bi-grid-fill"></i> Vista Tarjetas
+                    </button>
+                </div>
+
+                <button type="button" class="btn btn-sm btn-primary" onclick="openModal('modal-proveedor')" style="font-size:13px; font-weight:700; display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:8px;">
+                    <i class="bi bi-plus-circle"></i> Asignar Proveedor al Evento
+                </button>
+            </div>
         </div>
 
         <div style="padding:14px 16px; background:rgba(10,15,30,0.3); border-bottom:1px solid rgba(255,255,255,0.08); display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
@@ -1666,13 +1892,101 @@
             </div>
             <select id="filter-estado-proveedores" class="form-control form-control-sm" style="width:170px; font-size:12.5px; border-radius:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12);" onchange="filterTable('table-proveedores', document.getElementById('search-proveedores').value, this.value)">
                 <option value="">Todos los Estados</option>
-                <option value="Habilitado">🟢 Habilitado</option>
-                <option value="Deshabilitado">🔴 Deshabilitado</option>
+                <option value="Habilitado">Habilitado</option>
+                <option value="Deshabilitado">Deshabilitado</option>
             </select>
         </div>
 
-        <!-- VISTA TARJETAS PROVEEDORES (UTILIZANDO EL 100% DEL ESPACIO DE IZQUIERDA A DERECHA) -->
-        <div style="padding:16px; display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:16px;">
+        <!-- VISTA TABLA (POR DEFECTO) -->
+        <div id="view-proveedores-tabla" class="table-wrapper" style="display:block;">
+            <table id="table-proveedores" class="table align-middle" style="margin:0;">
+                <thead>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.08); font-size:11.5px; text-transform:uppercase; color:var(--text-muted);">
+                        <th style="padding:12px 16px;">Proveedor / PIN</th>
+                        <th style="padding:12px 16px;">Estatus</th>
+                        <th style="padding:12px 16px; text-align:center;">Pts por Escaneo</th>
+                        <th style="padding:12px 16px; text-align:center;">Escaneos</th>
+                        <th style="padding:12px 16px; text-align:center;">Prospectos Marcados</th>
+                        <th style="padding:12px 16px; text-align:right;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($proveedores as $prov)
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.05); font-size:13px;">
+                        <td style="padding:12px 16px;">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div style="width:36px; height:36px; border-radius:8px; background:rgba(212,175,55,0.12); border:1px solid rgba(212,175,55,0.3); display:flex; align-items:center; justify-content:center; color:var(--accent-gold); font-size:16px; flex-shrink:0;">
+                                    <i class="bi bi-person-badge-fill"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight:800; color:var(--text-primary);">{{ $prov->NombreProveedor }}</div>
+                                    <div style="font-size:11px; color:var(--text-muted); font-family:monospace;">
+                                        PIN: <span style="color:var(--accent-gold); font-weight:700;">{{ $prov->password_visible ?: '***' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding:12px 16px;">
+                            <form action="{{ route('proveedores.update', $prov->ID) }}" method="POST" style="margin:0;">
+                                @csrf @method('PUT')
+                                <input type="hidden" name="active_tab" value="tab-proveedores">
+                                <input type="hidden" name="Activo" value="{{ $prov->Activo ? 0 : 1 }}">
+                                <button type="submit" style="border:1px solid {{ $prov->Activo ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)' }}; cursor:pointer; font-size:11px; padding:4px 10px; font-weight:800; border-radius:6px; background:{{ $prov->Activo ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)' }}; color:{{ $prov->Activo ? '#4ade80' : '#f87171' }}; display:inline-flex; align-items:center; gap:5px;">
+                                    <i class="bi bi-power"></i> {{ $prov->Activo ? 'Habilitado' : 'Deshabilitado' }}
+                                </button>
+                            </form>
+                        </td>
+                        <td style="padding:12px 16px; text-align:center;">
+                            <form action="{{ route('proveedores.update', $prov->ID) }}" method="POST" style="display:inline-flex; align-items:center; gap:6px; margin:0;">
+                                @csrf @method('PUT')
+                                <input type="hidden" name="active_tab" value="tab-proveedores">
+                                <input type="number" name="Puntos" value="{{ $prov->Puntos }}" min="0" required class="form-control" style="width:65px; text-align:center; font-size:12px; font-weight:800; color:#0f172a; background:var(--accent-gold); border:none; border-radius:6px; padding:3px 6px;">
+                                <button type="submit" class="btn btn-sm btn-secondary" style="padding:3px 8px; font-size:11px; font-weight:700; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15);" title="Guardar Puntos">
+                                    <i class="bi bi-check"></i>
+                                </button>
+                            </form>
+                        </td>
+                        <td style="padding:12px 16px; text-align:center;">
+                            <span style="font-weight:900; font-size:12.5px; color:#0284c7; background:rgba(2,132,199,0.12); border:1px solid rgba(2,132,199,0.3); padding:4px 10px; border-radius:6px;">
+                                <i class="bi bi-qr-code-scan"></i> {{ $prov->total_escaneos ?? 0 }}
+                            </span>
+                        </td>
+                        <td style="padding:12px 16px; text-align:center;">
+                            <span style="font-weight:900; font-size:12.5px; color:#d97706; background:rgba(217,119,6,0.15); border:1px solid rgba(217,119,6,0.4); padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;">
+                                <i class="bi bi-person-star-fill"></i> {{ $prov->total_prospectos ?? 0 }}
+                            </span>
+                        </td>
+                        <td style="padding:12px 16px; text-align:right;">
+                            <div style="display:flex; justify-content:flex-end; align-items:center; gap:6px;">
+                                <button type="button" onclick="verProspectosProveedor('{{ addslashes($prov->NombreProveedor) }}')" style="background:linear-gradient(135deg, #d97706, #b45309); color:#ffffff; font-weight:800; font-size:11.5px; padding:6px 12px; border-radius:6px; border:none; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 8px rgba(217,119,6,0.3); cursor:pointer;">
+                                    <i class="bi bi-person-star-fill"></i> Ver Prospectos
+                                </button>
+
+                                @if(isset($prov->usuario_id) && $prov->usuario_id)
+                                <button type="button" class="btn btn-sm btn-secondary" style="font-weight:600; font-size:11.5px; padding:6px 10px; border-radius:6px;" title="Modificar Credenciales" onclick="openEditModalInEvent({{ $prov->usuario_id }}, '{{ addslashes($prov->NombreProveedor) }}', '{{ addslashes($prov->password_visible) }}')">
+                                    <i class="bi bi-pencil-square" style="color:var(--accent-gold);"></i>
+                                </button>
+                                @endif
+
+                                <form action="{{ route('proveedores.destroy', $prov->ID) }}" method="POST" style="display:inline;" class="delete-form" data-message="¿Eliminar al proveedor '{{ $prov->NombreProveedor }}' de este evento?">
+                                    @csrf @method('DELETE')
+                                    <input type="hidden" name="active_tab" value="tab-proveedores">
+                                    <button type="submit" class="btn btn-sm btn-secondary btn-delete" style="color:#ef4444; padding:6px 10px; border-radius:6px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2);" title="Eliminar"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" style="text-align:center; padding:32px; color:var(--text-muted); font-size:13px;">No hay proveedores asignados a este evento.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <!-- VISTA TARJETAS PROVEEDORES (SECUNDARIA) -->
+        <div id="view-proveedores-tarjetas" style="padding:16px; display:none; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:16px;">
             @forelse($proveedores as $prov)
             <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-left:4px solid var(--accent-gold); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:12px; box-shadow:0 4px 14px rgba(0,0,0,0.25);">
                 <!-- Header: Icono + Nombre a la izquierda, PIN a la derecha -->
@@ -1705,7 +2019,7 @@
                             <input type="hidden" name="active_tab" value="tab-proveedores">
                             <input type="hidden" name="Activo" value="{{ $prov->Activo ? 0 : 1 }}">
                             <button type="submit" style="border:1px solid {{ $prov->Activo ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)' }}; cursor:pointer; font-size:11px; padding:3px 10px; font-weight:700; border-radius:6px; background:{{ $prov->Activo ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)' }}; color:{{ $prov->Activo ? '#4ade80' : '#f87171' }}; display:inline-flex; align-items:center; gap:4px;">
-                                <i class="bi bi-power"></i> {{ $prov->Activo ? '🟢 Habilitado' : '🔴 Deshabilitado' }}
+                                <i class="bi bi-power"></i> {{ $prov->Activo ? 'Habilitado' : 'Deshabilitado' }}
                             </button>
                         </form>
                     </div>
@@ -1723,8 +2037,7 @@
                     </div>
                 </div>
 
-                <!-- Footer Toolbar: Botones distribuidos a lo ancho -->
-                <!-- Strip Mótricas Rápidas -->
+                <!-- Strip Métricas Rápidas -->
                 <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(15,23,42,0.5); padding:8px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.05); font-size:11.5px;">
                     <div style="color:var(--text-muted); font-weight:700; display:flex; align-items:center; gap:5px;">
                         <i class="bi bi-qr-code-scan" style="color:#0284c7;"></i> Escaneos: <strong style="color:var(--text-primary);">{{ $prov->total_escaneos ?? 0 }}</strong>
