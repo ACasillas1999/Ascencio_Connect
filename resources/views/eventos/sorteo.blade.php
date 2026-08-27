@@ -1414,18 +1414,7 @@
 
             if (backendPrizes && backendPrizes.length > 0) {
                 prizes = backendPrizes;
-                try {
-                    const savedLocal = localStorage.getItem('sorteo_prizes_{{ $evento->ID }}');
-                    if (savedLocal) {
-                        const localArr = JSON.parse(savedLocal);
-                        prizes.forEach(p => {
-                            const found = localArr.find(lp => lp.id === p.id);
-                            if (found && found.dia_sorteo) {
-                                p.dia_sorteo = found.dia_sorteo;
-                            }
-                        });
-                    }
-                } catch(e) {}
+                saveToStorage();
             } else {
                 try {
                     const savedLocal = localStorage.getItem('sorteo_prizes_{{ $evento->ID }}');
