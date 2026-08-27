@@ -2117,6 +2117,7 @@
 
                         drawnBallsHistory.splice(index, 1);
                         saveToStorage();
+                        initTombolaPhysics();
                         updateUI();
                         showCustomToast("Premio Revertido", "El premio ha sido devuelto al sorteo correctamente.");
                         restoreWiiPointerIfNeeded();
@@ -2770,10 +2771,9 @@
                 participants = participants.filter(p => p.display_id !== winnerMii.display_id);
 
                 // Instanciar la bola cayendo
-                const winningBallIndex = tombolaBalls.findIndex(b => b.displayId === winnerMii.display_id);
+                const winningBallIndex = tombolaBalls.findIndex(b => b.displayId === winnerMii.display_id || b.name === winnerMii.name);
                 if (winningBallIndex !== -1) {
                     droppingBallObj = tombolaBalls[winningBallIndex];
-                    tombolaBalls.splice(winningBallIndex, 1);
                 } else {
                     droppingBallObj = new PhysicalBall(
                         winnerMii.name, 
@@ -2783,6 +2783,9 @@
                         winnerMii.display_id || (winnerIndex + 1)
                     );
                 }
+
+                // REMOVER TODAS LAS ESFERAS DE ESTE GANADOR DEL BOMBO FÍSICO
+                tombolaBalls = tombolaBalls.filter(b => b.displayId !== winnerMii.display_id && b.name !== winnerMii.name);
 
                 // Posicionarla en el centro para expulsarla hacia el frente
                 droppingBallObj.x = 200;
