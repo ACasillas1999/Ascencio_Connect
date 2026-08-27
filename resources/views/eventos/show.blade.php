@@ -409,7 +409,7 @@
                         </div>
                         <div>
                             <span style="color:#94a3b8; font-weight:600; display:block;">Empresa / Negocio:</span>
-                            <strong style="color:#f97316;">${item.Empresa || 'N/A'}</strong>
+                            <strong style="color:#f97316;">${item.Empresa || item.Proveedor || 'N/A'}</strong>
                         </div>
                         <div>
                             <span style="color:#94a3b8; font-weight:600; display:block;">Teléfono:</span>
@@ -465,7 +465,7 @@
         list.forEach(p => {
             const nombre = (p.participante_nombre || '').replace(/"/g, '""');
             const rfc = (p.RFC || '').replace(/"/g, '""');
-            const empresa = (p.Empresa || '').replace(/"/g, '""');
+            const empresa = (p.Empresa || p.Proveedor || '').replace(/"/g, '""');
             const telefono = (p.Telefono || '').replace(/"/g, '""');
             const sucursal = (p.Sucursal || '').replace(/"/g, '""');
             const vendedor = (p.Vendedor || '').replace(/"/g, '""');
