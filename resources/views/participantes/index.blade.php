@@ -331,9 +331,18 @@
                             <a href="{{ route('participantes.show', $p) }}" class="btn btn-sm btn-secondary" title="Ver Detalles en Evento">
                                 <i class="bi bi-eye"></i>
                             </a>
+                            @if(auth()->check() && auth()->user()->esAdmin())
                             <a href="{{ route('participantes.edit', $p) }}" class="btn btn-sm btn-secondary" title="Editar">
                                 <i class="bi bi-pencil"></i>
                             </a>
+                            <form action="{{ route('participantes.destroy', $p) }}" method="POST" class="delete-form" data-message="¿Deseas eliminar al participante '{{ $p->Nombre }}'?" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-secondary" style="color:#ef4444;" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                            @endif
                         </div>
                     </td>
                 </tr>
@@ -399,9 +408,18 @@
                 <a href="{{ route('participantes.show', $p) }}" class="btn btn-sm btn-primary mpc-btn-primary">
                     <i class="bi bi-eye"></i> Detalle
                 </a>
+                @if(auth()->check() && auth()->user()->esAdmin())
                 <a href="{{ route('participantes.edit', $p) }}" class="btn btn-sm btn-secondary" title="Editar">
                     <i class="bi bi-pencil"></i>
                 </a>
+                <form action="{{ route('participantes.destroy', $p) }}" method="POST" class="delete-form" data-message="¿Deseas eliminar al participante '{{ $p->Nombre }}'?" style="display:inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-sm btn-secondary" style="color:#ef4444;" title="Eliminar">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
+                @endif
                 @if($p->Ruta_Gafete)
                     <button class="btn btn-sm btn-secondary" onclick="openPreview('{{ asset('storage/' . $p->Ruta_Gafete) }}', 'Gafete de {{ $p->Nombre }}')" title="Gafete">
                         <i class="bi bi-person-vcard"></i>

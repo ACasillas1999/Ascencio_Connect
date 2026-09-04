@@ -95,19 +95,18 @@ class ParticipanteController extends Controller
 
     public function edit(Participante $participante)
     {
-        if (auth()->check() && (auth()->user()->Rol === 'Vendedor' || (method_exists(auth()->user(), 'esVendedor') && auth()->user()->esVendedor()))) {
-            if ($participante->evento && $participante->evento->estado === 'FINALIZADO') {
-                return redirect()->route('participantes.index')->with('error', 'No tienes permiso para editar participantes de eventos finalizados.');
-            }
-            $eventos = Evento::whereIn('estado', ['EN CURSO', 'PRÓXIMO'])->orderByDesc('fecha_inicio')->get();
-        } else {
-            $eventos = Evento::orderByDesc('fecha_inicio')->get();
+        if (!auth()->check() || !auth()->user()->esAdmin()) {
+            return redirect()->route('participantes.index')->with('error', 'No tienes permiso para editar participantes. Solo los administradores pueden realizar esta acción.');
         }
+        $eventos = Evento::orderByDesc('fecha_inicio')->get();
         return view('participantes.edit', compact('participante', 'eventos'));
     }
 
     public function update(Request $request, Participante $participante)
     {
+        if (!auth()->check() || !auth()->user()->esAdmin()) {
+            return redirect()->route('participantes.index')->with('error', 'No tienes permiso para editar participantes. Solo los administradores pueden realizar esta acción.');
+        }
         $data = $request->validate([
             'Nombre'   => [
                 'required', 'string', 'max:255',
@@ -132,6 +131,9 @@ class ParticipanteController extends Controller
 
     public function destroy(Participante $participante)
     {
+        if (!auth()->check() || !auth()->user()->esAdmin()) {
+            return redirect()->route('participantes.index')->with('error', 'No tienes permiso para eliminar participantes.');
+        }
         $participante->delete();
         return redirect()->route('participantes.index')->with('success', 'Participante eliminado.');
     }

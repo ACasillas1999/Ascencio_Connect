@@ -1597,6 +1597,66 @@
 @stack('scripts')
 
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+    @if(session('success'))
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: "{{ session('success') }}",
+                showConfirmButton: false,
+                timer: 3500,
+                timerProgressBar: true
+            });
+        }
+    @endif
+
+    @if(session('error'))
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Atención',
+                text: "{{ session('error') }}",
+                confirmButtonColor: '#ef4444'
+            });
+        }
+    @endif
+
+    document.querySelectorAll('.delete-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formToSubmit = this;
+            const msg = this.dataset.message || '¿Seguro que deseas eliminar este registro?';
+            
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: '¿Confirmar eliminación?',
+                    text: msg,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#475569',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar',
+                    background: 'var(--bg-card, #1e293b)',
+                    color: 'var(--text-primary, #f8fafc)'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        formToSubmit.submit();
+                    }
+                });
+            } else {
+                if (confirm(msg)) {
+                    formToSubmit.submit();
+                }
+            }
+        });
+    });
+});
+</script>
+
+<script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
             navigator.serviceWorker.register('{{ asset("sw.js") }}')

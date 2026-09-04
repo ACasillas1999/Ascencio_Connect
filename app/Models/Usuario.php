@@ -41,7 +41,7 @@ class Usuario extends Authenticatable
 
     public function esAdmin(): bool
     {
-        return $this->Rol === 'Admin';
+        return \App\Helpers\Permisos::normalizar($this->Rol) === 'Admin';
     }
 
     public function esGerente(): bool

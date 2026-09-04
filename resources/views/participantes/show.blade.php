@@ -10,9 +10,18 @@
             <i class="bi bi-person-badge"></i> <span class="d-none d-md-inline">Perfil Global</span><span class="d-md-none">Global</span>
         </a>
         @endif
+        @if(auth()->check() && auth()->user()->esAdmin())
         <a href="{{ route('participantes.edit', $participante) }}" class="btn btn-secondary btn-sm" title="Editar" style="padding:4px 8px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px; border-radius:6px;">
             <i class="bi bi-pencil"></i> <span class="d-none d-sm-inline">Editar</span>
         </a>
+        <form action="{{ route('participantes.destroy', $participante) }}" method="POST" class="delete-form" data-message="¿Deseas eliminar al participante '{{ $participante->Nombre }}'?" style="display:inline;">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-secondary btn-sm" title="Eliminar" style="padding:4px 8px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px; border-radius:6px; color:#ef4444;">
+                <i class="bi bi-trash"></i> <span class="d-none d-sm-inline">Eliminar</span>
+            </button>
+        </form>
+        @endif
         <a href="{{ route('participantes.index') }}" class="btn btn-secondary btn-sm" title="Volver" style="padding:4px 8px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px; border-radius:6px;">
             <i class="bi bi-arrow-left"></i> <span class="d-none d-sm-inline">Volver</span>
         </a>
