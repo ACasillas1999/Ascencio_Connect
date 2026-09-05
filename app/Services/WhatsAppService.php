@@ -10,19 +10,62 @@ use Illuminate\Support\Facades\Log;
 class WhatsAppService
 {
     /**
-     * Envía un mensaje con plantilla por WhatsApp usando Meta Cloud API
+     * Envia un mensaje con plantilla por WhatsApp usando Meta Cloud API
      */
-    public function enviarPlantilla(Participante $participante, Evento $evento, string $token): bool
+    public function enviarPlantilla(Participante $participante, Evento $evento, string $token = "", ?string $headerImageUrl = null): bool
     {
-        // NOTA: Estos valores idealmente deberían estar en el archivo .env
-        $accessToken = env('META_WA_ACCESS_TOKEN');
-        $phoneNumberId = env('META_WA_PHONE_NUMBER_ID');
+        $accessToken = env("META_WA_ACCESS_TOKEN");
+        $phoneNumberId = env("META_WA_PHONE_NUMBER_ID");
         
-        // El nombre de la plantilla ahora viene de la BD si está configurada, sino usa la default
-        $templateName = $evento->wa_template_name ?: env('META_WA_TEMPLATE_NAME', 'ascencio_day_len_2026');
+        // Nombre de la plantilla desde la BD del evento o .env
+        $templateName = $evento->wa_template_name ?: env("META_WA_TEMPLATE_NAME", "conexion_ascencio_2026");
+        // Idioma segun Meta Manager (Spanish MEX = es_MX)
+        $languageCode = env("META_WA_LANGUAGE", "es_MX");
 
-        $telefonoDestino = "52" . $participante->Telefono;
+        // Limpiar telefono para dejar solo digitos
+        $telefonoLimpio = preg_replace("/\D/", "", $participante->Telefono);
+        $telefonoDestino = "52" . $telefonoLimpio;
+        
         $url = "https://graph.facebook.com/v19.0/{$phoneNumberId}/messages";
+
+        // Parametros de la plantilla:
+        // {{1}} -> Nombre del participante
+        // {{2}} -> Folio / ID del participante
+        $folio = (string) $participante->ID;
+
+        // Determinar la URL de la imagen del Encabezado (Header)
+        // 1. $headerImageUrl parametro explicito
+        // 2. META_WA_HEADER_IMAGE_URL en .env (banner fijo)
+        // 3. Imagen del Gafete generado del participante
+        $imageUrl = $headerImageUrl 
+            ?: env("META_WA_HEADER_IMAGE_URL") 
+            ?: ($participante->Ruta_Gafete ? url("storage/" . $participante->Ruta_Gafete) : null);
+
+        $components = [];
+
+        // Si la plantilla tiene encabezado de Imagen, lo agregamos
+        if ($imageUrl) {
+            $components[] = [
+                "type" => "header",
+                "parameters" => [
+                    [
+                        "type" => "image",
+                        "image" => [
+                            "link" => $imageUrl
+                        ]
+                    ]
+                ]
+            ];
+        }
+
+        // Componente Body: {{1}} = Nombre, {{2}} = Folio
+        $components[] = [
+            "type" => "body",
+            "parameters" => [
+                ["type" => "text", "text" => $participante->Nombre],
+                ["type" => "text", "text" => $folio]
+            ]
+        ];
 
         $data = [
             "messaging_product" => "whatsapp",
@@ -30,43 +73,17 @@ class WhatsAppService
             "type" => "template",
             "template" => [
                 "name" => $templateName,
-                "language" => ["code" => "en_US"],
-                "components" => [
-                    [
-                        "type" => "body",
-                        "parameters" => [
-                            ["type" => "text", "text" => $participante->Nombre]
-                        ]
-                    ],
-                    // Botón 0: Gafete
-                    [
-                        "type" => "button",
-                        "sub_type" => "url",
-                        "index" => "0",
-                        "parameters" => [
-                            ["type" => "text", "text" => $token]
-                        ]
-                    ],
-                    // Botón 1: Horario
-                    [
-                        "type" => "button",
-                        "sub_type" => "url",
-                        "index" => "1",
-                        "parameters" => [
-                            ["type" => "text", "text" => $token]
-                        ]
-                    ]
-                ]
+                "language" => ["code" => $languageCode],
+                "components" => $components
             ]
         ];
 
-        $response = Http::withToken($accessToken)
-            ->post($url, $data);
+        $response = Http::withToken($accessToken)->post($url, $data);
 
         if ($response->failed()) {
             Log::error("Error al enviar WhatsApp a {$telefonoDestino}", [
-                'response' => $response->json(),
-                'status' => $response->status()
+                "response" => $response->json(),
+                "status"   => $response->status()
             ]);
             return false;
         }
