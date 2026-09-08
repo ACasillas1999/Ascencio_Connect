@@ -494,6 +494,16 @@
 
         // Frontend Validation for form submission
         const form = document.getElementById('form-participante');
+        // Prevenir envio accidental del formulario al presionar la tecla Enter
+        form.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                if (e.target.tagName.toLowerCase() !== 'textarea') {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        });
+
         form.addEventListener('submit', function(e) {
             const selectedOpt = eventoSelect.options[eventoSelect.selectedIndex];
             if (selectedOpt && selectedOpt.getAttribute('data-obligatorias') === '1') {
