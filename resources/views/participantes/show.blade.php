@@ -274,7 +274,7 @@
                     <div style="width:100%;">
                         <div style="font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); font-weight:700; margin-bottom:6px; text-align:center;">Gafete</div>
                         <div style="text-align:center;">
-                            <img src="{{ asset('storage/' . $participante->Ruta_Gafete) }}" style="width:100%; max-width:180px; border-radius:8px; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.3);" onclick="openPreview('{{ asset('storage/' . $participante->Ruta_Gafete) }}', 'Gafete de {{ $participante->Nombre }}')">
+             <img src="{{ asset('storage/' . $participante->Ruta_Gafete) }}?v={{ time() }}" style="width:100%; max-width:180px; border-radius:8px; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.3);" onclick="openPreview('{{ asset('storage/' . $participante->Ruta_Gafete) }}?v={{ time() }}', 'Gafete de {{ $participante->Nombre }}')">
                             <div style="margin-top:8px;">
                                 <form action="{{ route('participantes.regenerarGafete', $participante) }}" method="POST" style="display:inline;">
                                     @csrf
