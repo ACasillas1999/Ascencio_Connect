@@ -275,6 +275,15 @@
                         <div style="font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); font-weight:700; margin-bottom:6px; text-align:center;">Gafete</div>
                         <div style="text-align:center;">
                             <img src="{{ asset('storage/' . $participante->Ruta_Gafete) }}" style="width:100%; max-width:180px; border-radius:8px; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.3);" onclick="openPreview('{{ asset('storage/' . $participante->Ruta_Gafete) }}', 'Gafete de {{ $participante->Nombre }}')">
+                            <div style="margin-top:8px;">
+                                <form action="{{ route('participantes.regenerarGafete', $participante) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    <button type="submit" class="btn btn-secondary btn-sm" style="padding:4px 10px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px; border-radius:6px; background:rgba(212,175,55,0.12); border:1px solid var(--accent-gold); color:var(--accent-gold);" onclick="return confirm('¿Deseas regenerar el gafete con la plantilla actual del evento?')" title="Regenerar Gafete">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                        Regenerar Gafete
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 @endif

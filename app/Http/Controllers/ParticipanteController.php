@@ -411,4 +411,15 @@ class ParticipanteController extends Controller
 
         return view('clientes.perfil', compact('participantes', 'cliente', 'totalPuntos', 'eventosAsistidos', 'telefono'));
     }
+
+    public function regenerarGafete(Participante $participante)
+    {
+        $imageService = new \App\Services\ImageService();
+        $gafetePath = $imageService->generarGafete($participante);
+        if ($gafetePath) {
+            $participante->update(['Ruta_Gafete' => $gafetePath]);
+            return back()->with('success', 'Gafete regenerado exitosamente con el formato actual.');
+        }
+        return back()->with('error', 'Ocurrió un error al regenerar el gafete.');
+    }
 }

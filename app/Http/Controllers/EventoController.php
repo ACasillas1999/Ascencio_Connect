@@ -1096,4 +1096,21 @@ class EventoController extends Controller
 
         return response()->json(['ok' => true, 'dia' => $dia]);
     }
+
+    public function regenerarGafetes(Evento $evento)
+    {
+        $imageService = new \App\Services\ImageService();
+        $participantes = $evento->participantes;
+        $count = 0;
+
+        foreach ($participantes as $participante) {
+            $gafetePath = $imageService->generarGafete($participante);
+            if ($gafetePath) {
+                $participante->update(['Ruta_Gafete' => $gafetePath]);
+                $count++;
+            }
+        }
+
+        return back()->with('success', "Se regeneraron exitosamente $count gafetes del evento con el formato actual.");
+    }
 }

@@ -2365,6 +2365,15 @@
                             <label style="font-size:11px; color:var(--text-primary);">Color de ID</label>
                             <input type="color" name="gafete_color_id" id="input-color-id" value="{{ $evento->gafete_color_id ?? '#000000' }}" class="form-control" style="padding:0; height:30px; border:none; background:transparent;">
                         </div>
+                        <div style="margin-top:16px; border-top:1px solid rgba(255,255,255,0.08); padding-top:12px;">
+                            <form action="{{ route('eventos.regenerarGafetes', $evento) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-secondary btn-sm" style="width:100%; font-size:11px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; gap:6px; background:rgba(212,175,55,0.12); border:1px solid var(--accent-gold); color:var(--accent-gold); padding:8px;" onclick="return confirm('¿Estás seguro de regenerar los gafetes de TODOS los participantes de este evento con el formato actual?')" title="Regenerar todos los gafetes del evento">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                    Regenerar Gafetes Masivo
+                                </button>
+                            </form>
+                        </div>
                     </div>
                     
                     <!-- Center Canvas Area (Positioning & Preview stacked) -->
