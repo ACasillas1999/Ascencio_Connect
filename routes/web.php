@@ -166,6 +166,7 @@ Route::middleware('auth')->group(function () {
 
         /* Participantes (Acciones exclusivas de Admin: editar y borrar) */
         Route::resource('participantes', ParticipanteController::class)->only(['edit', 'update', 'destroy']);
+        Route::post('participantes/{participante}/regenerar-gafete', [ParticipanteController::class, 'regenerarGafete'])->name('participantes.regenerarGafete');
     });
 
     /* === RUTAS COMPARTIDAS (ADMIN Y VENDEDOR) === */
@@ -183,6 +184,7 @@ Route::middleware('auth')->group(function () {
     /* === RUTAS COMPARTIDAS (ADMIN Y EVENTO) === */
     Route::middleware('role:Administrador,Evento')->group(function () {
         Route::get('eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
+        Route::post('eventos/{evento}/regenerar-gafetes', [EventoController::class, 'regenerarGafetes'])->name('eventos.regenerarGafetes');
         Route::get('eventos/{evento}/estadisticas', [EventoController::class, 'estadisticas'])->name('eventos.estadisticas');
         Route::get('eventos/{evento}/estadisticas/export', [EventoController::class, 'exportarEstadisticasExcel'])->name('eventos.estadisticas.export');
         Route::get('eventos/{evento}/sorteo', [EventoController::class, 'sorteo'])->name('eventos.sorteo');
