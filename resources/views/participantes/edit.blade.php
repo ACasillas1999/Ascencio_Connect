@@ -42,7 +42,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="Telefono">Teléfono</label>
-                        <input id="Telefono" name="Telefono" type="text" class="form-control" maxlength="15"
+                        <input id="Telefono" name="Telefono" type="text" class="form-control" maxlength="10" inputmode="numeric" pattern="[0-9]*"
                                value="{{ old('Telefono', $participante->Telefono) }}">
                     </div>
                     <div class="form-group">
@@ -108,6 +108,12 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+        const telefonoInput = document.getElementById('Telefono');
+        if (telefonoInput) {
+            telefonoInput.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '');
+            });
+        }
     const vendedorInput = document.getElementById('Vendedor');
     const vendedorDropdown = document.getElementById('vendedor-dropdown');
 

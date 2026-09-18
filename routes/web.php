@@ -179,6 +179,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('participantes', ParticipanteController::class)->only(['index', 'show', 'create', 'store']);
         Route::get('eventos/{evento}/agenda-json', [ParticipanteController::class, 'getAgenda'])->name('eventos.agenda.json');
         Route::get('clientes/perfil/{telefono}', [ParticipanteController::class, 'globalProfile'])->name('clientes.perfil');
+        Route::post('participantes/{participante}/reenviar-whatsapp', [ParticipanteController::class, 'reenviarWhatsApp'])->name('participantes.reenviar-whatsapp');
     });
 
     /* === RUTAS COMPARTIDAS (ADMIN Y EVENTO) === */

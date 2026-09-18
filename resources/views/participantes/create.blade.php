@@ -79,7 +79,7 @@
                                 <div class="form-group" style="position:relative;">
                                     <label class="form-label" for="Telefono">Teléfono (WhatsApp) *</label>
                                     <input id="Telefono" name="Telefono" type="text" class="form-control"
-                                           value="{{ old('Telefono') }}" placeholder="10 dígitos" required autocomplete="off">
+                                           value="{{ old('Telefono') }}" placeholder="10 d�gitos" required autocomplete="off" inputmode="numeric" pattern="[0-9]*" maxlength="10">
                                     <div id="telefono-dropdown" style="display:none; position:absolute; top:100%; left:0; width:100%; background:var(--bg-card, #1e293b); border:1px solid var(--border-subtle, #334155); border-radius:4px; max-height:200px; overflow-y:auto; z-index:100; box-shadow:0 4px 6px rgba(0,0,0,0.3);">
                                     </div>
                                 </div>
@@ -191,8 +191,9 @@
             let timeoutId;
             
             telefonoInput.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '');
                 clearTimeout(timeoutId);
-                let val = this.value.replace(/\D/g, '');
+                let val = this.value;
                 
                 if (val.length < 3) {
                     telefonoDropdown.style.display = 'none';

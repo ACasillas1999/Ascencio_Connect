@@ -6,6 +6,12 @@
 @section('topbar-actions')
     <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
         @if($participante->Telefono)
+        <form action="{{ route('participantes.reenviar-whatsapp', $participante) }}" method="POST" style="display:inline;">
+            @csrf
+            <button type="submit" class="btn btn-sm" title="Reenviar mensaje de WhatsApp" style="padding:4px 8px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px; border-radius:6px; background:#25D366; border:1px solid #25D366; color:#ffffff;">
+                <i class="bi bi-whatsapp"></i> <span class="d-none d-sm-inline">Reenviar WhatsApp</span>
+            </button>
+        </form>
         <a href="{{ route('clientes.perfil', $participante->Telefono) }}" class="btn btn-primary btn-sm" title="Ver Perfil Global" style="padding:4px 8px; font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:4px; border-radius:6px;">
             <i class="bi bi-person-badge"></i> <span class="d-none d-md-inline">Perfil Global</span><span class="d-md-none">Global</span>
         </a>

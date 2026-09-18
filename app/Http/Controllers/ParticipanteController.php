@@ -104,6 +104,9 @@ class ParticipanteController extends Controller
 
     public function update(Request $request, Participante $participante)
     {
+        if ($request->filled('Telefono')) {
+            $request->merge(['Telefono' => preg_replace('/[^0-9]/', '', $request->input('Telefono'))]);
+        }
         if (!auth()->check() || !auth()->user()->esAdmin()) {
             return redirect()->route('participantes.index')->with('error', 'No tienes permiso para editar participantes. Solo los administradores pueden realizar esta acciÃ³n.');
         }
@@ -117,7 +120,7 @@ class ParticipanteController extends Controller
                 }
             ],
             'RFC'      => 'required|string|max:20',
-            'Telefono' => 'required|string|max:15',
+            'Telefono' => 'required|string|regex:/^[0-9]+$/|max:15',
             'Sucursal' => 'nullable|string|max:100',
             'Vendedor' => 'nullable|string|max:100',
             'Proveedor'=> 'nullable|string|max:255',
@@ -152,6 +155,9 @@ class ParticipanteController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->filled('Telefono')) {
+            $request->merge(['Telefono' => preg_replace('/[^0-9]/', '', $request->input('Telefono'))]);
+        }
         if ($request->filled('Nombre_P') && $request->filled('Apellido_P')) {
             $request->merge([
                 'Nombre' => trim($request->input('Nombre_P') . ' ' . $request->input('Apellido_P'))
@@ -169,7 +175,7 @@ class ParticipanteController extends Controller
                 }
             ],
             'RFC'       => 'required|string|max:20',
-            'Telefono'  => 'required|string|max:15',
+            'Telefono'  => 'required|string|regex:/^[0-9]+$/|max:15',
             'Sucursal'  => 'nullable|string|max:100',
             'Vendedor'  => 'nullable|string|max:100',
             'Proveedor' => 'nullable|string|max:255',
@@ -421,5 +427,27 @@ class ParticipanteController extends Controller
             return back()->with('success', 'Gafete regenerado exitosamente con el formato actual.');
         }
         return back()->with('error', 'OcurriÃ³ un error al regenerar el gafete.');
+    }
+
+    public function reenviarWhatsApp(Participante $participante)
+    {
+        if (!$participante->Telefono) {
+            return back()->with('error', 'El participante no cuenta con un número de teléfono registrado.');
+        }
+
+        $evento = $participante->evento;
+        if (!$evento) {
+            return back()->with('error', 'El participante no tiene un evento asignado.');
+        }
+
+        $whatsAppService = new \App\Services\WhatsAppService();
+        $token = urlencode(base64_encode($participante->ID . '|' . $evento->ID));
+        $enviado = $whatsAppService->enviarPlantilla($participante, $evento, $token);
+
+        if ($enviado) {
+            return back()->with('success', 'Mensaje de WhatsApp reenviado exitosamente a ' . $participante->Telefono);
+        } else {
+            return back()->with('error', 'No se pudo enviar el mensaje de WhatsApp. Por favor verifica las credenciales o los logs.');
+        }
     }
 }

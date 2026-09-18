@@ -324,7 +324,7 @@
                     <td>
                         <div style="display:flex;gap:6px">
                             @if($p->Telefono)
-                            <a href="{{ route('clientes.perfil', $p->Telefono) }}" class="btn btn-sm btn-secondary" title="Ver Perfil Global">
+                            <form action="{{ route('participantes.reenviar-whatsapp', $p) }}" method="POST" style="display:inline;">@csrf<button type="submit" class="btn btn-sm btn-secondary" title="Reenviar WhatsApp" style="color:#25D366;"><i class="bi bi-whatsapp"></i></button></form><a href="{{ route('clientes.perfil', $p->Telefono) }}" class="btn btn-sm btn-secondary" title="Ver Perfil Global">
                                 <i class="bi bi-person-badge" style="color:var(--accent-gold);"></i>
                             </a>
                             @endif
@@ -401,7 +401,7 @@
 
             <div class="mpc-actions">
                 @if($p->Telefono)
-                    <a href="{{ route('clientes.perfil', $p->Telefono) }}" class="btn btn-sm btn-secondary" title="Ver Perfil Global">
+                    <form action="{{ route('participantes.reenviar-whatsapp', $p) }}" method="POST" style="display:inline;">@csrf<button type="submit" class="btn btn-sm btn-secondary" title="Reenviar WhatsApp" style="color:#25D366;"><i class="bi bi-whatsapp"></i></button></form><a href="{{ route('clientes.perfil', $p->Telefono) }}" class="btn btn-sm btn-secondary" title="Ver Perfil Global">
                         <i class="bi bi-person-badge" style="color:var(--accent-gold);"></i> Perfil
                     </a>
                 @endif
