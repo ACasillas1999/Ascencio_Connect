@@ -94,18 +94,18 @@
     <tr>
         <th class="text-center">#</th>
         <th>Vendedor / Registrador</th>
-        <th class="text-center">Inscritos Registrados</th>
-        <th class="text-center">Asistieron Realmente</th>
-        <th class="text-center">Ausentes</th>
+        <th>Sucursal / Ubicación</th>
+        <th class="text-center">Inscritos</th>
+        <th class="text-center">Asistieron</th>
         <th class="text-right">Efectividad (%)</th>
     </tr>
     @forelse($rankingVendedores as $idx => $v)
     <tr class="{{ $idx % 2 == 1 ? 'even' : '' }}">
         <td class="text-center font-bold">{{ $idx + 1 }}</td>
         <td class="font-bold">{{ $v->vendedor_nombre }}</td>
+        <td class="font-bold c-gold">{{ $v->sucursal_vendedor }}</td>
         <td class="text-center font-bold">{{ number_format($v->total_registrados) }} pers.</td>
         <td class="text-center font-bold c-green">{{ number_format($v->total_asistieron) }} fueron</td>
-        <td class="text-center c-red">{{ number_format($v->ausentes) }}</td>
         <td class="text-right font-bold">{{ $v->pct_asistencia }}%</td>
     </tr>
     @empty
@@ -166,21 +166,24 @@
 
     <!-- SECCIÓN 5: SUCURSALES -->
     <tr>
-        <td colspan="6" class="section-header">5. DISTRIBUCIÓN DE ASISTENCIA POR SUCURSAL</td>
+        <td colspan="6" class="section-header">5. REGISTROS VS ASISTENCIA POR SUCURSAL</td>
     </tr>
     <tr>
         <th class="text-center">#</th>
-        <th colspan="2">Sucursal / Filial</th>
-        <th class="text-center">Asistentes Únicos</th>
-        <th colspan="2" class="text-right">% Aforo Global</th>
+        <th>Sucursal / Filial</th>
+        <th class="text-center">Total Registrados</th>
+        <th class="text-center">Asistieron Realmente</th>
+        <th class="text-center">Ausentes</th>
+        <th class="text-right">% Asistencia</th>
     </tr>
     @forelse($asistenciaPorSucursal as $idx => $sucG)
-    @php $pctS = $totalAsistieron > 0 ? round(($sucG->total_asistentes / $totalAsistieron) * 100, 1) : 0; @endphp
     <tr class="{{ $idx % 2 == 1 ? 'even' : '' }}">
         <td class="text-center font-bold">{{ $idx + 1 }}</td>
-        <td colspan="2" class="font-bold">{{ $sucG->sucursal ?: 'Sin Sucursal' }}</td>
-        <td class="text-center font-bold c-gold">{{ number_format($sucG->total_asistentes) }} pers.</td>
-        <td colspan="2" class="text-right font-bold c-green">{{ $pctS }}%</td>
+        <td class="font-bold">{{ $sucG->sucursal ?: 'Sin Sucursal' }}</td>
+        <td class="text-center font-bold">{{ number_format($sucG->total_registrados) }} pers.</td>
+        <td class="text-center font-bold c-green">{{ number_format($sucG->total_asistieron) }} fueron</td>
+        <td class="text-center c-red">{{ number_format($sucG->ausentes) }}</td>
+        <td class="text-right font-bold c-blue">{{ $sucG->pct_asistencia }}%</td>
     </tr>
     @empty
     <tr><td colspan="6" class="text-center">Sin datos de sucursales.</td></tr>
@@ -324,6 +327,60 @@
     @endforelse
 
     @endforeach
+
+    <tr class="spacer-row"><td colspan="6"></td></tr>
+
+    <!-- SECCIÓN 8: RETROALIMENTACIÓN DE CLASES Y ACTIVIDADES -->
+    <tr>
+        <td colspan="6" class="section-header">8. RETROALIMENTACIÓN Y ANALÍTICA DE CLASES (AGENDA)</td>
+    </tr>
+    <tr>
+        <th class="text-center">#</th>
+        <th>Actividad / Clase</th>
+        <th>Salón / Aula</th>
+        <th class="text-center">Asistentes Únicos</th>
+        <th class="text-center">Total Escaneos</th>
+        <th class="text-right">% Alcance Audiencia</th>
+    </tr>
+    @forelse($retroActividades as $idx => $act)
+    <tr class="{{ $idx % 2 == 1 ? 'even' : '' }}">
+        <td class="text-center font-bold">{{ $idx + 1 }}</td>
+        <td class="font-bold">{{ $act->actividad }}</td>
+        <td class="c-gold">{{ $act->salon }}</td>
+        <td class="text-center font-bold c-green">{{ number_format($act->asistentes_unicos) }} pers.</td>
+        <td class="text-center">{{ number_format($act->total_escaneos) }}</td>
+        <td class="text-right font-bold c-blue">{{ $act->pct_audiencia }}%</td>
+    </tr>
+    @empty
+    <tr><td colspan="6" class="text-center">Sin clases registradas.</td></tr>
+    @endforelse
+
+    <tr class="spacer-row"><td colspan="6"></td></tr>
+
+    <!-- SECCIÓN 9: RETROALIMENTACIÓN DE PROVEEDORES Y PROSPECTOS -->
+    <tr>
+        <td colspan="6" class="section-header">9. RETROALIMENTACIÓN DE PROVEEDORES Y CAPTACIÓN DE PROSPECTOS</td>
+    </tr>
+    <tr>
+        <th class="text-center">#</th>
+        <th>Proveedor / Marca</th>
+        <th class="text-center">Atendidos</th>
+        <th class="text-center">Puntos Otorgados</th>
+        <th class="text-center">Prospectos Captados</th>
+        <th class="text-right">% Conv. Prospecto</th>
+    </tr>
+    @forelse($retroProveedores as $idx => $prov)
+    <tr class="{{ $idx % 2 == 1 ? 'even' : '' }}">
+        <td class="text-center font-bold">{{ $idx + 1 }}</td>
+        <td class="font-bold">{{ $prov->proveedor }}</td>
+        <td class="text-center font-bold">{{ number_format($prov->participantes_atendidos) }} pers.</td>
+        <td class="text-center font-bold c-green">{{ number_format($prov->total_puntos) }} pts</td>
+        <td class="text-center font-bold c-gold">{{ number_format($prov->total_prospectos) }}</td>
+        <td class="text-right font-bold c-blue">{{ $prov->pct_prospecto }}%</td>
+    </tr>
+    @empty
+    <tr><td colspan="6" class="text-center">Sin datos de actividad de proveedores.</td></tr>
+    @endforelse
 
 </table>
 

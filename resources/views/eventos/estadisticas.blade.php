@@ -42,6 +42,11 @@
             <i class="bi bi-bar-chart-line-fill" style="margin-right:6px;"></i> Resumen General (Todos los Días)
         </button>
 
+        <!-- PESTAÑA: RETROALIMENTACIÓN DE CLASES Y PROVEEDORES -->
+        <button type="button" class="tab-est-btn" onclick="switchEstadisticaTab(this, 'tab-est-retro')" style="padding:10px 20px; font-weight:700; font-size:13px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03); color:var(--text-secondary); cursor:pointer; white-space:nowrap; transition:all 0.2s ease;">
+            <i class="bi bi-star-fill" style="margin-right:6px; color:#f59e0b;"></i> Retro Clases & Proveedores
+        </button>
+
         <!-- PESTAÑAS DINÁMICAS POR CADA DÍA DEL EVENTO -->
         @foreach($todasLasFechas as $index => $fStr)
             @php
@@ -280,7 +285,7 @@
             <div class="card" style="margin-bottom:0;">
                 <div class="card-header" style="padding:16px 20px;">
                     <span class="card-title" style="font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px;">
-                        <i class="bi bi-building-fill" style="color:var(--accent-gold);"></i> 4. Asistencia por Sucursal
+                        <i class="bi bi-building-fill" style="color:var(--accent-gold);"></i> 4. Registros vs Asistencia por Sucursal
                     </span>
                 </div>
                 <div class="card-body" style="padding:20px;">
@@ -292,22 +297,25 @@
                             <thead>
                                 <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
                                     <th style="padding:8px 12px; font-size:11px; text-transform:uppercase; color:var(--text-secondary);">Sucursal</th>
-                                    <th style="padding:8px 12px; font-size:11px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Asistentes</th>
-                                    <th style="padding:8px 12px; font-size:11px; text-transform:uppercase; color:var(--text-secondary); text-align:right;">% Aforo</th>
+                                    <th style="padding:8px 12px; font-size:11px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Registrados</th>
+                                    <th style="padding:8px 12px; font-size:11px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Asistieron</th>
+                                    <th style="padding:8px 12px; font-size:11px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Ausentes</th>
+                                    <th style="padding:8px 12px; font-size:11px; text-transform:uppercase; color:var(--text-secondary); text-align:right;">% Asistencia</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($asistenciaPorSucursal as $suc)
-                                @php $pctS = $totalAsistieron > 0 ? round(($suc->total_asistentes / $totalAsistieron) * 100, 1) : 0; @endphp
                                 <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
                                     <td style="padding:8px 12px; font-weight:700; font-size:12.5px; color:var(--text-primary);">
                                         <i class="bi bi-geo-alt-fill" style="color:var(--accent-gold); margin-right:6px;"></i> {{ $suc->sucursal ?: 'Sin Sucursal' }}
                                     </td>
-                                    <td style="padding:8px 12px; text-align:center; font-weight:800; color:var(--accent-gold);">{{ number_format($suc->total_asistentes) }}</td>
-                                    <td style="padding:8px 12px; text-align:right; font-weight:700; color:#4ade80;">{{ $pctS }}%</td>
+                                    <td style="padding:8px 12px; text-align:center; font-weight:800; color:var(--text-primary);">{{ number_format($suc->total_registrados) }}</td>
+                                    <td style="padding:8px 12px; text-align:center; font-weight:800; color:#4ade80;">{{ number_format($suc->total_asistieron) }}</td>
+                                    <td style="padding:8px 12px; text-align:center; font-weight:700; color:var(--text-secondary);">{{ number_format($suc->ausentes) }}</td>
+                                    <td style="padding:8px 12px; text-align:right; font-weight:700; color:{{ $suc->pct_asistencia >= 75 ? '#4ade80' : ($suc->pct_asistencia >= 40 ? '#fb923c' : '#f87171') }};">{{ $suc->pct_asistencia }}%</td>
                                 </tr>
                                 @empty
-                                <tr><td colspan="3" style="text-align:center; padding:16px; color:var(--text-muted);">Sin datos de sucursal.</td></tr>
+                                <tr><td colspan="5" style="text-align:center; padding:16px; color:var(--text-muted);">Sin datos de sucursal.</td></tr>
                                 @endforelse
                             </tbody>
                         </table>
@@ -368,6 +376,7 @@
                     <thead>
                         <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
                             <th style="padding:12px 20px; font-size:12px; text-transform:uppercase; color:var(--text-secondary);">Vendedor / Registrador</th>
+                            <th style="padding:12px 20px; font-size:12px; text-transform:uppercase; color:var(--text-secondary);">Sucursal / Ubicación</th>
                             <th style="padding:12px 20px; font-size:12px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Total Inscritos</th>
                             <th style="padding:12px 20px; font-size:12px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Asistieron Realmente</th>
                             <th style="padding:12px 20px; font-size:12px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Ausentes</th>
@@ -380,6 +389,9 @@
                             <td style="padding:14px 20px; font-weight:700; font-size:13.5px; color:var(--text-primary);">
                                 <span style="color:var(--accent-gold); font-weight:900; margin-right:8px;">#{{ $index + 1 }}</span>
                                 {{ $v->vendedor_nombre }}
+                            </td>
+                            <td style="padding:14px 20px; font-size:13px; color:var(--text-secondary);">
+                                <i class="bi bi-geo-alt-fill" style="color:var(--accent-gold); margin-right:4px;"></i> {{ $v->sucursal_vendedor }}
                             </td>
                             <td style="padding:14px 20px; text-align:center; font-size:14px; font-weight:800; color:var(--text-primary);">
                                 {{ number_format($v->total_registrados) }} pers.
@@ -402,7 +414,7 @@
                             </td>
                         </tr>
                         @empty
-                        <tr><td colspan="5" style="text-align:center; padding:32px; color:var(--text-muted);">No hay información de registradores o vendedores.</td></tr>
+                        <tr><td colspan="6" style="text-align:center; padding:32px; color:var(--text-muted);">No hay información de registradores o vendedores.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -461,6 +473,256 @@
     @php
         $fKey = str_replace('-', '_', $fStr);
     @endphp
+        <!-- PESTAÑA DEDICADA: RETROALIMENTACIÓN DE CLASES Y PROVEEDORES -->
+    <div id="tab-est-retro" class="tab-pane" style="display:none;">
+        
+        <!-- HEADER DE RETROALIMENTACIÓN -->
+        <div style="background:var(--bg-secondary); border-radius:14px; padding:20px 24px; margin-bottom:24px; border:1px solid rgba(245,158,11,0.3); background:linear-gradient(135deg, rgba(245,158,11,0.08) 0%, rgba(15,23,42,0.6) 100%);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                <div>
+                    <h2 style="font-size:18px; font-weight:800; color:#f59e0b; margin:0 0 4px 0; display:flex; align-items:center; gap:8px;">
+                        <i class="bi bi-chat-square-heart-fill"></i> Retroalimentación y Analítica de Clases & Proveedores
+                    </h2>
+                    <p style="font-size:13px; color:var(--text-secondary); margin:0;">
+                        Análisis comparativo de demanda de talleres/clases e impacto comercial e interacción con proveedores.
+                    </p>
+                </div>
+                <div style="display:flex; gap:16px; align-items:center;">
+                    <div style="text-align:right;">
+                        <span style="font-size:11px; text-transform:uppercase; color:var(--text-muted); font-weight:700;">Total Clases</span>
+                        <div style="font-size:18px; font-weight:900; color:var(--text-primary);">{{ $retroActividades->count() }}</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="font-size:11px; text-transform:uppercase; color:var(--text-muted); font-weight:700;">Total Proveedores</span>
+                        <div style="font-size:18px; font-weight:900; color:#4ade80;">{{ $retroProveedores->count() }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPIS PRINCIPALES DE RETROALIMENTACIÓN -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:20px; margin-bottom:24px;">
+            
+            <!-- KPI RETRO 1: CLASE MÁS CONCURRIDA -->
+            @php $topClase = $retroActividades->first(); @endphp
+            <div style="background:var(--bg-secondary); border-radius:14px; padding:20px; border:1px solid rgba(59,130,246,0.3);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="font-size:11px; font-weight:800; text-transform:uppercase; color:#60a5fa;">
+                        <i class="bi bi-award-fill" style="margin-right:4px;"></i> Clase Top (#1 Aforo)
+                    </span>
+                    <div style="width:36px; height:36px; border-radius:8px; background:rgba(59,130,246,0.15); display:flex; align-items:center; justify-content:center; color:#60a5fa;">
+                        <i class="bi bi-book-fill"></i>
+                    </div>
+                </div>
+                <div style="font-size:16px; font-weight:800; color:var(--text-primary); margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    {{ $topClase ? $topClase->actividad : 'Sin clases' }}
+                </div>
+                <div style="font-size:12.5px; color:#4ade80; font-weight:700;">
+                    {{ $topClase ? number_format($topClase->asistentes_unicos) . ' asistentes únicos (' . $topClase->pct_audiencia . '% del evento)' : '-' }}
+                </div>
+            </div>
+
+            <!-- KPI RETRO 2: PROMEDIO DE ASISTENTES POR CLASE -->
+            @php $promAsistClase = $retroActividades->count() > 0 ? round($retroActividades->avg('asistentes_unicos'), 1) : 0; @endphp
+            <div style="background:var(--bg-secondary); border-radius:14px; padding:20px; border:1px solid rgba(245,158,11,0.3);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="font-size:11px; font-weight:800; text-transform:uppercase; color:#f59e0b;">
+                        <i class="bi bi-people-fill" style="margin-right:4px;"></i> Promedio Asistencia / Clase
+                    </span>
+                    <div style="width:36px; height:36px; border-radius:8px; background:rgba(245,158,11,0.15); display:flex; align-items:center; justify-content:center; color:#f59e0b;">
+                        <i class="bi bi-bar-chart-fill"></i>
+                    </div>
+                </div>
+                <div style="font-size:22px; font-weight:900; color:#f59e0b; margin-bottom:2px;">
+                    {{ $promAsistClase }} <span style="font-size:13px; color:var(--text-muted);">personas/clase</span>
+                </div>
+                <div style="font-size:11.5px; color:var(--text-secondary);">
+                    De un total de {{ $retroActividades->count() }} actividades evaluadas.
+                </div>
+            </div>
+
+            <!-- KPI RETRO 3: PROVEEDOR CON MÁS PUNTOS -->
+            @php $topProvPuntos = $retroProveedores->first(); @endphp
+            <div style="background:var(--bg-secondary); border-radius:14px; padding:20px; border:1px solid rgba(34,197,94,0.3);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="font-size:11px; font-weight:800; text-transform:uppercase; color:#4ade80;">
+                        <i class="bi bi-shop" style="margin-right:4px;"></i> Proveedor Líder Puntos
+                    </span>
+                    <div style="width:36px; height:36px; border-radius:8px; background:rgba(34,197,94,0.15); display:flex; align-items:center; justify-content:center; color:#4ade80;">
+                        <i class="bi bi-trophy-fill"></i>
+                    </div>
+                </div>
+                <div style="font-size:16px; font-weight:800; color:var(--text-primary); margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    {{ $topProvPuntos ? $topProvPuntos->proveedor : 'Sin datos' }}
+                </div>
+                <div style="font-size:12.5px; color:#4ade80; font-weight:700;">
+                    {{ $topProvPuntos ? number_format($topProvPuntos->total_puntos) . ' pts (' . number_format($topProvPuntos->participantes_atendidos) . ' atendidos)' : '-' }}
+                </div>
+            </div>
+
+            <!-- KPI RETRO 4: PROSPECTOS CAPTADOS -->
+            @php $totalProspectosG = $retroProveedores->sum('total_prospectos'); @endphp
+            <div style="background:var(--bg-secondary); border-radius:14px; padding:20px; border:1px solid rgba(168,85,247,0.3);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="font-size:11px; font-weight:800; text-transform:uppercase; color:#c084fc;">
+                        <i class="bi bi-person-lines-fill" style="margin-right:4px;"></i> Total Prospectos Captados
+                    </span>
+                    <div style="width:36px; height:36px; border-radius:8px; background:rgba(168,85,247,0.15); display:flex; align-items:center; justify-content:center; color:#c084fc;">
+                        <i class="bi bi-briefcase-fill"></i>
+                    </div>
+                </div>
+                <div style="font-size:22px; font-weight:900; color:#c084fc; margin-bottom:2px;">
+                    {{ number_format($totalProspectosG) }} <span style="font-size:13px; color:var(--text-muted);">prospectos</span>
+                </div>
+                <div style="font-size:11.5px; color:var(--text-secondary);">
+                    Participantes calificados como prospectos comerciales.
+                </div>
+            </div>
+
+        </div>
+
+        <!-- BLOQUE 1: ANALÍTICA Y RETROALIMENTACIÓN DE CLASES / AGENDA -->
+        <div class="card" style="margin-bottom:24px;">
+            <div class="card-header" style="padding:16px 20px; display:flex; justify-content:space-between; align-items:center;">
+                <span class="card-title" style="font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px;">
+                    <i class="bi bi-journal-bookmark-fill" style="color:#60a5fa;"></i> 1. Retroalimentación de Clases y Actividades (Agenda)
+                </span>
+                <span style="font-size:12px; color:var(--text-muted);">Ordenado por Mayor Audiencia</span>
+            </div>
+            <div class="card-body" style="padding:20px;">
+                <div style="position:relative; height:240px; margin-bottom:20px;">
+                    <canvas id="chartRetroActividades"></canvas>
+                </div>
+
+                <div class="table-wrapper" style="max-height:360px; overflow-y:auto;">
+                    <table>
+                        <thead>
+                            <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                                <th style="padding:10px 14px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary);">#</th>
+                                <th style="padding:10px 14px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary);">Actividad / Clase</th>
+                                <th style="padding:10px 14px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary);">Fecha & Horario</th>
+                                <th style="padding:10px 14px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary);">Salón / Aula</th>
+                                <th style="padding:10px 14px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Asistentes Únicos</th>
+                                <th style="padding:10px 14px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Total Escaneos</th>
+                                <th style="padding:10px 14px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary); text-align:right;">% Alcance Audiencia</th>
+                                <th style="padding:10px 14px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Diagnóstico / Estatus</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($retroActividades as $idx => $act)
+                            <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                                <td style="padding:12px 14px; font-weight:800; color:var(--accent-gold);">#{{ $idx + 1 }}</td>
+                                <td style="padding:12px 14px; font-weight:700; font-size:13px; color:var(--text-primary);">
+                                    {{ $act->actividad }}
+                                </td>
+                                <td style="padding:12px 14px; font-size:12.5px; color:var(--text-secondary);">
+                                    <i class="bi bi-clock" style="color:var(--accent-gold); margin-right:4px;"></i>
+                                    {{ \Carbon\Carbon::parse($act->fecha)->format('d/m/Y') }} {{ substr($act->horario, 0, 5) }} hrs
+                                </td>
+                                <td style="padding:12px 14px; font-size:12.5px; color:var(--text-secondary);">
+                                    <i class="bi bi-door-open-fill" style="color:var(--accent-gold); margin-right:4px;"></i> {{ $act->salon }}
+                                </td>
+                                <td style="padding:12px 14px; text-align:center; font-weight:800; color:#4ade80;">
+                                    {{ number_format($act->asistentes_unicos) }} pers.
+                                </td>
+                                <td style="padding:12px 14px; text-align:center; font-weight:700; color:var(--text-primary);">
+                                    {{ number_format($act->total_escaneos) }}
+                                </td>
+                                <td style="padding:12px 14px; text-align:right; font-weight:700; color:#60a5fa;">
+                                    {{ $act->pct_audiencia }}%
+                                </td>
+                                <td style="padding:12px 14px; text-align:center;">
+                                    @if($act->pct_audiencia >= 40)
+                                        <span class="badge" style="background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.3); color:#4ade80; padding:4px 8px; font-size:11px;">
+                                            🟢 Alta Concurrencia
+                                        </span>
+                                    @elseif($act->pct_audiencia >= 20)
+                                        <span class="badge" style="background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.3); color:#f59e0b; padding:4px 8px; font-size:11px;">
+                                            🟡 Afluencia Media
+                                        </span>
+                                    @else
+                                        <span class="badge" style="background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); color:#60a5fa; padding:4px 8px; font-size:11px;">
+                                            🔵 Moderada
+                                        </span>
+                                    @endif
+                                </td>
+                            </tr>
+                            @empty
+                            <tr><td colspan="8" style="text-align:center; padding:24px; color:var(--text-muted);">Sin clases registradas en el evento.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- BLOQUE 2: ANALÍTICA Y RETROALIMENTACIÓN DE PROVEEDORES -->
+        <div class="card" style="margin-bottom:24px;">
+            <div class="card-header" style="padding:16px 20px; display:flex; justify-content:space-between; align-items:center;">
+                <span class="card-title" style="font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px;">
+                    <i class="bi bi-shop-window" style="color:#4ade80;"></i> 2. Retroalimentación y Desempeño Comercial de Proveedores
+                </span>
+                <span style="font-size:12px; color:var(--text-muted);">Métricas de Interacción y Captación de Prospectos</span>
+            </div>
+            <div class="card-body" style="padding:20px;">
+                <div style="position:relative; height:240px; margin-bottom:20px;">
+                    <canvas id="chartRetroProveedores"></canvas>
+                </div>
+
+                <div class="table-wrapper" style="max-height:360px; overflow-y:auto;">
+                    <table>
+                        <thead>
+                            <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                                <th style="padding:10px 14px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary);">#</th>
+                                <th style="padding:10px 14px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary);">Proveedor / Marca</th>
+                                <th style="padding:10px 14px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Participantes Atendidos</th>
+                                <th style="padding:10px 14px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Puntos Otorgados</th>
+                                <th style="padding:10px 14px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Promedio Pts / Persona</th>
+                                <th style="padding:10px 14px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Prospectos Captados</th>
+                                <th style="padding:10px 14px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary); text-align:right;">% Conv. Prospecto</th>
+                                <th style="padding:10px 14px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Transacciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($retroProveedores as $idx => $prov)
+                            <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                                <td style="padding:12px 14px; font-weight:800; color:var(--accent-gold);">#{{ $idx + 1 }}</td>
+                                <td style="padding:12px 14px; font-weight:700; font-size:13px; color:var(--text-primary);">
+                                    <i class="bi bi-briefcase-fill" style="color:var(--accent-gold); margin-right:6px;"></i>
+                                    {{ $prov->proveedor }}
+                                </td>
+                                <td style="padding:12px 14px; text-align:center; font-weight:800; color:var(--text-primary);">
+                                    {{ number_format($prov->participantes_atendidos) }} pers.
+                                </td>
+                                <td style="padding:12px 14px; text-align:center; font-weight:800; color:#4ade80;">
+                                    {{ number_format($prov->total_puntos) }} pts
+                                </td>
+                                <td style="padding:12px 14px; text-align:center; font-weight:700; color:var(--accent-gold);">
+                                    {{ $prov->promedio_puntos }} pts/p
+                                </td>
+                                <td style="padding:12px 14px; text-align:center;">
+                                    <span class="badge" style="background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.3); color:#c084fc; padding:4px 9px; font-weight:800;">
+                                        🎯 {{ number_format($prov->total_prospectos) }}
+                                    </span>
+                                </td>
+                                <td style="padding:12px 14px; text-align:right; font-weight:700; color:#c084fc;">
+                                    {{ $prov->pct_prospecto }}%
+                                </td>
+                                <td style="padding:12px 14px; text-align:center; font-size:12.5px; color:var(--text-secondary);">
+                                    {{ number_format($prov->num_transacciones) }} op.
+                                </td>
+                            </tr>
+                            @empty
+                            <tr><td colspan="8" style="text-align:center; padding:24px; color:var(--text-muted);">Sin actividad de proveedores registrada.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
     <div id="tab-est-dia-{{ $fStr }}" class="tab-pane" style="display:none;">
         
         <!-- HEADER DEL DÍA SELECCIONADO CON KPIS COMPLETOS -->
@@ -616,7 +878,7 @@
             <div class="card" style="margin-bottom:0;">
                 <div class="card-header" style="padding:16px 20px;">
                     <span class="card-title" style="font-size:14.5px; font-weight:700; display:flex; align-items:center; gap:8px;">
-                        <i class="bi bi-building-fill" style="color:var(--accent-gold);"></i> 4. Asistencia por Sucursal en el Día
+                        <i class="bi bi-building-fill" style="color:var(--accent-gold);"></i> 4. Registros vs Asistencia por Sucursal en el Día
                     </span>
                 </div>
                 <div class="card-body" style="padding:20px;">
@@ -628,7 +890,10 @@
                             <thead>
                                 <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
                                     <th style="padding:8px 12px; font-size:11px; text-transform:uppercase; color:var(--text-secondary);">Sucursal</th>
-                                    <th style="padding:8px 12px; font-size:11px; text-transform:uppercase; color:var(--text-secondary); text-align:right;">Asistentes Únicos</th>
+                                    <th style="padding:8px 12px; font-size:11px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Registrados</th>
+                                    <th style="padding:8px 12px; font-size:11px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Asistieron</th>
+                                    <th style="padding:8px 12px; font-size:11px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Ausentes</th>
+                                    <th style="padding:8px 12px; font-size:11px; text-transform:uppercase; color:var(--text-secondary); text-align:right;">% Asistencia</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -637,10 +902,13 @@
                                     <td style="padding:8px 12px; font-weight:700; font-size:12.5px; color:var(--text-primary);">
                                         <i class="bi bi-geo-alt-fill" style="color:var(--accent-gold); margin-right:6px;"></i> {{ $sucD->sucursal ?: 'Sin Sucursal' }}
                                     </td>
-                                    <td style="padding:8px 12px; text-align:right; font-weight:800; color:var(--accent-gold);">{{ number_format($sucD->total_asistentes) }} pers.</td>
+                                    <td style="padding:8px 12px; text-align:center; font-weight:800; color:var(--text-primary);">{{ number_format($sucD->total_registrados) }}</td>
+                                    <td style="padding:8px 12px; text-align:center; font-weight:800; color:#4ade80;">{{ number_format($sucD->total_asistieron) }}</td>
+                                    <td style="padding:8px 12px; text-align:center; font-weight:700; color:var(--text-secondary);">{{ number_format($sucD->ausentes) }}</td>
+                                    <td style="padding:8px 12px; text-align:right; font-weight:700; color:{{ $sucD->pct_asistencia >= 75 ? '#4ade80' : ($sucD->pct_asistencia >= 40 ? '#fb923c' : '#f87171') }};">{{ $sucD->pct_asistencia }}%</td>
                                 </tr>
                                 @empty
-                                <tr><td colspan="2" style="text-align:center; padding:16px; color:var(--text-muted);">Sin datos de sucursal.</td></tr>
+                                <tr><td colspan="5" style="text-align:center; padding:16px; color:var(--text-muted);">Sin datos de sucursal.</td></tr>
                                 @endforelse
                             </tbody>
                         </table>
@@ -702,6 +970,7 @@
                     <thead>
                         <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
                             <th style="padding:10px 16px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary);">Registrador / Vendedor</th>
+                            <th style="padding:10px 16px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary);">Sucursal / Ubicación</th>
                             <th style="padding:10px 16px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Total Inscritos</th>
                             <th style="padding:10px 16px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Asistieron este Día</th>
                             <th style="padding:10px 16px; font-size:11.5px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Ausentes este Día</th>
@@ -714,6 +983,9 @@
                             <td style="padding:12px 16px; font-weight:700; font-size:13px; color:var(--text-primary);">
                                 <i class="bi bi-person-circle" style="color:var(--accent-gold); margin-right:6px;"></i>
                                 {{ $vD->vendedor }}
+                            </td>
+                            <td style="padding:12px 16px; font-size:12.5px; color:var(--text-secondary);">
+                                <i class="bi bi-geo-alt-fill" style="color:var(--accent-gold); margin-right:4px;"></i> {{ $vD->sucursal_vendedor }}
                             </td>
                             <td style="padding:12px 16px; text-align:center; font-weight:800; font-size:13.5px; color:var(--text-primary);">
                                 {{ number_format($vD->total_registrados) }} pers.
@@ -736,7 +1008,7 @@
                             </td>
                         </tr>
                         @empty
-                        <tr><td colspan="5" style="text-align:center; padding:24px; color:var(--text-muted);">Sin datos de vendedores en este día.</td></tr>
+                        <tr><td colspan="6" style="text-align:center; padding:24px; color:var(--text-muted);">Sin datos de vendedores en este día.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -892,19 +1164,19 @@
             });
         }
 
-        const ctxSucursalesG = document.getElementById('chartSucursalesGlobal');
-        if (ctxSucursalesG) {
-            new Chart(ctxSucursalesG, {
+                const ctxRetroAct = document.getElementById('chartRetroActividades');
+        if (ctxRetroAct) {
+            new Chart(ctxRetroAct, {
                 type: 'bar',
                 data: {
-                    labels: {!! json_encode($asistenciaPorSucursal->pluck('sucursal')->map(fn($s) => $s ?: 'Sin Sucursal')) !!},
+                    labels: {!! json_encode($retroActividades->pluck('actividad')->map(fn($a) => \Str::limit($a, 30))) !!},
                     datasets: [{
-                        label: 'Asistentes',
-                        data: {!! json_encode($asistenciaPorSucursal->pluck('total_asistentes')) !!},
-                        backgroundColor: 'rgba(212, 175, 55, 0.4)',
-                        borderColor: '#d4af37',
-                        borderWidth: 2,
-                        borderRadius: 6
+                        label: 'Asistentes Únicos por Clase',
+                        data: {!! json_encode($retroActividades->pluck('asistentes_unicos')) !!},
+                        backgroundColor: 'rgba(96, 165, 250, 0.75)',
+                        borderColor: '#60a5fa',
+                        borderWidth: 1.5,
+                        borderRadius: 4
                     }]
                 },
                 options: {
@@ -914,7 +1186,86 @@
                         y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
                         x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
                     },
-                    plugins: { legend: { display: false } }
+                    plugins: { legend: { display: true, labels: { color: '#cbd5e1', font: { weight: 'bold' } } } }
+                }
+            });
+        }
+
+        const ctxRetroProv = document.getElementById('chartRetroProveedores');
+        if (ctxRetroProv) {
+            new Chart(ctxRetroProv, {
+                type: 'bar',
+                data: {
+                    labels: {!! json_encode($retroProveedores->pluck('proveedor')) !!},
+                    datasets: [
+                        {
+                            label: 'Participantes Atendidos',
+                            data: {!! json_encode($retroProveedores->pluck('participantes_atendidos')) !!},
+                            backgroundColor: 'rgba(59, 130, 246, 0.75)',
+                            borderColor: '#3b82f6',
+                            borderWidth: 1.5,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Prospectos Captados',
+                            data: {!! json_encode($retroProveedores->pluck('total_prospectos')) !!},
+                            backgroundColor: 'rgba(168, 85, 247, 0.75)',
+                            borderColor: '#c084fc',
+                            borderWidth: 1.5,
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                    },
+                    plugins: { legend: { display: true, labels: { color: '#cbd5e1', font: { weight: 'bold' } } } }
+                }
+            });
+        }
+
+        const ctxSucursalesG = document.getElementById('chartSucursalesGlobal');
+        if (ctxSucursalesG) {
+            new Chart(ctxSucursalesG, {
+                type: 'bar',
+                data: {
+                    labels: {!! json_encode($asistenciaPorSucursal->pluck('sucursal')->map(fn($s) => $s ?: 'Sin Sucursal')) !!},
+                    datasets: [
+                        {
+                            label: 'Registrados',
+                            data: {!! json_encode($asistenciaPorSucursal->pluck('total_registrados')) !!},
+                            backgroundColor: 'rgba(59, 130, 246, 0.65)',
+                            borderColor: '#3b82f6',
+                            borderWidth: 1.5,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Asistieron',
+                            data: {!! json_encode($asistenciaPorSucursal->pluck('total_asistieron')) !!},
+                            backgroundColor: 'rgba(34, 197, 94, 0.75)',
+                            borderColor: '#22c55e',
+                            borderWidth: 1.5,
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                    },
+                    plugins: { 
+                        legend: { 
+                            display: true, 
+                            labels: { color: '#cbd5e1', font: { size: 11, weight: 'bold' } } 
+                        } 
+                    }
                 }
             });
         }
@@ -1025,14 +1376,24 @@
                 type: 'bar',
                 data: {
                     labels: {!! json_encode($dStats['sucursales']->pluck('sucursal')->map(fn($s) => $s ?: 'Sin Sucursal')) !!},
-                    datasets: [{
-                        label: 'Asistentes',
-                        data: {!! json_encode($dStats['sucursales']->pluck('total_asistentes')) !!},
-                        backgroundColor: 'rgba(212, 175, 55, 0.4)',
-                        borderColor: '#d4af37',
-                        borderWidth: 2,
-                        borderRadius: 6
-                    }]
+                    datasets: [
+                        {
+                            label: 'Registrados',
+                            data: {!! json_encode($dStats['sucursales']->pluck('total_registrados')) !!},
+                            backgroundColor: 'rgba(59, 130, 246, 0.65)',
+                            borderColor: '#3b82f6',
+                            borderWidth: 1.5,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Asistieron',
+                            data: {!! json_encode($dStats['sucursales']->pluck('total_asistieron')) !!},
+                            backgroundColor: 'rgba(34, 197, 94, 0.75)',
+                            borderColor: '#22c55e',
+                            borderWidth: 1.5,
+                            borderRadius: 4
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
@@ -1041,7 +1402,12 @@
                         y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
                         x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
                     },
-                    plugins: { legend: { display: false } }
+                    plugins: { 
+                        legend: { 
+                            display: true, 
+                            labels: { color: '#cbd5e1', font: { size: 10, weight: 'bold' } } 
+                        } 
+                    }
                 }
             });
         }

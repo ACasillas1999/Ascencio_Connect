@@ -104,7 +104,7 @@ class EventoController extends Controller
         return redirect()->route('eventos.index')->with('success', 'Evento creado correctamente.');
     }
 
-    public function show(Evento $evento)
+    public function show(Evento $evento, Request $request = null)
     {
         $normRol = auth()->check() ? \App\Helpers\Permisos::normalizar(auth()->user()->Rol) : '';
         if (in_array($normRol, ['Vendedor', 'Gerente'])) {
@@ -113,17 +113,41 @@ class EventoController extends Controller
             }
         }
 
-        $evento->loadCount(['participantes', 'actividades', 'agenda']);
-        $participantes = $evento->participantes()->paginate(20);
+                $evento->loadCount(['participantes', 'actividades', 'agenda']);
+        
+        $participantesQuery = $evento->participantes();
+
+        if (request()->filled('search_participante')) {
+            $searchP = trim(request('search_participante'));
+            $participantesQuery->where(function($q) use ($searchP) {
+                $q->where('participante.Nombre', 'LIKE', "%{$searchP}%")
+                  ->orWhere('participante.RFC', 'LIKE', "%{$searchP}%")
+                  ->orWhere('participante.Telefono', 'LIKE', "%{$searchP}%")
+                  ->orWhere('participante.Sucursal', 'LIKE', "%{$searchP}%")
+                  ->orWhere('participante.Vendedor', 'LIKE', "%{$searchP}%")
+                  ->orWhere('participante.Proveedor', 'LIKE', "%{$searchP}%")
+                  ->orWhere('participante.QR_Code', 'LIKE', "%{$searchP}%");
+            });
+        }
+
+        if (request()->filled('filter_sucursal')) {
+            $participantesQuery->where('participante.Sucursal', request('filter_sucursal'));
+        }
+
+        $participantes = $participantesQuery->orderBy('participante.ID', 'desc')->paginate(20)->withQueryString();
         
         $actividades = $evento->actividades()->orderBy('Actividad')->get();
         $agenda = $evento->agenda()->orderBy('Fecha')->orderBy('Horario')->get();
         
-        $proveedores = \DB::table('proveedor_evento')
-            ->leftJoin('usuarios', 'usuarios.username', '=', 'proveedor_evento.NombreProveedor')
-            ->where('proveedor_evento.ID_Evento', $evento->ID)
-            ->select('proveedor_evento.*', 'usuarios.ID as usuario_id', 'usuarios.password_visible')
-            ->get();
+        if (\Illuminate\Support\Facades\Schema::hasTable('proveedor_evento')) {
+            $proveedores = \DB::table('proveedor_evento')
+                ->leftJoin('usuarios', 'usuarios.username', '=', 'proveedor_evento.NombreProveedor')
+                ->where('proveedor_evento.ID_Evento', $evento->ID)
+                ->select('proveedor_evento.*', 'usuarios.ID as usuario_id', 'usuarios.password_visible')
+                ->get();
+        } else {
+            $proveedores = collect();
+        }
 
         foreach ($proveedores as $prov) {
             if (\Illuminate\Support\Facades\Schema::hasTable('puntos_proveedor')) {
@@ -160,7 +184,7 @@ class EventoController extends Controller
         
         $ubicacionModel = \App\Models\Ubicacion::where('Nombre', $evento->ubicacion)->first();
         $numSalones = $ubicacionModel ? $ubicacionModel->Salones : 1;
-        $salones = $ubicacionModel ? \App\Models\Salon::where('ubicacion_id', $ubicacionModel->ID)->orderBy('Nombre')->get() : collect();
+        $salones = ($ubicacionModel && \Illuminate\Support\Facades\Schema::hasTable('salones')) ? \App\Models\Salon::where('ubicacion_id', $ubicacionModel->ID)->orderBy('Nombre')->get() : collect();
         $agendaJson = $agenda->toJson();
         
         $premios = \App\Models\PremioEvento::where('ID_Evento', $evento->ID)->get();
@@ -523,7 +547,7 @@ class EventoController extends Controller
         // 2. Participantes que ASISTIERON (al menos a 1 actividad)
         $asistentesIds = \DB::table('clase')
             ->whereIn('ID_Agenda', $agendaIds)
-            ->where('Asistio', 1)
+            
             ->pluck('ID_Participante')
             ->unique();
         
@@ -547,7 +571,7 @@ class EventoController extends Controller
             $agendaIdsDia1 = $agendaPorFecha->get($dia1Str)->pluck('ID')->toArray();
             $partDia1 = \DB::table('clase')
                 ->whereIn('ID_Agenda', $agendaIdsDia1)
-                ->where('Asistio', 1)
+                
                 ->pluck('ID_Participante')
                 ->unique();
         }
@@ -556,7 +580,7 @@ class EventoController extends Controller
             $agendaIdsDia2 = $agendaPorFecha->get($dia2Str)->pluck('ID')->toArray();
             $partDia2 = \DB::table('clase')
                 ->whereIn('ID_Agenda', $agendaIdsDia2)
-                ->where('Asistio', 1)
+                
                 ->pluck('ID_Participante')
                 ->unique();
         }
@@ -573,45 +597,57 @@ class EventoController extends Controller
         $asistenciaPorHora = \DB::table('clase')
             ->join('agenda', 'clase.ID_Agenda', '=', 'agenda.ID')
             ->where('agenda.ID_Evento', $evento->ID)
-            ->where('clase.Asistio', 1)
+            
             ->selectRaw("
                 SUBSTRING_INDEX(agenda.Horario, '-', 1) as hora_raw,
                 COUNT(*) as total_escaneos,
                 COUNT(DISTINCT clase.ID_Participante) as asistentes_unicos
             ")
-            ->groupBy('hora_raw')
+            ->groupBy('agenda.Horario')
             ->orderBy('hora_raw')
             ->get();
 
-        // 5. Asistencia por Sucursal
-        $asistenciaPorSucursal = \DB::table('clase')
-            ->join('agenda', 'clase.ID_Agenda', '=', 'agenda.ID')
-            ->join('participante', 'clase.ID_Participante', '=', 'participante.ID')
-            ->where('agenda.ID_Evento', $evento->ID)
-            ->where('clase.Asistio', 1)
-            ->selectRaw("participante.Sucursal as sucursal, COUNT(DISTINCT participante.ID) as total_asistentes")
+        // 5. Registros y Asistencia por Sucursal (Registrados vs Asistieron)
+        $asistenciaPorSucursal = \DB::table('participante')
+            ->leftJoin('clase', function($join) use ($agendaIds) {
+                $join->on('participante.ID', '=', 'clase.ID_Participante')
+                    ->whereIn('clase.ID_Agenda', $agendaIds)
+                    ;
+            })
+            ->where('participante.ID_Evento', $evento->ID)
             ->groupBy('participante.Sucursal')
-            ->orderByDesc('total_asistentes')
-            ->get();
+            ->selectRaw("
+                COALESCE(NULLIF(TRIM(participante.Sucursal), ''), 'Sin Sucursal Especificada') as sucursal,
+                COUNT(DISTINCT participante.ID) as total_registrados,
+                COUNT(DISTINCT clase.ID_Participante) as total_asistieron
+            ")
+            ->orderByDesc('total_registrados')
+            ->get()
+            ->map(function($item) {
+                $item->total_asistentes = $item->total_asistieron;
+                $item->ausentes = max(0, $item->total_registrados - $item->total_asistieron);
+                $item->pct_asistencia = $item->total_registrados > 0 ? round(($item->total_asistieron / $item->total_registrados) * 100, 1) : 0;
+                return $item;
+            });
 
         // 5.5. Asistencia por Puesto / Perfil de Asistentes
         $asistenciaPorPuesto = \DB::table('clase')
             ->join('agenda', 'clase.ID_Agenda', '=', 'agenda.ID')
             ->join('participante', 'clase.ID_Participante', '=', 'participante.ID')
             ->where('agenda.ID_Evento', $evento->ID)
-            ->where('clase.Asistio', 1)
+            
             ->selectRaw("
-                COALESCE(NULLIF(TRIM(participante.Puesto), ''), 'Sin Puesto Especificado') as puesto,
+                COALESCE(NULLIF(TRIM(participante.Proveedor), ''), 'Sin Puesto Especificado') as puesto,
                 COUNT(DISTINCT participante.ID) as total_asistentes
             ")
-            ->groupBy('puesto')
+            ->groupBy('participante.Proveedor')
             ->orderByDesc('total_asistentes')
             ->get();
 
         // 6. Actividades con Mayor Aforo
         $topActividades = \DB::table('agenda')
             ->leftJoin('clase', function($join) {
-                $join->on('agenda.ID', '=', 'clase.ID_Agenda')->where('clase.Asistio', 1);
+                $join->on('agenda.ID', '=', 'clase.ID_Agenda');
             })
             ->where('agenda.ID_Evento', $evento->ID)
             ->groupBy('agenda.ID', 'agenda.Actividad', 'agenda.Fecha', 'agenda.Horario', 'agenda.Salon')
@@ -620,17 +656,18 @@ class EventoController extends Controller
             ->take(8)
             ->get();
 
-        // 7. Ranking de Vendedores / Registradores (¿Quién registró más y cuántos asistieron?)
+        // 7. Ranking de Vendedores / Registradores (¿Quién registró más, cuántos asistieron y sucursal/origen?)
         $rankingVendedores = \DB::table('participante')
             ->leftJoin('clase', function($join) use ($agendaIds) {
                 $join->on('participante.ID', '=', 'clase.ID_Participante')
                     ->whereIn('clase.ID_Agenda', $agendaIds)
-                    ->where('clase.Asistio', 1);
+                    ;
             })
             ->where('participante.ID_Evento', $evento->ID)
             ->groupBy('participante.Vendedor')
             ->selectRaw("
                 participante.Vendedor as vendedor,
+                GROUP_CONCAT(DISTINCT COALESCE(NULLIF(TRIM(participante.Sucursal), ''), 'Sin Especificar') SEPARATOR ', ') as sucursal_vendedor,
                 COUNT(DISTINCT participante.ID) as total_registrados,
                 COUNT(DISTINCT clase.ID_Participante) as total_asistieron
             ")
@@ -638,6 +675,7 @@ class EventoController extends Controller
             ->get()
             ->map(function($item) {
                 $item->vendedor_nombre = $item->vendedor ? $item->vendedor : 'Sin Vendedor Asignado';
+                $item->sucursal_vendedor = $item->sucursal_vendedor ? $item->sucursal_vendedor : 'Sin Sucursal';
                 $item->ausentes = max(0, $item->total_registrados - $item->total_asistieron);
                 $item->pct_asistencia = $item->total_registrados > 0 ? round(($item->total_asistieron / $item->total_registrados) * 100, 1) : 0;
                 return $item;
@@ -660,9 +698,9 @@ class EventoController extends Controller
         $salonesGlobal = \DB::table('clase')
             ->join('agenda', 'clase.ID_Agenda', '=', 'agenda.ID')
             ->where('agenda.ID_Evento', $evento->ID)
-            ->where('clase.Asistio', 1)
+            
             ->selectRaw("COALESCE(NULLIF(TRIM(agenda.Salon), ''), 'Sin Salón Especificado') as salon, COUNT(clase.ID) as total_asistencias, COUNT(DISTINCT clase.ID_Participante) as asistentes_unicos")
-            ->groupBy('salon')
+            ->groupBy('agenda.Salon')
             ->orderByDesc('total_asistencias')
             ->get();
 
@@ -685,7 +723,7 @@ class EventoController extends Controller
                 SUM(puntos) as puntos_otorgados,
                 COUNT(DISTINCT id_participante) as participantes_atendidos
             ")
-            ->groupBy('fecha_dia', 'hora', 'proveedor')
+            ->groupBy(\DB::raw("DATE_FORMAT(fecha, '%Y-%m-%d')"), \DB::raw("DATE_FORMAT(fecha, '%H:00')"), 'usuario')
             ->orderBy('fecha_dia')
             ->orderBy('hora')
             ->get()
@@ -707,26 +745,26 @@ class EventoController extends Controller
 
             $partDia = \DB::table('clase')
                 ->whereIn('ID_Agenda', $slotIdsDia)
-                ->where('Asistio', 1)
+                
                 ->pluck('ID_Participante')
                 ->unique();
 
             $afluenciaDia = \DB::table('clase')
                 ->join('agenda', 'clase.ID_Agenda', '=', 'agenda.ID')
                 ->whereIn('agenda.ID', $slotIdsDia)
-                ->where('clase.Asistio', 1)
+                
                 ->selectRaw("
                     SUBSTRING_INDEX(agenda.Horario, '-', 1) as hora_raw,
                     COUNT(*) as total_escaneos,
                     COUNT(DISTINCT clase.ID_Participante) as asistentes_unicos
                 ")
-                ->groupBy('hora_raw')
+                ->groupBy('agenda.Horario')
                 ->orderBy('hora_raw')
                 ->get();
 
             $actividadesDia = \DB::table('agenda')
                 ->leftJoin('clase', function($join) {
-                    $join->on('agenda.ID', '=', 'clase.ID_Agenda')->where('clase.Asistio', 1);
+                    $join->on('agenda.ID', '=', 'clase.ID_Agenda');
                 })
                 ->whereIn('agenda.ID', $slotIdsDia)
                 ->groupBy('agenda.ID', 'agenda.Actividad', 'agenda.Horario', 'agenda.Salon')
@@ -746,28 +784,40 @@ class EventoController extends Controller
                 ->join('agenda', 'clase.ID_Agenda', '=', 'agenda.ID')
                 ->join('participante', 'clase.ID_Participante', '=', 'participante.ID')
                 ->whereIn('agenda.ID', $slotIdsDia)
-                ->where('clase.Asistio', 1)
-                ->selectRaw("COALESCE(NULLIF(TRIM(participante.Puesto), ''), 'Sin Puesto Especificado') as puesto, COUNT(DISTINCT participante.ID) as total_asistentes")
-                ->groupBy('puesto')
+                
+                ->selectRaw("COALESCE(NULLIF(TRIM(participante.Proveedor), ''), 'Sin Puesto Especificado') as puesto, COUNT(DISTINCT participante.ID) as total_asistentes")
+                ->groupBy('participante.Proveedor')
                 ->orderByDesc('total_asistentes')
                 ->get();
 
-            $sucursalesDia = \DB::table('clase')
-                ->join('agenda', 'clase.ID_Agenda', '=', 'agenda.ID')
-                ->join('participante', 'clase.ID_Participante', '=', 'participante.ID')
-                ->whereIn('agenda.ID', $slotIdsDia)
-                ->where('clase.Asistio', 1)
-                ->selectRaw("participante.Sucursal as sucursal, COUNT(DISTINCT participante.ID) as total_asistentes")
+            $sucursalesDia = \DB::table('participante')
+                ->leftJoin('clase', function($join) use ($slotIdsDia) {
+                    $join->on('participante.ID', '=', 'clase.ID_Participante')
+                        ->whereIn('clase.ID_Agenda', $slotIdsDia)
+                        ;
+                })
+                ->where('participante.ID_Evento', $evento->ID)
                 ->groupBy('participante.Sucursal')
-                ->orderByDesc('total_asistentes')
-                ->get();
+                ->selectRaw("
+                    COALESCE(NULLIF(TRIM(participante.Sucursal), ''), 'Sin Sucursal Especificada') as sucursal,
+                    COUNT(DISTINCT participante.ID) as total_registrados,
+                    COUNT(DISTINCT clase.ID_Participante) as total_asistieron
+                ")
+                ->orderByDesc('total_registrados')
+                ->get()
+                ->map(function($item) {
+                    $item->total_asistentes = $item->total_asistieron;
+                    $item->ausentes = max(0, $item->total_registrados - $item->total_asistieron);
+                    $item->pct_asistencia = $item->total_registrados > 0 ? round(($item->total_asistieron / $item->total_registrados) * 100, 1) : 0;
+                    return $item;
+                });
 
             $salonesDia = \DB::table('clase')
                 ->join('agenda', 'clase.ID_Agenda', '=', 'agenda.ID')
                 ->whereIn('agenda.ID', $slotIdsDia)
-                ->where('clase.Asistio', 1)
+                
                 ->selectRaw("COALESCE(NULLIF(TRIM(agenda.Salon), ''), 'Sin Salón Especificado') as salon, COUNT(clase.ID) as total_asistencias")
-                ->groupBy('salon')
+                ->groupBy('agenda.Salon')
                 ->orderByDesc('total_asistencias')
                 ->get();
 
@@ -775,18 +825,21 @@ class EventoController extends Controller
                 ->leftJoin('clase', function($join) use ($slotIdsDia) {
                     $join->on('participante.ID', '=', 'clase.ID_Participante')
                         ->whereIn('clase.ID_Agenda', $slotIdsDia)
-                        ->where('clase.Asistio', 1);
+                        ;
                 })
                 ->where('participante.ID_Evento', $evento->ID)
                 ->groupBy('participante.Vendedor')
                 ->selectRaw("
                     COALESCE(NULLIF(TRIM(participante.Vendedor), ''), 'Sin Vendedor Asignado') as vendedor,
+                    GROUP_CONCAT(DISTINCT COALESCE(NULLIF(TRIM(participante.Sucursal), ''), 'Sin Especificar') SEPARATOR ', ') as sucursal_vendedor,
                     COUNT(DISTINCT participante.ID) as total_registrados,
                     COUNT(DISTINCT clase.ID_Participante) as total_asistieron
                 ")
                 ->orderByDesc('total_registrados')
                 ->get()
                 ->map(function($item) {
+                    $item->vendedor_nombre = $item->vendedor;
+                    $item->sucursal_vendedor = $item->sucursal_vendedor ? $item->sucursal_vendedor : 'Sin Sucursal';
                     $item->ausentes = max(0, $item->total_registrados - $item->total_asistieron);
                     $item->pct_asistencia = $item->total_registrados > 0 ? round(($item->total_asistieron / $item->total_registrados) * 100, 1) : 0;
                     return $item;
@@ -807,6 +860,46 @@ class EventoController extends Controller
                 'total_puntos_dia'   => $puntosDia->sum('total_puntos'),
             ];
         }
+
+                // 11. Retroalimentación de Clases / Actividades
+        $retroActividades = \DB::table('agenda')
+            ->leftJoin('clase', 'agenda.ID', '=', 'clase.ID_Agenda')
+            ->where('agenda.ID_Evento', $evento->ID)
+            ->groupBy('agenda.ID', 'agenda.Actividad', 'agenda.Fecha', 'agenda.Horario', 'agenda.Salon')
+            ->selectRaw("
+                agenda.ID as id,
+                agenda.Actividad as actividad,
+                agenda.Fecha as fecha,
+                agenda.Horario as horario,
+                COALESCE(NULLIF(TRIM(agenda.Salon), ''), 'Sin Salón Especificado') as salon,
+                COUNT(clase.ID) as total_escaneos,
+                COUNT(DISTINCT clase.ID_Participante) as asistentes_unicos
+            ")
+            ->orderByDesc('asistentes_unicos')
+            ->get()
+            ->map(function($item) use ($totalAsistieron) {
+                $item->pct_audiencia = $totalAsistieron > 0 ? round(($item->asistentes_unicos / $totalAsistieron) * 100, 1) : 0;
+                return $item;
+            });
+
+        // 12. Retroalimentación y Desempeño de Proveedores
+        $retroProveedores = \DB::table('puntos_proveedor')
+            ->where('id_evento', $evento->ID)
+            ->groupBy('usuario')
+            ->selectRaw("
+                COALESCE(NULLIF(TRIM(usuario), ''), 'Sin Nombre Especificado') as proveedor,
+                SUM(puntos) as total_puntos,
+                COUNT(DISTINCT id_participante) as participantes_atendidos,
+                SUM(CASE WHEN es_prospecto = 1 THEN 1 ELSE 0 END) as total_prospectos,
+                COUNT(*) as num_transacciones
+            ")
+            ->orderByDesc('total_puntos')
+            ->get()
+            ->map(function($item) {
+                $item->promedio_puntos = $item->participantes_atendidos > 0 ? round($item->total_puntos / $item->participantes_atendidos, 1) : 0;
+                $item->pct_prospecto = $item->participantes_atendidos > 0 ? round(($item->total_prospectos / $item->participantes_atendidos) * 100, 1) : 0;
+                return $item;
+            });
 
         return view('eventos.estadisticas', compact(
             'evento',
@@ -833,7 +926,9 @@ class EventoController extends Controller
             'salonesGlobal',
             'topPremiosCanjeados',
             'puntosPorFechaHora',
-            'statsPorDia'
+            'statsPorDia',
+            'retroActividades',
+            'retroProveedores'
         ));
     }
 
@@ -845,7 +940,7 @@ class EventoController extends Controller
 
         $asistentesIds = \DB::table('clase')
             ->whereIn('ID_Agenda', $agendaIds)
-            ->where('Asistio', 1)
+            
             ->pluck('ID_Participante')
             ->unique();
         
@@ -858,12 +953,13 @@ class EventoController extends Controller
             ->leftJoin('clase', function($join) use ($agendaIds) {
                 $join->on('participante.ID', '=', 'clase.ID_Participante')
                     ->whereIn('clase.ID_Agenda', $agendaIds)
-                    ->where('clase.Asistio', 1);
+                    ;
             })
             ->where('participante.ID_Evento', $evento->ID)
             ->groupBy('participante.Vendedor')
             ->selectRaw("
                 participante.Vendedor as vendedor,
+                GROUP_CONCAT(DISTINCT COALESCE(NULLIF(TRIM(participante.Sucursal), ''), 'Sin Especificar') SEPARATOR ', ') as sucursal_vendedor,
                 COUNT(DISTINCT participante.ID) as total_registrados,
                 COUNT(DISTINCT clase.ID_Participante) as total_asistieron
             ")
@@ -871,6 +967,7 @@ class EventoController extends Controller
             ->get()
             ->map(function($item) {
                 $item->vendedor_nombre = $item->vendedor ? $item->vendedor : 'Sin Vendedor Asignado';
+                $item->sucursal_vendedor = $item->sucursal_vendedor ? $item->sucursal_vendedor : 'Sin Sucursal';
                 $item->ausentes = max(0, $item->total_registrados - $item->total_asistieron);
                 $item->pct_asistencia = $item->total_registrados > 0 ? round(($item->total_asistieron / $item->total_registrados) * 100, 1) : 0;
                 return $item;
@@ -890,34 +987,46 @@ class EventoController extends Controller
             ->get();
 
         // Sucursales
-        $asistenciaPorSucursal = \DB::table('clase')
-            ->join('agenda', 'clase.ID_Agenda', '=', 'agenda.ID')
-            ->join('participante', 'clase.ID_Participante', '=', 'participante.ID')
-            ->where('agenda.ID_Evento', $evento->ID)
-            ->where('clase.Asistio', 1)
-            ->selectRaw("participante.Sucursal as sucursal, COUNT(DISTINCT participante.ID) as total_asistentes")
+        $asistenciaPorSucursal = \DB::table('participante')
+            ->leftJoin('clase', function($join) use ($agendaIds) {
+                $join->on('participante.ID', '=', 'clase.ID_Participante')
+                    ->whereIn('clase.ID_Agenda', $agendaIds)
+                    ;
+            })
+            ->where('participante.ID_Evento', $evento->ID)
             ->groupBy('participante.Sucursal')
-            ->orderByDesc('total_asistentes')
-            ->get();
+            ->selectRaw("
+                COALESCE(NULLIF(TRIM(participante.Sucursal), ''), 'Sin Sucursal Especificada') as sucursal,
+                COUNT(DISTINCT participante.ID) as total_registrados,
+                COUNT(DISTINCT clase.ID_Participante) as total_asistieron
+            ")
+            ->orderByDesc('total_registrados')
+            ->get()
+            ->map(function($item) {
+                $item->total_asistentes = $item->total_asistieron;
+                $item->ausentes = max(0, $item->total_registrados - $item->total_asistieron);
+                $item->pct_asistencia = $item->total_registrados > 0 ? round(($item->total_asistieron / $item->total_registrados) * 100, 1) : 0;
+                return $item;
+            });
 
         // Puestos
         $asistenciaPorPuesto = \DB::table('clase')
             ->join('agenda', 'clase.ID_Agenda', '=', 'agenda.ID')
             ->join('participante', 'clase.ID_Participante', '=', 'participante.ID')
             ->where('agenda.ID_Evento', $evento->ID)
-            ->where('clase.Asistio', 1)
+            
             ->selectRaw("
-                COALESCE(NULLIF(TRIM(participante.Puesto), ''), 'Sin Puesto Especificado') as puesto,
+                COALESCE(NULLIF(TRIM(participante.Proveedor), ''), 'Sin Puesto Especificado') as puesto,
                 COUNT(DISTINCT participante.ID) as total_asistentes
             ")
-            ->groupBy('puesto')
+            ->groupBy('participante.Proveedor')
             ->orderByDesc('total_asistentes')
             ->get();
 
         // Actividades
         $topActividades = \DB::table('agenda')
             ->leftJoin('clase', function($join) {
-                $join->on('agenda.ID', '=', 'clase.ID_Agenda')->where('clase.Asistio', 1);
+                $join->on('agenda.ID', '=', 'clase.ID_Agenda');
             })
             ->where('agenda.ID_Evento', $evento->ID)
             ->groupBy('agenda.ID', 'agenda.Actividad', 'agenda.Fecha', 'agenda.Horario', 'agenda.Salon')
@@ -929,13 +1038,13 @@ class EventoController extends Controller
         $asistenciaPorHora = \DB::table('clase')
             ->join('agenda', 'clase.ID_Agenda', '=', 'agenda.ID')
             ->where('agenda.ID_Evento', $evento->ID)
-            ->where('clase.Asistio', 1)
+            
             ->selectRaw("
                 SUBSTRING_INDEX(agenda.Horario, '-', 1) as hora_raw,
                 COUNT(*) as total_escaneos,
                 COUNT(DISTINCT clase.ID_Participante) as asistentes_unicos
             ")
-            ->groupBy('hora_raw')
+            ->groupBy('agenda.Horario')
             ->orderBy('hora_raw')
             ->get();
 
@@ -943,9 +1052,9 @@ class EventoController extends Controller
         $salonesGlobal = \DB::table('clase')
             ->join('agenda', 'clase.ID_Agenda', '=', 'agenda.ID')
             ->where('agenda.ID_Evento', $evento->ID)
-            ->where('clase.Asistio', 1)
+            
             ->selectRaw("COALESCE(NULLIF(TRIM(agenda.Salon), ''), 'Sin Salón Especificado') as salon, COUNT(clase.ID) as total_asistencias, COUNT(DISTINCT clase.ID_Participante) as asistentes_unicos")
-            ->groupBy('salon')
+            ->groupBy('agenda.Salon')
             ->orderByDesc('total_asistencias')
             ->get();
 
@@ -974,26 +1083,26 @@ class EventoController extends Controller
 
             $partDia = \DB::table('clase')
                 ->whereIn('ID_Agenda', $slotIdsDia)
-                ->where('Asistio', 1)
+                
                 ->pluck('ID_Participante')
                 ->unique();
 
             $afluenciaDia = \DB::table('clase')
                 ->join('agenda', 'clase.ID_Agenda', '=', 'agenda.ID')
                 ->whereIn('agenda.ID', $slotIdsDia)
-                ->where('clase.Asistio', 1)
+                
                 ->selectRaw("
                     SUBSTRING_INDEX(agenda.Horario, '-', 1) as hora_raw,
                     COUNT(*) as total_escaneos,
                     COUNT(DISTINCT clase.ID_Participante) as asistentes_unicos
                 ")
-                ->groupBy('hora_raw')
+                ->groupBy('agenda.Horario')
                 ->orderBy('hora_raw')
                 ->get();
 
             $actividadesDia = \DB::table('agenda')
                 ->leftJoin('clase', function($join) {
-                    $join->on('agenda.ID', '=', 'clase.ID_Agenda')->where('clase.Asistio', 1);
+                    $join->on('agenda.ID', '=', 'clase.ID_Agenda');
                 })
                 ->whereIn('agenda.ID', $slotIdsDia)
                 ->groupBy('agenda.ID', 'agenda.Actividad', 'agenda.Horario', 'agenda.Salon')
@@ -1013,38 +1122,53 @@ class EventoController extends Controller
                 ->join('agenda', 'clase.ID_Agenda', '=', 'agenda.ID')
                 ->join('participante', 'clase.ID_Participante', '=', 'participante.ID')
                 ->whereIn('agenda.ID', $slotIdsDia)
-                ->where('clase.Asistio', 1)
-                ->selectRaw("COALESCE(NULLIF(TRIM(participante.Puesto), ''), 'Sin Puesto Especificado') as puesto, COUNT(DISTINCT participante.ID) as total_asistentes")
-                ->groupBy('puesto')
+                
+                ->selectRaw("COALESCE(NULLIF(TRIM(participante.Proveedor), ''), 'Sin Puesto Especificado') as puesto, COUNT(DISTINCT participante.ID) as total_asistentes")
+                ->groupBy('participante.Proveedor')
                 ->orderByDesc('total_asistentes')
                 ->get();
 
-            $sucursalesDia = \DB::table('clase')
-                ->join('agenda', 'clase.ID_Agenda', '=', 'agenda.ID')
-                ->join('participante', 'clase.ID_Participante', '=', 'participante.ID')
-                ->whereIn('agenda.ID', $slotIdsDia)
-                ->where('clase.Asistio', 1)
-                ->selectRaw("participante.Sucursal as sucursal, COUNT(DISTINCT participante.ID) as total_asistentes")
-                ->groupBy('participante.Sucursal')
-                ->orderByDesc('total_asistentes')
-                ->get();
-
-            $vendedoresDia = \DB::table('participante')
+            $sucursalesDia = \DB::table('participante')
                 ->leftJoin('clase', function($join) use ($slotIdsDia) {
                     $join->on('participante.ID', '=', 'clase.ID_Participante')
                         ->whereIn('clase.ID_Agenda', $slotIdsDia)
-                        ->where('clase.Asistio', 1);
+                        ;
                 })
                 ->where('participante.ID_Evento', $evento->ID)
-                ->groupBy('participante.Vendedor')
+                ->groupBy('participante.Sucursal')
                 ->selectRaw("
-                    COALESCE(NULLIF(TRIM(participante.Vendedor), ''), 'Sin Vendedor Asignado') as vendedor,
+                    COALESCE(NULLIF(TRIM(participante.Sucursal), ''), 'Sin Sucursal Especificada') as sucursal,
                     COUNT(DISTINCT participante.ID) as total_registrados,
                     COUNT(DISTINCT clase.ID_Participante) as total_asistieron
                 ")
                 ->orderByDesc('total_registrados')
                 ->get()
                 ->map(function($item) {
+                    $item->total_asistentes = $item->total_asistieron;
+                    $item->ausentes = max(0, $item->total_registrados - $item->total_asistieron);
+                    $item->pct_asistencia = $item->total_registrados > 0 ? round(($item->total_asistieron / $item->total_registrados) * 100, 1) : 0;
+                    return $item;
+                });
+
+            $vendedoresDia = \DB::table('participante')
+                ->leftJoin('clase', function($join) use ($slotIdsDia) {
+                    $join->on('participante.ID', '=', 'clase.ID_Participante')
+                        ->whereIn('clase.ID_Agenda', $slotIdsDia)
+                        ;
+                })
+                ->where('participante.ID_Evento', $evento->ID)
+                ->groupBy('participante.Vendedor')
+                ->selectRaw("
+                    COALESCE(NULLIF(TRIM(participante.Vendedor), ''), 'Sin Vendedor Asignado') as vendedor,
+                    GROUP_CONCAT(DISTINCT COALESCE(NULLIF(TRIM(participante.Sucursal), ''), 'Sin Especificar') SEPARATOR ', ') as sucursal_vendedor,
+                    COUNT(DISTINCT participante.ID) as total_registrados,
+                    COUNT(DISTINCT clase.ID_Participante) as total_asistieron
+                ")
+                ->orderByDesc('total_registrados')
+                ->get()
+                ->map(function($item) {
+                    $item->vendedor_nombre = $item->vendedor;
+                    $item->sucursal_vendedor = $item->sucursal_vendedor ? $item->sucursal_vendedor : 'Sin Sucursal';
                     $item->ausentes = max(0, $item->total_registrados - $item->total_asistieron);
                     $item->pct_asistencia = $item->total_registrados > 0 ? round(($item->total_asistieron / $item->total_registrados) * 100, 1) : 0;
                     return $item;
@@ -1065,17 +1189,58 @@ class EventoController extends Controller
             ];
         }
 
+        // Retroalimentación de Clases y Proveedores para Excel
+        $retroActividades = \DB::table('agenda')
+            ->leftJoin('clase', 'agenda.ID', '=', 'clase.ID_Agenda')
+            ->where('agenda.ID_Evento', $evento->ID)
+            ->groupBy('agenda.ID', 'agenda.Actividad', 'agenda.Fecha', 'agenda.Horario', 'agenda.Salon')
+            ->selectRaw("
+                agenda.ID as id,
+                agenda.Actividad as actividad,
+                agenda.Fecha as fecha,
+                agenda.Horario as horario,
+                COALESCE(NULLIF(TRIM(agenda.Salon), ''), 'Sin Salón Especificado') as salon,
+                COUNT(clase.ID) as total_escaneos,
+                COUNT(DISTINCT clase.ID_Participante) as asistentes_unicos
+            ")
+            ->orderByDesc('asistentes_unicos')
+            ->get()
+            ->map(function($item) use ($totalAsistieron) {
+                $item->pct_audiencia = $totalAsistieron > 0 ? round(($item->asistentes_unicos / $totalAsistieron) * 100, 1) : 0;
+                return $item;
+            });
+
+        $retroProveedores = \DB::table('puntos_proveedor')
+            ->where('id_evento', $evento->ID)
+            ->groupBy('usuario')
+            ->selectRaw("
+                COALESCE(NULLIF(TRIM(usuario), ''), 'Sin Nombre Especificado') as proveedor,
+                SUM(puntos) as total_puntos,
+                COUNT(DISTINCT id_participante) as participantes_atendidos,
+                SUM(CASE WHEN es_prospecto = 1 THEN 1 ELSE 0 END) as total_prospectos,
+                COUNT(*) as num_transacciones
+            ")
+            ->orderByDesc('total_puntos')
+            ->get()
+            ->map(function($item) {
+                $item->promedio_puntos = $item->participantes_atendidos > 0 ? round($item->total_puntos / $item->participantes_atendidos, 1) : 0;
+                $item->pct_prospecto = $item->participantes_atendidos > 0 ? round(($item->total_prospectos / $item->participantes_atendidos) * 100, 1) : 0;
+                return $item;
+            });
+
         $filename = "Reporte_Estadisticas_" . \Str::slug($evento->name_evento) . "_" . date('Ymd_His') . ".xls";
 
         return response()->streamDownload(function() use (
             $evento, $totalInscritos, $totalAsistieron, $totalSinAsistencia, $porcentajeAsistencia,
             $rankingVendedores, $topProveedoresPuntos, $asistenciaPorSucursal, $asistenciaPorPuesto, $topActividades,
-            $asistenciaPorHora, $salonesGlobal, $topPremiosCanjeados, $statsPorDia
+            $asistenciaPorHora, $salonesGlobal, $topPremiosCanjeados, $statsPorDia, $retroActividades, $retroProveedores
         ) {
             echo view('eventos.excel_estadisticas', compact(
                 'evento', 'totalInscritos', 'totalAsistieron', 'totalSinAsistencia', 'porcentajeAsistencia',
                 'rankingVendedores', 'topProveedoresPuntos', 'asistenciaPorSucursal', 'asistenciaPorPuesto', 'topActividades',
-                'asistenciaPorHora', 'salonesGlobal', 'topPremiosCanjeados', 'statsPorDia'
+                'asistenciaPorHora', 'salonesGlobal', 'topPremiosCanjeados', 'statsPorDia',
+            'retroActividades',
+            'retroProveedores'
             ))->render();
         }, $filename, [
             'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',

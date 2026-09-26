@@ -1592,26 +1592,39 @@
                 <i class="bi bi-list-stars me-1"></i> Ver todos
             </a>
         </div>
-        <div style="padding:14px 16px; background:rgba(10,15,30,0.3); border-bottom:1px solid rgba(255,255,255,0.08); display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <form method="GET" action="{{ route('eventos.show', $evento) }}" id="form-search-participantes" style="padding:14px 16px; background:rgba(10,15,30,0.3); border-bottom:1px solid rgba(255,255,255,0.08); display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:0;">
+            <input type="hidden" name="active_tab" value="tab-participantes">
             <div style="position:relative; flex:1; min-width:220px;">
                 <i class="bi bi-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:13px;"></i>
-                <input type="text" id="search-participantes" class="form-control form-control-sm" placeholder="Buscar por nombre, RFC, teléfono, sucursal..." style="padding-left:36px; font-size:12.5px; border-radius:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12);" oninput="filterTable('table-participantes', this.value, document.getElementById('filter-sucursal-participantes').value)">
+                <input type="text" name="search_participante" id="search-participantes" class="form-control form-control-sm" placeholder="Buscar en TODOS los participantes por nombre, RFC, teléfono, vendedor..." value="{{ request('search_participante') }}" style="padding-left:36px; font-size:12.5px; border-radius:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12);">
             </div>
-            <select id="filter-sucursal-participantes" class="form-control form-control-sm" style="width:170px; font-size:12.5px; border-radius:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12);" onchange="filterTable('table-participantes', document.getElementById('search-participantes').value, this.value)">
+            <select name="filter_sucursal" id="filter-sucursal-participantes" class="form-control form-control-sm" style="width:170px; font-size:12.5px; border-radius:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12);" onchange="this.form.submit()">
                 <option value="">Todas las Sucursales</option>
-                <option value="DIMEGSA">DIMEGSA</option>
-                <option value="DEASA">DEASA</option>
-                <option value="AIESA">AIESA</option>
-                <option value="SEGSA">SEGSA</option>
-                <option value="FESA">FESA</option>
-                <option value="TAPATIA">TAPATIA</option>
-                <option value="GABSA">GABSA</option>
-                <option value="ILUMINACION">ILUMINACION</option>
-                <option value="VALLARTA">VALLARTA</option>
-                <option value="QUERETARO">QUERETARO</option>
-                <option value="CODI">CODI</option>
+                @foreach(['DIMEGSA', 'DEASA', 'AIESA', 'SEGSA', 'FESA', 'TAPATIA', 'GABSA', 'ILUMINACION', 'VALLARTA', 'QUERETARO', 'CODI'] as $suc)
+                    <option value="{{ $suc }}" {{ request('filter_sucursal') == $suc ? 'selected' : '' }}>{{ $suc }}</option>
+                @endforeach
             </select>
+            <button type="submit" class="btn btn-sm btn-primary" style="border-radius:8px; font-weight:700; font-size:12.5px; padding:6px 14px; background:linear-gradient(135deg, var(--accent-gold) 0%, #b8860b 100%); color:#000; border:none; display:inline-flex; align-items:center; gap:4px;">
+                <i class="bi bi-search"></i> Buscar
+            </button>
+            @if(request('search_participante') || request('filter_sucursal'))
+                <a href="{{ route('eventos.show', [$evento, 'active_tab' => 'tab-participantes']) }}" class="btn btn-sm btn-secondary" style="border-radius:8px; font-size:12.5px; padding:6px 12px; text-decoration:none; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); display:inline-flex; align-items:center; gap:4px;">
+                    <i class="bi bi-x-circle"></i> Limpiar
+                </a>
+            @endif
+        </form>
+
+        @if(request('search_participante') || request('filter_sucursal'))
+        <div style="padding:10px 16px; background:rgba(212,175,55,0.08); border-bottom:1px solid rgba(212,175,55,0.2); font-size:12.5px; color:var(--accent-gold); display:flex; justify-content:space-between; align-items:center;">
+            <span>
+                <i class="bi bi-funnel-fill me-1"></i> Resultados de búsqueda global: 
+                <strong>{{ number_format($participantes->total()) }}</strong> participantes encontrados
+                @if(request('search_participante')) para "<strong>{{ request('search_participante') }}</strong>"@endif
+                @if(request('filter_sucursal')) en sucursal <strong>{{ request('filter_sucursal') }}</strong>@endif.
+            </span>
+            <a href="{{ route('eventos.show', [$evento, 'active_tab' => 'tab-participantes']) }}" style="color:var(--text-muted); font-size:12px; text-decoration:underline;">Ver todos</a>
         </div>
+        @endif
 
         <!-- TABLA ESCRITORIO -->
         <div class="table-wrapper participantes-desktop-table">

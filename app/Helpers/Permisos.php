@@ -65,6 +65,10 @@ class Permisos
             return true;
         }
 
+        if (!self::tablaExiste()) {
+            return true;
+        }
+
         $cacheKey = "permisos_{$rol}";
 
         $permisos = Cache::remember($cacheKey, 300, function () use ($rol) {
@@ -83,6 +87,9 @@ class Permisos
      */
     public static function obtenerPermisos(string $rol): array
     {
+        if (!self::tablaExiste()) {
+            return [];
+        }
         return DB::table('roles_permisos')
             ->where('rol', $rol)
             ->pluck('activo', 'modulo')
