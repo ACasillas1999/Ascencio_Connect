@@ -155,12 +155,6 @@ Route::middleware('auth')->group(function () {
         Route::resource('eventos.proveedores', \App\Http\Controllers\ProveedorEventoController::class)->only(['store', 'update', 'destroy'])->shallow();
         Route::get('eventos/{evento}/proveedores/{usuario}/prospectos', [\App\Http\Controllers\ProveedorController::class, 'getProspectosProveedor'])->name('eventos.proveedores.prospectos');
 
-        /* Canjes de Premios */
-        Route::get('eventos/{evento}/canjes', [\App\Http\Controllers\CanjeController::class, 'index'])->name('eventos.canjes.index');
-        Route::post('eventos/{evento}/canjes/buscar', [\App\Http\Controllers\CanjeController::class, 'buscarParticipante'])->name('eventos.canjes.buscar');
-        Route::get('eventos/{evento}/canjes/participante/{participante}', [\App\Http\Controllers\CanjeController::class, 'infoParticipante'])->name('eventos.canjes.participante');
-        Route::post('eventos/{evento}/canjes/canjear', [\App\Http\Controllers\CanjeController::class, 'canjear'])->name('eventos.canjes.canjear');
-        Route::get('eventos/{evento}/canjes/reporte', [\App\Http\Controllers\CanjeController::class, 'reporte'])->name('eventos.canjes.reporte');
 
         /* Participantes (Acciones exclusivas de Admin: editar y borrar) */
         Route::resource('participantes', ParticipanteController::class)->only(['edit', 'update', 'destroy']);
@@ -182,6 +176,12 @@ Route::middleware('auth')->group(function () {
 
     /* === RUTAS COMPARTIDAS (ADMIN Y EVENTO) === */
     Route::middleware('role:Administrador,Evento')->group(function () {
+        /* Canjes de Premios */
+        Route::get('eventos/{evento}/canjes', [\App\Http\Controllers\CanjeController::class, 'index'])->name('eventos.canjes.index');
+        Route::post('eventos/{evento}/canjes/buscar', [\App\Http\Controllers\CanjeController::class, 'buscarParticipante'])->name('eventos.canjes.buscar');
+        Route::get('eventos/{evento}/canjes/participante/{participante}', [\App\Http\Controllers\CanjeController::class, 'infoParticipante'])->name('eventos.canjes.participante');
+        Route::post('eventos/{evento}/canjes/canjear', [\App\Http\Controllers\CanjeController::class, 'canjear'])->name('eventos.canjes.canjear');
+        Route::get('eventos/{evento}/canjes/reporte', [\App\Http\Controllers\CanjeController::class, 'reporte'])->name('eventos.canjes.reporte');
         Route::resource('eventos.premios', \App\Http\Controllers\PremioController::class)->shallow();
         Route::post('premios/{premio}/stock', [\App\Http\Controllers\PremioController::class, 'updateStock'])->name('premios.stock');
         Route::get('eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
