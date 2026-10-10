@@ -12,10 +12,38 @@
     </a>
 @endsection
 
+@push('styles')
+<style>
+    .canjes-reporte-kpis {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    .canjes-reporte-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+
+    @media (max-width: 991.98px) {
+        .canjes-reporte-kpis {
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+        }
+        .canjes-reporte-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
 
 <!-- KPIs -->
-<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px;">
+<div class="canjes-reporte-kpis">
     <div class="kpi-card" style="--kpi-color:#d4af37">
         <div class="kpi-icon"><i class="bi bi-gift"></i></div>
         <div>
@@ -46,7 +74,7 @@
     </div>
 </div>
 
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px;">
+<div class="canjes-reporte-grid">
 
     <!-- RESUMEN POR PREMIO -->
     <div class="card">

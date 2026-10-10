@@ -127,11 +127,141 @@
     .canje-toast.success { background: rgba(16,185,129,0.95); color: #fff; }
     .canje-toast.error { background: rgba(239,68,68,0.95); color: #fff; }
     @keyframes slideIn { from { transform: translateX(100%); opacity:0; } to { transform: translateX(0); opacity:1; } }
+    /* ========================================================= */
+    /* DISE�O RESPONSIVO M�VIL (ULTRA ADAPTABLE)                */
+    /* ========================================================= */
+    .kpi-container-canjes {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .panel-inicial-grid {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 24px;
+        align-items: start;
+    }
+
+    .panel-canje-flex {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        align-items: flex-start;
+    }
+
+    .card-canjes-main {
+        flex: 1 1 55%;
+        min-width: 320px;
+        margin-bottom: 24px;
+    }
+
+    .card-canjes-historial {
+        flex: 1 1 35%;
+        min-width: 320px;
+        margin-bottom: 24px;
+    }
+
+    @media (max-width: 991.98px) {
+        .kpi-container-canjes {
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+        }
+
+        .panel-inicial-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .panel-canje-flex {
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card-canjes-main,
+        .card-canjes-historial {
+            flex: 1 1 100%;
+            width: 100%;
+            min-width: 0;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .canjes-card-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 10px !important;
+        }
+        .canjes-card-header .btn {
+            width: 100% !important;
+            justify-content: center !important;
+        }
+
+        .participante-info-wrapper {
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+            gap: 14px !important;
+        }
+
+        .participante-info-wrapper .participante-details-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .participante-info-wrapper .participante-meta-tags {
+            justify-content: center !important;
+        }
+
+        .participante-puntos-box {
+            text-align: center !important;
+            width: 100% !important;
+        }
+
+        .premio-canje-card {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            padding: 12px !important;
+            gap: 12px !important;
+        }
+
+        .premio-canje-header-mobile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .premio-canje-actions {
+            width: 100% !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            gap: 8px !important;
+            padding-top: 10px !important;
+            border-top: 1px solid rgba(255,255,255,0.06) !important;
+        }
+
+        .btn-canjear-individual {
+            flex: 1 !important;
+            justify-content: center !important;
+            padding: 8px 12px !important;
+            font-size: 13px !important;
+        }
+
+        #buscarParticipante {
+            font-size: 13px !important;
+            height: 44px !important;
+        }
+    }
 </style>
 @endpush
 
 <!-- KPIs -->
-<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px;">
+<div class="kpi-container-canjes">
     <div class="kpi-card" style="--kpi-color:#d4af37">
         <div class="kpi-icon"><i class="bi bi-gift"></i></div>
         <div>
@@ -157,7 +287,7 @@
 
 <!-- BUSCADOR PRINCIPAL CON ESCÁNER QR -->
 <div class="card" style="margin-bottom:24px; background:var(--bg-secondary); border:1px solid rgba(255,255,255,0.08); box-shadow:0 8px 32px rgba(0,0,0,0.25);">
-    <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.06); padding:16px 20px;">
+    <div class="card-header canjes-card-header" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.06); padding:16px 20px;">
         <span class="card-title" style="font-size:15px; font-weight:700;"><i class="bi bi-upc-scan" style="color:var(--accent-gold); margin-right:8px;"></i>Escanear o Buscar Participante</span>
         <button type="button" class="btn btn-sm btn-secondary" onclick="toggleCamScanner()" style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:6px 14px; background:rgba(212,175,55,0.12); border:1px solid var(--accent-gold); color:var(--accent-gold);">
             <i class="bi bi-camera-fill"></i> <span id="camBtnText">Cámara QR</span>
@@ -188,7 +318,7 @@
 
 <!-- PANEL INICIAL: MOSTRADO POR DEFECTO ANTES DE SELECCIONAR PARTICIPANTE -->
 <div id="panelInicial" style="display:block; animation: fadeSlide 0.4s ease;">
-    <div style="display:grid; grid-template-columns:1fr 380px; gap:24px; align-items:start;">
+    <div class="panel-inicial-grid">
 
         <!-- Catálogo General de Premios -->
         <div class="card" style="background:var(--bg-secondary); border:1px solid rgba(255,255,255,0.08); box-shadow:0 8px 32px rgba(0,0,0,0.25);">
@@ -268,9 +398,9 @@
     <!-- Info del participante -->
     <div id="participanteInfo" style="margin-bottom:24px;"></div>
 
-    <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start;">
+    <div class="panel-canje-flex">
         <!-- Premios canjeables (Columna Izquierda) -->
-        <div class="card" style="flex: 1 1 55%; min-width:320px; margin-bottom:24px; background:var(--bg-secondary); border:1px solid rgba(255,255,255,0.08); box-shadow:0 8px 32px rgba(0,0,0,0.25);">
+        <div class="card card-canjes-main" style="background:var(--bg-secondary); border:1px solid rgba(255,255,255,0.08); box-shadow:0 8px 32px rgba(0,0,0,0.25);">
             <div class="card-header" style="position: sticky; top: 0; z-index: 10; background: var(--bg-secondary); border-bottom: 1px solid rgba(255,255,255,0.06); border-radius: 12px 12px 0 0; padding:16px 20px;">
                 <span class="card-title" style="font-size:15px; font-weight:700;"><i class="bi bi-gift-fill" style="color:var(--accent-gold); margin-right:8px;"></i>Premios Disponibles</span>
                 <span id="premiosCount" class="badge badge-gold" style="margin-left:8px;"></span>
@@ -281,7 +411,7 @@
         </div>
 
         <!-- Historial de canjes del participante (Columna Derecha) -->
-        <div class="card" id="historialCard" style="flex: 1 1 35%; min-width:320px; margin-bottom:24px; background:var(--bg-secondary); border:1px solid rgba(255,255,255,0.08); box-shadow:0 8px 32px rgba(0,0,0,0.25);">
+        <div class="card card-canjes-historial" id="historialCard" style="background:var(--bg-secondary); border:1px solid rgba(255,255,255,0.08); box-shadow:0 8px 32px rgba(0,0,0,0.25);">
             <div class="card-header" style="display:flex; align-items:center; justify-content:space-between; position: sticky; top: 0; z-index: 10; background: var(--bg-secondary); border-bottom: 1px solid rgba(255,255,255,0.06); border-radius: 12px 12px 0 0; padding:16px 20px;">
                 <span class="card-title" style="font-size:15px; font-weight:700;"><i class="bi bi-clock-history" style="color:var(--accent-gold); margin-right:8px;"></i>Historial de Canjes</span>
                 <span id="historialCount" class="badge badge-secondary"></span>
@@ -469,23 +599,23 @@ document.addEventListener('DOMContentLoaded', function() {
             // --- Render Info del Participante ---
             document.getElementById('participanteInfo').innerHTML = `
                 <div class="participante-info-card" style="background:var(--bg-secondary); border:1px solid rgba(255,255,255,0.08); box-shadow:0 8px 32px rgba(0,0,0,0.25);">
-                    <div style="display:flex; align-items:center; gap:16px;">
+                    <div class="participante-info-wrapper" style="display:flex; align-items:center; gap:16px;">
                         <div style="width:54px; height:54px; border-radius:50%; background:linear-gradient(135deg, rgba(212,175,55,0.3), rgba(212,175,55,0.08)); display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--accent-gold); font-size:22px; flex-shrink:0; border:1px solid var(--accent-gold);">
                             ${data.participante.Nombre.charAt(0).toUpperCase()}
                         </div>
-                        <div style="flex:1;">
+                        <div class="participante-details-col" style="flex:1; min-width:0;">
                             <div style="display:flex; align-items:center; gap:10px;">
                                 <div style="font-weight:700; font-size:17px; color:var(--text-primary);">${data.participante.Nombre}</div>
                                 <button type="button" onclick="limpiarSeleccion()" class="btn btn-sm btn-secondary" style="font-size:11px; padding:3px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:4px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15); color:var(--text-primary);"><i class="bi bi-arrow-left"></i> Cambiar Participante</button>
                             </div>
-                            <div style="font-size:12px; color:var(--text-muted); display:flex; gap:14px; flex-wrap:wrap; margin-top:4px;">
+                            <div class="participante-meta-tags" style="font-size:12px; color:var(--text-muted); display:flex; gap:12px; flex-wrap:wrap; margin-top:4px;">
                                 <span><i class="bi bi-hash" style="color:var(--accent-gold);"></i> ID: ${data.participante.ID}</span>
                                 <span><i class="bi bi-telephone" style="color:var(--accent-gold);"></i> ${data.participante.Telefono || '—'}</span>
                                 <span><i class="bi bi-building" style="color:var(--accent-gold);"></i> ${data.participante.Sucursal || '—'}</span>
                                 <span><i class="bi bi-shop" style="color:var(--accent-gold);"></i> ${data.participante.Proveedor || '—'}</span>
                             </div>
                         </div>
-                        <div style="text-align:right; background:rgba(212,175,55,0.08); padding:10px 18px; border-radius:10px; border:1px solid rgba(212,175,55,0.2);">
+                        <div class="participante-puntos-box" style="text-align:right; background:rgba(212,175,55,0.08); padding:10px 18px; border-radius:10px; border:1px solid rgba(212,175,55,0.2);">
                             <div style="font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; font-weight:800;">Puntos Disponibles</div>
                             <div style="font-size:30px; font-weight:900; color:var(--accent-gold); line-height:1; margin-top:2px;">⭐ ${Number(pts).toLocaleString()}</div>
                             <div style="font-size:10.5px; color:var(--text-muted); margin-top:3px;">
@@ -533,7 +663,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </div>
                                 </div>
                                 ${p.puede_canjear ? `
-                                    <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+                                    <div class="premio-canje-actions" style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
                                         <div class="canje-qty-control">
                                             <button class="canje-qty-btn" onclick="cambiarCantidad(${p.id}, -1, ${p.max_canjeable})">−</button>
                                             <input type="number" class="canje-qty-val" id="qty-${p.id}" value="1" min="1" max="${p.max_canjeable}" readonly>
