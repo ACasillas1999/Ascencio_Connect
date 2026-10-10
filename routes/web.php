@@ -151,9 +151,7 @@ Route::middleware('auth')->group(function () {
             'actividades' => 'actividad'
         ])->shallow();
         
-        Route::resource('eventos.premios', \App\Http\Controllers\PremioController::class)->shallow();
-        Route::post('premios/{premio}/stock', [\App\Http\Controllers\PremioController::class, 'updateStock'])->name('premios.stock');
-        Route::resource('eventos.agenda', \App\Http\Controllers\AgendaController::class)->shallow();
+                Route::resource('eventos.agenda', \App\Http\Controllers\AgendaController::class)->shallow();
         Route::resource('eventos.proveedores', \App\Http\Controllers\ProveedorEventoController::class)->only(['store', 'update', 'destroy'])->shallow();
         Route::get('eventos/{evento}/proveedores/{usuario}/prospectos', [\App\Http\Controllers\ProveedorController::class, 'getProspectosProveedor'])->name('eventos.proveedores.prospectos');
 
@@ -184,6 +182,8 @@ Route::middleware('auth')->group(function () {
 
     /* === RUTAS COMPARTIDAS (ADMIN Y EVENTO) === */
     Route::middleware('role:Administrador,Evento')->group(function () {
+        Route::resource('eventos.premios', \App\Http\Controllers\PremioController::class)->shallow();
+        Route::post('premios/{premio}/stock', [\App\Http\Controllers\PremioController::class, 'updateStock'])->name('premios.stock');
         Route::get('eventos/{evento}', [EventoController::class, 'show'])->name('eventos.show');
         Route::post('eventos/{evento}/regenerar-gafetes', [EventoController::class, 'regenerarGafetes'])->name('eventos.regenerarGafetes');
         Route::get('eventos/{evento}/estadisticas', [EventoController::class, 'estadisticas'])->name('eventos.estadisticas');

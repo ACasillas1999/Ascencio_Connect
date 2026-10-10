@@ -505,9 +505,13 @@
     <a href="{{ route('eventos.estadisticas', $evento) }}" class="btn btn-sm" title="Estadísticas" style="background:linear-gradient(135deg, #10b981, #059669); border:1px solid #059669; color:#ffffff; font-weight:700; font-size:12px; display:inline-flex; align-items:center; gap:4px; padding:6px 10px; border-radius:8px; text-decoration:none; flex-shrink:0;">
         <i class="bi bi-bar-chart-line-fill"></i><span class="d-none d-sm-inline">Estadísticas</span>
     </a>
+    @if(\App\Helpers\Permisos::normalizar(auth()->user()->Rol ?? '') !== 'Evento')
+
     <a href="{{ route('eventos.sorteo', $evento) }}" class="btn btn-sm d-none d-md-inline-flex" title="Tómbola" style="background:linear-gradient(135deg, #00a0e9, #0084c2); border:1px solid #0084c2; color:#ffffff; font-weight:700; font-size:12px; align-items:center; gap:4px; padding:6px 10px; border-radius:8px; text-decoration:none; flex-shrink:0;">
         <i class="bi bi-play-circle-fill"></i><span>Tómbola</span>
     </a>
+
+    @endif
     <a href="{{ route('eventos.canjes.index', $evento) }}" class="btn btn-sm" title="Canjes" style="background:linear-gradient(135deg, var(--accent-gold), #b38e1b); border:1px solid #b38e1b; color:#ffffff; font-weight:700; font-size:12px; display:inline-flex; align-items:center; gap:4px; padding:6px 10px; border-radius:8px; text-decoration:none; flex-shrink:0;">
         <i class="bi bi-gift-fill"></i><span class="d-none d-sm-inline">Canjes</span>
     </a>
@@ -2129,9 +2133,13 @@
         <button type="button" id="subtab-btn-ranking" onclick="switchPremiosSubtab('ranking')" style="flex:1; padding:8px 6px; font-size:12px; font-weight:700; border-radius:8px; border:none; background:transparent; color:var(--text-secondary); transition:all 0.2s;">
             <i class="bi bi-fire me-1"></i> Ranking
         </button>
+        @if(\App\Helpers\Permisos::normalizar(auth()->user()->Rol ?? '') !== 'Evento')
+
         <button type="button" id="subtab-btn-tombola" onclick="switchPremiosSubtab('tombola')" style="flex:1; padding:8px 6px; font-size:12px; font-weight:700; border-radius:8px; border:none; background:transparent; color:var(--text-secondary); transition:all 0.2s;">
             <i class="bi bi-ticket-perforated-fill me-1"></i> Tómbola
         </button>
+
+        @endif
     </div>
 
     <!-- CONTENEDOR SUPERIOR EN REJILLA PARA ESCRITORIO: CATÁLOGO DE PREMIOS + RANKING DE LADO A LADO -->
@@ -2244,9 +2252,13 @@
             <span class="card-title" style="font-size:14px; font-weight:700; display:flex; align-items:center; gap:6px;">
                 <i class="bi bi-ticket-perforated-fill" style="color:var(--accent-gold);"></i> Boletos en Tómbola
             </span>
+            @if(\App\Helpers\Permisos::normalizar(auth()->user()->Rol ?? '') !== 'Evento')
+
             <a href="{{ route('eventos.sorteo', $evento) }}" class="btn btn-sm btn-primary d-none d-md-inline-flex" style="font-weight:700; font-size:12px; border-radius:8px; align-items:center; gap:6px; padding:5px 10px;">
                 <i class="bi bi-play-circle-fill"></i> Tómbola en Vivo
             </a>
+
+            @endif
         </div>
 
         @if(isset($boletosPorSucursal) && $boletosPorSucursal->isNotEmpty())
@@ -4438,24 +4450,24 @@ window.switchPremiosSubtab = function(tabName) {
         catalogSec.style.display = 'block';
         tombolaSec.style.display = 'none';
 
-        btnCatalog.style.background = 'var(--accent-gold)';
-        btnCatalog.style.color = '#0f172a';
-        btnCatalog.style.fontWeight = '800';
+        if (btnCatalog) btnCatalog.style.background = 'var(--accent-gold)';
+        if (btnCatalog) btnCatalog.style.color = '#0f172a';
+        if (btnCatalog) btnCatalog.style.fontWeight = '800';
 
-        btnTombola.style.background = 'transparent';
-        btnTombola.style.color = 'var(--text-secondary)';
-        btnTombola.style.fontWeight = '700';
+        if (btnTombola) btnTombola.style.background = 'transparent';
+        if (btnTombola) btnTombola.style.color = 'var(--text-secondary)';
+        if (btnTombola) btnTombola.style.fontWeight = '700';
     } else {
         catalogSec.style.display = 'none';
         tombolaSec.style.display = 'flex';
 
-        btnTombola.style.background = 'var(--accent-gold)';
-        btnTombola.style.color = '#0f172a';
-        btnTombola.style.fontWeight = '800';
+        if (btnTombola) btnTombola.style.background = 'var(--accent-gold)';
+        if (btnTombola) btnTombola.style.color = '#0f172a';
+        if (btnTombola) btnTombola.style.fontWeight = '800';
 
-        btnCatalog.style.background = 'transparent';
-        btnCatalog.style.color = 'var(--text-secondary)';
-        btnCatalog.style.fontWeight = '700';
+        if (btnCatalog) btnCatalog.style.background = 'transparent';
+        if (btnCatalog) btnCatalog.style.color = 'var(--text-secondary)';
+        if (btnCatalog) btnCatalog.style.fontWeight = '700';
     }
 };
 </script>
