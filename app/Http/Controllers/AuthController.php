@@ -23,12 +23,20 @@ class AuthController extends Controller
         }
 
         if (Auth::check()) {
-            if (Auth::user()->Rol === 'Kiosko' || strtolower(Auth::user()->Rol) === 'kiosko') {
+            $norm = \App\Helpers\Permisos::normalizar(Auth::user()->Rol);
+            if ($norm === 'Kiosko') {
                 return redirect()->route('kiosko.index');
             }
-            $norm = \App\Helpers\Permisos::normalizar(Auth::user()->Rol);
             if ($norm === 'Vendedor' || $norm === 'Gerente') {
                 return redirect()->route('participantes.index');
+            }
+            if ($norm === 'Proveedor') {
+                return redirect()->route('proveedor.index');
+            }
+            if ($norm === 'Evento') {
+                if (Auth::user()->ID_Evento) {
+                    return redirect()->route('eventos.show', Auth::user()->ID_Evento);
+                }
             }
             return redirect()->route('dashboard');
         }

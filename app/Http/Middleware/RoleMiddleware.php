@@ -25,7 +25,7 @@ class RoleMiddleware
             return redirect()->route('login');
         }
 
-        // Si la cuenta está desactivada por el administrador, expulsar y cerrar sesión en tiempo real
+        // Si la cuenta esta desactivada por el administrador, expulsar y cerrar sesion en tiempo real
         if (isset($user->Activo) && (int)$user->Activo === 0) {
             \Illuminate\Support\Facades\Auth::logout();
             $request->session()->invalidate();
@@ -41,12 +41,12 @@ class RoleMiddleware
             return ($r === 'Admin' || $r === 'Administrador') ? 'Admin' : $r;
         }, $roles);
 
-        // Si el rol del usuario está en la lista de roles permitidos
+        // Si el rol del usuario esta en la lista de roles permitidos
         if (in_array($normalizedUserRol, $normalizedRoles)) {
             return $next($request);
         }
 
-        // Si no está en la lista explícita, verificar permisos dinámicos por módulo
+        // Si no esta en la lista explicita, verificar permisos dinamicos por modulo
         if (Permisos::tablaExiste()) {
             $routeName = $request->route()->getName();
             $modulo = $this->detectarModulo($routeName);
@@ -56,20 +56,33 @@ class RoleMiddleware
             }
         }
 
-        // Redirección amigable según el rol si no tiene acceso
-        if ($userRol === 'Proveedor' || $userRol === 'proveedor') {
-            return redirect()->route('proveedor.index')->with('error', 'No tienes acceso a esa sección.');
+        // Redireccion amigable segun el rol si no tiene acceso (a su ventana por defecto)
+        $normRol = Permisos::normalizar($userRol);
+
+        if ($normRol === 'Evento') {
+            if (!empty($user->ID_Evento)) {
+                return redirect()->route('eventos.show', $user->ID_Evento)->with('error', 'No tienes permiso para acceder a esa sección.');
+            }
+            return redirect()->route('login')->with('error', 'No tienes ningún evento asignado.');
         }
 
-        if ($userRol === 'Vendedor') {
-            return redirect()->route('participantes.index')->with('error', 'No tienes acceso a esa sección.');
+        if ($normRol === 'Proveedor') {
+            return redirect()->route('proveedor.index')->with('error', 'No tienes permiso para acceder a esa sección.');
+        }
+
+        if ($normRol === 'Vendedor' || $normRol === 'Gerente') {
+            return redirect()->route('participantes.index')->with('error', 'No tienes permiso para acceder a esa sección.');
+        }
+
+        if ($normRol === 'Kiosko') {
+            return redirect()->route('kiosko.index')->with('error', 'No tienes permiso para acceder a esa sección.');
         }
 
         abort(403, 'No tienes acceso a esa sección. Tu rol actual es: ' . $userRol);
     }
 
     /**
-     * Detectar el módulo a partir del nombre de la ruta.
+     * Detectar el modulo a partir del nombre de la ruta.
      */
     private function detectarModulo(?string $routeName): ?string
     {
