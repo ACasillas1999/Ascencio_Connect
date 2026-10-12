@@ -262,6 +262,35 @@ class ActividadController extends Controller
         return view('actividades._tabla_asistencia', compact('participantes', 'actividad'));
     }
 
+    /**
+     * Verifica si una sesión o actividad ha alcanzado su capacidad máxima de asistentes.
+     */
+    private function verificarCupoActividad(Actividad $actividad, $agendaId = null): ?string
+    {
+        if (!$actividad->capacidad || (int)$actividad->capacidad <= 0) {
+            return null;
+        }
+
+        $query = Clase::where('Asistio', true);
+
+        if ($agendaId) {
+            $query->where('ID_Agenda', $agendaId);
+        } else {
+            $agendaIds = Agenda::where('ID_Evento', $actividad->ID_Evento)
+                ->where('Actividad', $actividad->Actividad)
+                ->pluck('ID');
+            $query->whereIn('ID_Agenda', $agendaIds);
+        }
+
+        $totalAsistentes = $query->count();
+
+        if ($totalAsistentes >= (int)$actividad->capacidad) {
+            return "¡Cupo lleno! Esta clase ya alcanzó su aforo máximo de {$actividad->capacidad} asistentes ({$totalAsistentes}/{$actividad->capacidad}). No se permite dar ingreso a más participantes.";
+        }
+
+        return null;
+    }
+
     public function marcarAsistencia(Request $request, Actividad $actividad)
     {
         $idInput = trim($request->input('id_participante', ''));
@@ -298,6 +327,10 @@ class ActividadController extends Controller
 
         if ($clase->Asistio) {
             return response()->json(['ok' => false, 'msg' => "{$participante->Nombre} ya tiene su asistencia registrada previamente."]);
+        }
+
+        if ($errorCupo = $this->verificarCupoActividad($actividad, $clase->ID_Agenda)) {
+            return response()->json(['ok' => false, 'msg' => $errorCupo]);
         }
 
         $clase->Asistio = true;
@@ -341,6 +374,9 @@ class ActividadController extends Controller
         $claseExitente = Clase::where('ID_Participante', $idPart)->whereIn('ID_Agenda', [$agenda->ID])->first();
         if ($claseExitente) {
             if (!$claseExitente->Asistio) {
+                if ($errorCupo = $this->verificarCupoActividad($actividad, $agenda->ID)) {
+                    return response()->json(['ok' => false, 'msg' => $errorCupo]);
+                }
                 $claseExitente->Asistio = true;
                 $claseExitente->Asistencia_Fecha = Carbon::now();
                 $claseExitente->Asistencia_Usuario = Auth::id() ?? 0;
@@ -353,6 +389,10 @@ class ActividadController extends Controller
                 return response()->json(['ok' => true, 'msg' => "Asistencia registrada correctamente para {$participante->Nombre}"]);
             }
             return response()->json(['ok' => false, 'msg' => "{$participante->Nombre} ya está inscrito y cuenta con asistencia."]);
+        }
+
+        if ($errorCupo = $this->verificarCupoActividad($actividad, $agenda->ID)) {
+            return response()->json(['ok' => false, 'msg' => $errorCupo]);
         }
 
         Clase::create([
@@ -392,6 +432,23 @@ class ActividadController extends Controller
 
         if (!$agenda) {
             return response()->json(['ok' => false, 'msg' => 'Esta actividad no tiene horarios asignados']);
+        }
+
+        // Validar cupo del evento
+        $evento = Evento::find($actividad->ID_Evento);
+        if ($evento && $evento->capacidad && (int)$evento->capacidad > 0) {
+            $totalEventParts = Participante::where('ID_Evento', $evento->ID)->count();
+            if ($totalEventParts >= (int)$evento->capacidad) {
+                return response()->json([
+                    'ok' => false,
+                    'msg' => "¡Cupo del evento lleno! El evento '{$evento->name_evento}' alcanzó su capacidad máxima ({$evento->capacidad} participantes)."
+                ]);
+            }
+        }
+
+        // Validar cupo de la clase
+        if ($errorCupo = $this->verificarCupoActividad($actividad, $agenda->ID)) {
+            return response()->json(['ok' => false, 'msg' => $errorCupo]);
         }
 
         // Crear participante
@@ -451,6 +508,13 @@ class ActividadController extends Controller
         }
 
         $nuevoEstado = !$clase->Asistio;
+
+        if ($nuevoEstado) {
+            if ($errorCupo = $this->verificarCupoActividad($actividad, $clase->ID_Agenda)) {
+                return response()->json(['ok' => false, 'msg' => $errorCupo]);
+            }
+        }
+
         $clase->Asistio = $nuevoEstado ? 1 : 0;
         $clase->Asistencia_Fecha = $nuevoEstado ? Carbon::now() : null;
         $clase->Asistencia_Usuario = Auth::id() ?? 0;

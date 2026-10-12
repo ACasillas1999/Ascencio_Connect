@@ -145,11 +145,11 @@ class ParticipanteController extends Controller
 
     public function create()
     {
+        $query = Evento::withCount('participantes')->orderByDesc('fecha_inicio');
         if (auth()->check() && auth()->user()->Rol === 'Vendedor') {
-            $eventos = Evento::whereIn('estado', ['EN CURSO', 'PRÓXIMO'])->orderByDesc('fecha_inicio')->get();
-        } else {
-            $eventos = Evento::orderByDesc('fecha_inicio')->get();
+            $query->whereIn('estado', ['EN CURSO', 'PRÓXIMO']);
         }
+        $eventos = $query->get();
         return view('participantes.create', compact('eventos'));
     }
 
@@ -184,6 +184,16 @@ class ParticipanteController extends Controller
         ]);
 
         $evento = Evento::findOrFail($data['ID_Evento']);
+
+        // Verificación de capacidad del evento
+        if ($evento->capacidad && (int)$evento->capacidad > 0) {
+            $totalRegistrados = Participante::where('ID_Evento', $evento->ID)->count();
+            if ($totalRegistrados >= (int)$evento->capacidad) {
+                return back()->withInput()->withErrors([
+                    'ID_Evento' => "El evento '{$evento->name_evento}' ha alcanzado su capacidad máxima ({$evento->capacidad} participantes). No se pueden registrar más participantes."
+                ]);
+            }
+        }
 
         // Verificación de Teléfono duplicado
         $exists = Participante::where('Telefono', $data['Telefono'])->where('ID_Evento', $evento->ID)->exists();
@@ -222,6 +232,26 @@ class ParticipanteController extends Controller
                         $r2 = $parseHorario($a2->Horario);
                         if ($r1[0] < $r2[1] && $r1[1] > $r2[0]) {
                             return back()->withInput()->withErrors(['actividades' => "Las actividades '{$a1->Actividad}' y '{$a2->Actividad}' se solapan en su horario."]);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Verificación de cupo en las actividades seleccionadas
+        if (!empty($data['actividades'])) {
+            foreach ($data['actividades'] as $agendaId) {
+                $agendaItem = \App\Models\Agenda::find($agendaId);
+                if ($agendaItem) {
+                    $actModel = \App\Models\Actividad::where('ID_Evento', $evento->ID)
+                        ->where('Actividad', $agendaItem->Actividad)
+                        ->first();
+                    if ($actModel && $actModel->capacidad && (int)$actModel->capacidad > 0) {
+                        $totalInscritosClase = \App\Models\Clase::where('ID_Agenda', $agendaItem->ID)->count();
+                        if ($totalInscritosClase >= (int)$actModel->capacidad) {
+                            return back()->withInput()->withErrors([
+                                'actividades' => "La clase '{$agendaItem->Actividad}' ({$agendaItem->Horario}) ha alcanzado su cupo máximo ({$actModel->capacidad} participantes)."
+                            ]);
                         }
                     }
                 }
@@ -293,7 +323,8 @@ class ParticipanteController extends Controller
                 $join->on('agenda.ID_Evento', '=', 'actividades.ID_Evento')
                      ->on('agenda.Actividad', '=', 'actividades.Actividad');
             })
-            ->select('agenda.*', 'actividades.Exclusiva')
+            ->select('agenda.*', 'actividades.Exclusiva', 'actividades.capacidad')
+            ->withCount('clases')
             ->orderBy('agenda.Fecha')
             ->orderBy('agenda.Horario')
             ->get();
@@ -432,7 +463,7 @@ class ParticipanteController extends Controller
     public function reenviarWhatsApp(Participante $participante)
     {
         if (!$participante->Telefono) {
-            return back()->with('error', 'El participante no cuenta con un n�mero de tel�fono registrado.');
+            return back()->with('error', 'El participante no cuenta con un número de teléfono registrado.');
         }
 
         $evento = $participante->evento;

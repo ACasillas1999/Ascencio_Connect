@@ -49,6 +49,9 @@
                             </option>
                         @endforeach
                     </select>
+                    <div id="evento-lleno-aviso" style="display:none; margin-top:8px; padding:10px 14px; border-radius:8px; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; font-size:13px; font-weight:600;">
+                        <i class="bi bi-exclamation-triangle-fill" style="margin-right:6px;"></i> Este evento ha alcanzado su cupo máximo de participantes. No es posible realizar nuevos registros.
+                    </div>
                 </div>
 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start;">
@@ -79,7 +82,7 @@
                                 <div class="form-group" style="position:relative;">
                                     <label class="form-label" for="Telefono">Teléfono (WhatsApp) *</label>
                                     <input id="Telefono" name="Telefono" type="text" class="form-control"
-                                           value="{{ old('Telefono') }}" placeholder="10 d�gitos" required autocomplete="off" inputmode="numeric" pattern="[0-9]*" maxlength="10">
+                                           value="{{ old('Telefono') }}" placeholder="10 dígitos" required autocomplete="off" inputmode="numeric" pattern="[0-9]*" maxlength="10">
                                     <div id="telefono-dropdown" style="display:none; position:absolute; top:100%; left:0; width:100%; background:var(--bg-card, #1e293b); border:1px solid var(--border-subtle, #334155); border-radius:4px; max-height:200px; overflow-y:auto; z-index:100; box-shadow:0 4px 6px rgba(0,0,0,0.3);">
                                     </div>
                                 </div>
@@ -506,6 +509,21 @@
         });
 
         form.addEventListener('submit', function(e) {
+            const selectedOpt = eventoSelect.options[eventoSelect.selectedIndex];
+            if (selectedOpt && selectedOpt.getAttribute('data-lleno') === '1') {
+                e.preventDefault();
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Evento Lleno',
+                        text: 'Este evento ha alcanzado su capacidad máxima de participantes. No es posible registrar más personas.',
+                        confirmButtonColor: '#ef4444'
+                    });
+                } else {
+                    alert('Este evento ha alcanzado su capacidad máxima de participantes.');
+                }
+                return;
+            }
             const selectedOpt = eventoSelect.options[eventoSelect.selectedIndex];
             if (selectedOpt && selectedOpt.getAttribute('data-obligatorias') === '1') {
                 const checkedActivities = document.querySelectorAll('.actividad-checkbox:checked');
