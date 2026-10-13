@@ -390,6 +390,40 @@
     </div>
 </div>
 
+{{-- Modal: Registro rápido de participante --}}
+<div id="modalRegistro" style="display:none; position:fixed; z-index:1000; inset:0; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; padding:16px;">
+    <div style="background:var(--bg-secondary); padding:24px; border-radius:12px; width:100%; max-width:500px; border:1px solid var(--border);">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:18px;">
+            <h3 style="margin:0; font-size:17px; color:var(--text-primary);">Registro Nuevo Participante</h3>
+            <button type="button" onclick="cerrarModalRegistro()" style="background:none; border:none; color:var(--text-secondary); font-size:24px; cursor:pointer;">&times;</button>
+        </div>
+
+        <form id="formModalRegistro" onsubmit="guardarModalRegistro(event)">
+            @if($isSingleSlotView)
+                <input type="hidden" name="horario" value="{{ $selectedSlot->ID }}">
+            @endif
+
+            <div style="margin-bottom:14px;">
+                <label class="form-label">Nombre completo *</label>
+                <input type="text" name="nombre" required class="form-control">
+            </div>
+            <div style="margin-bottom:14px;">
+                <label class="form-label">Teléfono (10 dígitos) *</label>
+                <input type="tel" name="telefono" required class="form-control" pattern="[0-9]{10}" maxlength="10" inputmode="numeric">
+            </div>
+            <div style="margin-bottom:20px;">
+                <label class="form-label">Empresa / Proveedor *</label>
+                <input type="text" name="proveedor" required class="form-control">
+            </div>
+
+            <div style="display:flex; gap:10px;">
+                <button type="button" class="btn btn-secondary" onclick="cerrarModalRegistro()" style="flex:1;">Cancelar</button>
+                <button type="submit" class="btn btn-primary" style="flex:2;">REGISTRAR E INSCRIBIR</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 @push('scripts')
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
