@@ -1600,7 +1600,7 @@
             <input type="hidden" name="active_tab" value="tab-participantes">
             <div style="position:relative; flex:1; min-width:220px;">
                 <i class="bi bi-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:13px;"></i>
-                <input type="text" name="search_participante" id="search-participantes" class="form-control form-control-sm" placeholder="Buscar en TODOS los participantes por nombre, RFC, teléfono, vendedor..." value="{{ request('search_participante') }}" style="padding-left:36px; font-size:12.5px; border-radius:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12);">
+                <input type="text" name="search_participante" id="search-participantes" class="form-control form-control-sm" placeholder="Buscar por ID (#), nombre, RFC, teléfono, vendedor..." value="{{ request('search_participante') }}" style="padding-left:36px; font-size:12.5px; border-radius:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12);">
             </div>
             <select name="filter_sucursal" id="filter-sucursal-participantes" class="form-control form-control-sm" style="width:170px; font-size:12.5px; border-radius:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12);" onchange="this.form.submit()">
                 <option value="">Todas las Sucursales</option>
@@ -4163,7 +4163,15 @@
             timelinePreview.innerHTML = html;
         }
         
-        if (hasOverlap) {
+        const rangoInvalido = start && end && end <= start;
+        const warnText = overlapWarning ? overlapWarning.querySelector('span') : null;
+
+        if (rangoInvalido || hasOverlap) {
+            if (warnText) {
+                warnText.innerText = rangoInvalido
+                    ? 'La hora de fin debe ser mayor a la hora de inicio.'
+                    : '¡El horario seleccionado se solapa en el mismo salón!';
+            }
             if (overlapWarning) overlapWarning.style.display = 'block';
             if (submitBtn) {
                 submitBtn.disabled = true;
@@ -4434,6 +4442,22 @@
     });
 </script>
 @endif
+
+@if($errors->any())
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        Swal.fire({
+            title: 'No se pudo guardar',
+            text: @json($errors->first()),
+            icon: 'error',
+            background: 'var(--bg-secondary)',
+            color: 'var(--text-primary)',
+            confirmButtonColor: 'var(--accent-gold)'
+        });
+    });
+</script>
+@endif
+
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11">

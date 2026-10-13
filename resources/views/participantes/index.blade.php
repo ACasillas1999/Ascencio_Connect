@@ -184,7 +184,7 @@
                 <div style="position:relative">
                     <i class="bi bi-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted)"></i>
                     <input id="search" name="search" type="text" class="form-control" style="padding-left:36px"
-                           placeholder="Nombre, RFC, teléfono..." value="{{ request('search') }}">
+                           placeholder="ID (#), nombre, RFC, teléfono..." value="{{ request('search') }}">
                 </div>
             </div>
             <div style="flex:1;min-width:160px">

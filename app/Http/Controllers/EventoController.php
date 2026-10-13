@@ -119,15 +119,45 @@ class EventoController extends Controller
 
         if (request()->filled('search_participante')) {
             $searchP = trim(request('search_participante'));
-            $participantesQuery->where(function($q) use ($searchP) {
-                $q->where('participante.Nombre', 'LIKE', "%{$searchP}%")
-                  ->orWhere('participante.RFC', 'LIKE', "%{$searchP}%")
-                  ->orWhere('participante.Telefono', 'LIKE', "%{$searchP}%")
-                  ->orWhere('participante.Sucursal', 'LIKE', "%{$searchP}%")
-                  ->orWhere('participante.Vendedor', 'LIKE', "%{$searchP}%")
-                  ->orWhere('participante.Proveedor', 'LIKE', "%{$searchP}%")
-                  ->orWhere('participante.QR_Code', 'LIKE', "%{$searchP}%");
-            });
+
+            // Parsear posible ID (ej. 3279, #3279, ID: 3279, ID-3279, o formato QR)
+            $parsedId = null;
+            $cleanId = ltrim($searchP, '#');
+            if (preg_match('/^id[\s:#\-_]*(\d+)/i', $cleanId, $matches)) {
+                $parsedId = (int)$matches[1];
+            } elseif (is_numeric($cleanId)) {
+                $parsedId = (int)$cleanId;
+            } elseif (str_contains($searchP, '-')) {
+                $partes = explode('-', $searchP);
+                $rawId = preg_replace('/\D/', '', $partes[0]);
+                if (!empty($rawId)) {
+                    $parsedId = (int)$rawId;
+                }
+            }
+
+            $isExplicitId = (str_starts_with($searchP, '#') || preg_match('/^id[\s:#\-_]/i', $searchP));
+
+            if ($isExplicitId && $parsedId !== null) {
+                $participantesQuery->where('participante.ID', $parsedId);
+            } else {
+                $participantesQuery->where(function($q) use ($searchP, $parsedId) {
+                    if ($parsedId !== null) {
+                        $q->where('participante.ID', $parsedId)
+                          ->orWhere('participante.ID', 'LIKE', "%{$parsedId}%");
+                    }
+                    $q->orWhere('participante.Nombre', 'LIKE', "%{$searchP}%")
+                      ->orWhere('participante.RFC', 'LIKE', "%{$searchP}%")
+                      ->orWhere('participante.Telefono', 'LIKE', "%{$searchP}%")
+                      ->orWhere('participante.Sucursal', 'LIKE', "%{$searchP}%")
+                      ->orWhere('participante.Vendedor', 'LIKE', "%{$searchP}%")
+                      ->orWhere('participante.Proveedor', 'LIKE', "%{$searchP}%")
+                      ->orWhere('participante.QR_Code', 'LIKE', "%{$searchP}%");
+                });
+            }
+
+            if ($parsedId !== null) {
+                $participantesQuery->orderByRaw("CASE WHEN participante.ID = ? THEN 0 ELSE 1 END", [$parsedId]);
+            }
         }
 
         if (request()->filled('filter_sucursal')) {

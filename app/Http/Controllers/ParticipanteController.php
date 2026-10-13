@@ -29,13 +29,43 @@ class ParticipanteController extends Controller
             $query->where('participante.Sucursal', $request->sucursal);
         }
         if ($request->filled('search')) {
-            $s = $request->search;
-            $query->where(function ($q) use ($s) {
-                $q->where('participante.Nombre', 'like', "%$s%")
-                  ->orWhere('participante.RFC', 'like', "%$s%")
-                  ->orWhere('participante.Telefono', 'like', "%$s%")
-                  ->orWhere('participante.Sucursal', 'like', "%$s%");
-            });
+            $s = trim($request->search);
+
+            // Parsear posible ID (ej. 3279, #3279, ID: 3279, ID-3279, o formato QR)
+            $parsedId = null;
+            $cleanId = ltrim($s, '#');
+            if (preg_match('/^id[\s:#\-_]*(\d+)/i', $cleanId, $matches)) {
+                $parsedId = (int)$matches[1];
+            } elseif (is_numeric($cleanId)) {
+                $parsedId = (int)$cleanId;
+            } elseif (str_contains($s, '-')) {
+                $partes = explode('-', $s);
+                $rawId = preg_replace('/\D/', '', $partes[0]);
+                if (!empty($rawId)) {
+                    $parsedId = (int)$rawId;
+                }
+            }
+
+            $isExplicitId = (str_starts_with($s, '#') || preg_match('/^id[\s:#\-_]/i', $s));
+
+            if ($isExplicitId && $parsedId !== null) {
+                $query->where('participante.ID', $parsedId);
+            } else {
+                $query->where(function ($q) use ($s, $parsedId) {
+                    if ($parsedId !== null) {
+                        $q->where('participante.ID', $parsedId)
+                          ->orWhere('participante.ID', 'LIKE', "%{$parsedId}%");
+                    }
+                    $q->orWhere('participante.Nombre', 'like', "%$s%")
+                      ->orWhere('participante.RFC', 'like', "%$s%")
+                      ->orWhere('participante.Telefono', 'like', "%$s%")
+                      ->orWhere('participante.Sucursal', 'like', "%$s%");
+                });
+            }
+
+            if ($parsedId !== null) {
+                $query->orderByRaw("CASE WHEN participante.ID = ? THEN 0 ELSE 1 END", [$parsedId]);
+            }
         }
 
         // Definición de columnas ordenables (Por defecto ID descendente)
