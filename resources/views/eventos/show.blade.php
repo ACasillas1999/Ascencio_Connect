@@ -3357,7 +3357,7 @@
 
     function filterAgendaSlots(query) {
         const q = query.toLowerCase().trim();
-        const cards = document.querySelectorAll('.agenda-card, [data-actividad-id]');
+        const cards = document.querySelectorAll('.timetable-cell-card');
         cards.forEach(card => {
             const text = card.innerText.toLowerCase();
             if (!q || text.includes(q)) {
