@@ -307,12 +307,30 @@ class ProveedorController extends Controller
             'password' => 'nullable|string|min:4',
         ]);
 
-        $usuario->username = $request->username;
-        if ($request->filled('password')) {
-            $usuario->password = Hash::make($request->password);
-            $usuario->password_visible = $request->password;
-        }
-        $usuario->save();
+        $nombreAnterior = $usuario->username;
+
+        DB::transaction(function () use ($request, $usuario, $nombreAnterior) {
+            $usuario->username = $request->username;
+            if ($request->filled('password')) {
+                $usuario->password = Hash::make($request->password);
+                $usuario->password_visible = $request->password;
+            }
+            $usuario->save();
+
+            // Si cambió el nombre, mover sus asignaciones e historial al nombre nuevo
+            if ($nombreAnterior !== $usuario->username) {
+                DB::table('proveedor_evento')
+                    ->where('NombreProveedor', $nombreAnterior)
+                    ->update(['NombreProveedor' => $usuario->username]);
+
+                if (Schema::hasTable('puntos_proveedor')) {
+                    DB::table('puntos_proveedor')
+                        ->where('usuario', $nombreAnterior)
+                        ->update(['usuario' => $usuario->username]);
+                }
+            }
+        });
+
 
         return redirect()->back()->with('success', 'Cuenta de proveedor actualizada correctamente.');
     }
