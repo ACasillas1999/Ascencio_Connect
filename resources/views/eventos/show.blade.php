@@ -138,7 +138,8 @@
                     if (screen.orientation.unlock) screen.orientation.unlock();
                 });
             } else if (screen.orientation && screen.orientation.unlock) {
-                screen.orientation.unlock().catch(() => {});
+                try { screen.orientation.unlock(); } catch (e) {}
+
             }
         }
     };
