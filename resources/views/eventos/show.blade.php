@@ -1945,7 +1945,13 @@
                             </div>
                         </td>
                         <td style="padding:12px 16px;">
-                            <form action="{{ route('proveedores.update', $prov->ID) }}" method="POST" style="margin:0;">
+                            <form action="{{ route('proveedores.update', $prov->ID) }}" method="POST" style="display:inline-flex; align-items:center; gap:4px; margin:0;"
+                                  @if($prov->Activo)
+                                      class="confirm-form"
+                                      data-title="¿Deshabilitar proveedor?"
+                                      data-message="{{ $prov->NombreProveedor }} ya no podrá escanear ni asignar puntos en este evento hasta que lo vuelvas a habilitar."
+                                      data-confirm="Sí, deshabilitar"
+                                   @endif>
                                 @csrf @method('PUT')
                                 <input type="hidden" name="active_tab" value="tab-proveedores">
                                 <input type="hidden" name="Activo" value="{{ $prov->Activo ? 0 : 1 }}">
@@ -2032,7 +2038,13 @@
                         <span style="color:var(--accent-gold); font-size:12.5px; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
                             <i class="bi bi-calendar-event"></i> {{ $evento->name_evento }}
                         </span>
-                        <form action="{{ route('proveedores.update', $prov->ID) }}" method="POST" style="display:inline-flex; align-items:center; gap:4px; margin:0;">
+                        <form action="{{ route('proveedores.update', $prov->ID) }}" method="POST" style="display:inline-flex; align-items:center; gap:4px; margin:0;"
+                              @if($prov->Activo)
+                                  class="confirm-form"
+                                  data-title="¿Deshabilitar proveedor?"
+                                  data-message="{{ $prov->NombreProveedor }} ya no podrá escanear ni asignar puntos en este evento hasta que lo vuelvas a habilitar."
+                                  data-confirm="Sí, deshabilitar"
+                              @endif>
                             @csrf @method('PUT')
                             <input type="hidden" name="active_tab" value="tab-proveedores">
                             <input type="hidden" name="Activo" value="{{ $prov->Activo ? 0 : 1 }}">

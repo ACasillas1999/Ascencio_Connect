@@ -311,7 +311,13 @@
                                             <span style="color:rgba(255,255,255,0.2);">|</span>
 
                                             <!-- Botón Separado para Habilitar / Deshabilitar -->
-                                            <form action="{{ route('proveedores.update', $asig->id_asignacion) }}" method="POST" style="display:inline; margin:0;">
+                                            <form action="{{ route('proveedores.update', $asig->id_asignacion) }}" method="POST" style="display:inline; margin:0;"
+                                                @if($asig->Activo)
+                                                    class="confirm-form"
+                                                    data-title="¿Deshabilitar proveedor?"
+                                                    data-message="{{ $prov->username }} ya no podrá escanear ni asignar puntos en {{ $asig->name_evento }} hasta que lo vuelvas a habilitar."
+                                                    data-confirm="Sí, deshabilitar"
+                                                @endif>
                                                 @csrf @method('PUT')
                                                 <input type="hidden" name="Activo" value="{{ $asig->Activo ? 0 : 1 }}">
                                                 <button type="submit" style="border:1px solid {{ $asig->Activo ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)' }}; cursor:pointer; font-size:11px; padding:3px 8px; font-weight:700; border-radius:6px; background:{{ $asig->Activo ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)' }}; color:{{ $asig->Activo ? '#4ade80' : '#f87171' }}; display:inline-flex; align-items:center; gap:4px;" title="Clic para {{ $asig->Activo ? 'deshabilitar' : 'habilitar' }} la cuenta en {{ $asig->name_evento }}">
@@ -383,7 +389,13 @@
                             <span class="mpv-asig-name">
                                 <i class="bi bi-calendar-event"></i> {{ Str::limit($asig->name_evento, 26) }}
                             </span>
-                            <form action="{{ route('proveedores.update', $asig->id_asignacion) }}" method="POST" style="display:inline; margin:0;">
+                            <form action="{{ route('proveedores.update', $asig->id_asignacion) }}" method="POST" style="display:inline; margin:0;"
+                                  @if($asig->Activo)
+                                      class="confirm-form"
+                                      data-title="¿Deshabilitar proveedor?"
+                                      data-message="{{ $prov->username }} ya no podrá escanear ni asignar puntos en {{ $asig->name_evento }} hasta que lo vuelvas a habilitar."
+                                      data-confirm="Sí, deshabilitar"
+                                  @endif>
                                 @csrf @method('PUT')
                                 <input type="hidden" name="Activo" value="{{ $asig->Activo ? 0 : 1 }}">
                                 <button type="submit" style="border:1px solid {{ $asig->Activo ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)' }}; cursor:pointer; font-size:10.5px; padding:2px 8px; font-weight:700; border-radius:6px; background:{{ $asig->Activo ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)' }}; color:{{ $asig->Activo ? '#4ade80' : '#f87171' }}; display:inline-flex; align-items:center; gap:4px;" title="Clic para {{ $asig->Activo ? 'deshabilitar' : 'habilitar' }}">

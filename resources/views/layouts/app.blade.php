@@ -1653,6 +1653,36 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    // Confirmación genérica para acciones que no son eliminar (ej. deshabilitar)
+    document.querySelectorAll('.confirm-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formToSubmit = this;
+            const msg = this.dataset.message || '¿Seguro que deseas continuar?';
+
+            if (typeof Swal === 'undefined') {
+                if (confirm(msg)) formToSubmit.submit();
+                return;
+            }
+
+            Swal.fire({
+                title: this.dataset.title || '¿Confirmar acción?',
+                text: msg,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f97316',
+                cancelButtonColor: '#475569',
+                confirmButtonText: this.dataset.confirm || 'Sí, continuar',
+                cancelButtonText: 'Cancelar',
+                background: 'var(--bg-card, #1e293b)',
+                color: 'var(--text-primary, #f8fafc)'
+            }).then(result => {
+                if (result.isConfirmed) formToSubmit.submit();
+            });
+        });
+    });
+
 });
 </script>
 
