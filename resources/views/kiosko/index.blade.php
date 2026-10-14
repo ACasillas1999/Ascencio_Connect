@@ -548,30 +548,31 @@
         border-bottom-color: #e2e8f0 !important;
         color: #1e293b !important;
     }
-    /* BANNER ANIMADO / GIF EN TÓTEM */
+    /* BANNER ANIMADO / GIF EN TÓTEM (AMPLIADO PARA LLENAR ESPACIO) */
     .totem-gif-banner {
-        margin-top: 25px;
+        margin-top: 20px;
         display: flex;
         justify-content: center;
         align-items: center;
         width: 100%;
         text-align: center;
-        padding: 10px 0;
+        padding: 10px 0 35px 0;
     }
 
     .totem-gif-img {
-        max-width: 95%;
-        max-height: 480px;
         width: auto;
+        max-width: 90%;
         height: auto;
+        max-height: 75vh;
+        min-height: 480px;
         object-fit: contain;
-        filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.45));
-        border-radius: 8px;
+        filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.55));
+        transition: transform 0.3s ease;
     }
 
-    @media (max-height: 800px) {
+    @media (min-height: 1000px) {
         .totem-gif-img {
-            max-height: 320px;
+            max-height: 820px;
         }
     }
 </style>
