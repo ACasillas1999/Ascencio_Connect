@@ -16,6 +16,9 @@
         padding: 0 !important;
         font-family: 'Inter', system-ui, -apple-system, sans-serif;
         box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: calc(100vh - 120px) !important;
     }
 
     /* HEADER TÓTEM ULTRA MODERNO */
@@ -548,31 +551,43 @@
         border-bottom-color: #e2e8f0 !important;
         color: #1e293b !important;
     }
-    /* BANNER ANIMADO / GIF EN TÓTEM (AMPLIADO PARA LLENAR ESPACIO) */
+    /* BANNER ANIMADO / GIF EN TÓTEM (TOTALMENTE ADAPTABLE AL TAMAÑO DE VENTANA) */
     .totem-gif-banner {
-        margin-top: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        text-align: center;
-        padding: 10px 0 35px 0;
+        margin-top: 15px !important;
+        flex: 1 1 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 100% !important;
+        text-align: center !important;
+        padding: 10px 0 25px 0 !important;
+        min-height: 0 !important;
+    }
+
+    .totem-gif-banner picture {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 100% !important;
+        height: 100% !important;
+        flex: 1 !important;
     }
 
     .totem-gif-img {
-        width: auto;
-        max-width: 90%;
-        height: auto;
-        max-height: 75vh;
-        min-height: 480px;
-        object-fit: contain;
+        width: auto !important;
+        max-width: 95% !important;
+        height: auto !important;
+        max-height: calc(100vh - 300px) !important;
+        min-height: 450px !important;
+        object-fit: contain !important;
         filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.55));
-        transition: transform 0.3s ease;
+        transition: all 0.2s ease;
     }
 
-    @media (min-height: 1000px) {
+    @media (min-height: 900px) {
         .totem-gif-img {
-            max-height: 820px;
+            max-height: calc(100vh - 280px) !important;
         }
     }
 </style>
