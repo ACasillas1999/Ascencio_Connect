@@ -324,6 +324,17 @@
                                                     <i class="bi bi-power"></i> {{ $asig->Activo ? '🟢 Habilitado' : '🔴 Deshabilitado' }}
                                                 </button>
                                             </form>
+                                            <span style="color:rgba(255,255,255,0.2);">|</span>
+
+                                            <!-- Desasignar del evento -->
+                                            <form action="{{ route('proveedores.destroy', $asig->id_asignacion) }}" method="POST" style="display:inline; margin:0;"
+                                                  class="delete-form"
+                                                  data-message="¿Quitar a {{ $prov->username }} del evento {{ $asig->name_evento }}? Ya no podrá escanear ni asignar puntos ahí.">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger" style="padding:2px 8px; font-size:11px; display:inline-flex; align-items:center; gap:4px;" title="Desasignar">
+                                                    <i class="bi bi-x-lg"></i> Quitar
+                                                </button>
+                                            </form>
                                         </div>
                                     @endforeach
                                 </div>
@@ -706,5 +717,17 @@
             }
         });
     });
+    @if($errors->any())
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            icon: 'error',
+            title: 'No se pudo guardar',
+            text: @json($errors->first()),
+            confirmButtonColor: 'var(--accent-gold)',
+            background: 'var(--bg-secondary)',
+            color: 'var(--text-primary)'
+        });
+    });
+    @endif
 </script>
 @endsection
