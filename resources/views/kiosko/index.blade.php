@@ -551,9 +551,9 @@
         border-bottom-color: #e2e8f0 !important;
         color: #1e293b !important;
     }
-    /* BANNER ANIMADO / GIF EN TÓTEM (TOTALMENTE ADAPTABLE AL TAMAÑO DE VENTANA) */
+    /* BANNER ANIMADO / GIF EN TÓTEM (DINÁMICO Y EXPANDIBLE SEGÚN LA VENTANA) */
     .totem-gif-banner {
-        margin-top: 15px !important;
+        margin-top: 10px !important;
         flex: 1 1 auto !important;
         display: flex !important;
         flex-direction: column !important;
@@ -561,7 +561,7 @@
         align-items: center !important;
         width: 100% !important;
         text-align: center !important;
-        padding: 10px 0 25px 0 !important;
+        padding: 5px 0 15px 0 !important;
         min-height: 0 !important;
     }
 
@@ -575,20 +575,12 @@
     }
 
     .totem-gif-img {
+        height: clamp(520px, calc(100vh - 280px), 1250px) !important;
         width: auto !important;
         max-width: 95% !important;
-        height: auto !important;
-        max-height: calc(100vh - 300px) !important;
-        min-height: 450px !important;
         object-fit: contain !important;
         filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.55));
-        transition: all 0.2s ease;
-    }
-
-    @media (min-height: 900px) {
-        .totem-gif-img {
-            max-height: calc(100vh - 280px) !important;
-        }
+        transition: transform 0.2s ease;
     }
 </style>
 @endpush
@@ -689,9 +681,9 @@
 
     <!-- BANNER ANIMADO / GIF INFORMATIVO EN PARTE INFERIOR -->
     <div class="totem-gif-banner" id="kioskoGifBanner">
-        <picture>
+        <picture style="display:flex; justify-content:center; align-items:center; width:100%; height:100%;">
             <source srcset="{{ asset('images/kiosko-animacion.webp') }}" type="image/webp">
-            <img src="{{ asset('images/kiosko-animacion.gif') }}" alt="Animación Kiosko" class="totem-gif-img">
+            <img src="{{ asset('images/kiosko-animacion.gif') }}" alt="Animación Kiosko" class="totem-gif-img" style="height: clamp(520px, calc(100vh - 280px), 1250px); width: auto; max-width: 95%; object-fit: contain;">
         </picture>
     </div>
 
