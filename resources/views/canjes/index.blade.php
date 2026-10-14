@@ -128,7 +128,7 @@
     .canje-toast.error { background: rgba(239,68,68,0.95); color: #fff; }
     @keyframes slideIn { from { transform: translateX(100%); opacity:0; } to { transform: translateX(0); opacity:1; } }
     /* ========================================================= */
-    /* DISE�O RESPONSIVO M�VIL (ULTRA ADAPTABLE)                */
+    /* DISE�O RESPONSIVO M�VIL (ULTRA ADAPTABLE)                */
     /* ========================================================= */
     .kpi-container-canjes {
         display: grid;
@@ -569,7 +569,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Enter') {
             e.preventDefault();
             const q = this.value.trim();
-            const foundId = extractIdFromQr(q);
+            // 10 o más dígitos = teléfono, no ID: que lo resuelva la búsqueda normal
+            const esTelefono = /^\d{10,}$/.test(q);
+            const foundId = esTelefono ? null : extractIdFromQr(q);
+
             if (foundId) {
                 seleccionarParticipante(foundId);
             } else if (q.length >= 2) {
