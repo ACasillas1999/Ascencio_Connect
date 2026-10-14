@@ -548,6 +548,32 @@
         border-bottom-color: #e2e8f0 !important;
         color: #1e293b !important;
     }
+    /* BANNER ANIMADO / GIF EN TÓTEM */
+    .totem-gif-banner {
+        margin-top: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        text-align: center;
+        padding: 10px 0;
+    }
+
+    .totem-gif-img {
+        max-width: 95%;
+        max-height: 480px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.45));
+        border-radius: 8px;
+    }
+
+    @media (max-height: 800px) {
+        .totem-gif-img {
+            max-height: 320px;
+        }
+    }
 </style>
 @endpush
 
@@ -643,6 +669,14 @@
             </form>
         </div>
 
+    </div>
+
+    <!-- BANNER ANIMADO / GIF INFORMATIVO EN PARTE INFERIOR -->
+    <div class="totem-gif-banner" id="kioskoGifBanner">
+        <picture>
+            <source srcset="{{ asset('images/kiosko-animacion.webp') }}" type="image/webp">
+            <img src="{{ asset('images/kiosko-animacion.gif') }}" alt="Animación Kiosko" class="totem-gif-img">
+        </picture>
     </div>
 
     <!-- TARJETA DE RESULTADO DE IMPACTO EN TÓTEM (REEMPLAZA EL ESCÁNER A PANTALLA COMPLETA) -->
@@ -877,6 +911,9 @@
         const grid = document.getElementById('kioskoGrid');
         if (grid) grid.style.display = 'none';
 
+        const gifBanner = document.getElementById('kioskoGifBanner');
+        if (gifBanner) gifBanner.style.display = 'none';
+
         const card = document.getElementById('participanteResultCard');
         
         document.getElementById('resAvatar').innerText = (p.nombre ? p.nombre.charAt(0).toUpperCase() : 'P');
@@ -942,6 +979,9 @@
         // OCULTAR RESULTADO Y MOSTRAR DE NUEVO EL ESCÁNER A PANTALLA COMPLETA
         document.getElementById('participanteResultCard').style.display = 'none';
         setModoKiosko(currentModoKiosko);
+
+        const gifBanner = document.getElementById('kioskoGifBanner');
+        if (gifBanner) gifBanner.style.display = 'flex';
 
         const input = document.getElementById('kioskoInputCodigo');
         if (input) {
