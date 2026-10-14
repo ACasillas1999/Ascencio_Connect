@@ -553,25 +553,29 @@
     }
     /* BANNER ANIMADO / GIF EN TÓTEM (DINÁMICO Y EXPANDIBLE SEGÚN LA VENTANA) */
     .totem-gif-banner {
-        margin-top: 10px !important;
-        flex: 1 1 auto !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        align-items: center !important;
-        width: 100% !important;
-        text-align: center !important;
-        padding: 5px 0 15px 0 !important;
-        min-height: 0 !important;
+        margin-top: 10px;
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        text-align: center;
+        padding: 5px 0 15px 0;
+        min-height: 0;
+    }
+
+    .totem-gif-banner.oculto-kiosko {
+        display: none !important;
     }
 
     .totem-gif-banner picture {
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        width: 100% !important;
-        height: 100% !important;
-        flex: 1 !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        flex: 1;
     }
 
     .totem-gif-img {
@@ -920,7 +924,10 @@
         if (grid) grid.style.display = 'none';
 
         const gifBanner = document.getElementById('kioskoGifBanner');
-        if (gifBanner) gifBanner.style.display = 'none';
+        if (gifBanner) {
+            gifBanner.style.setProperty('display', 'none', 'important');
+            gifBanner.classList.add('oculto-kiosko');
+        }
 
         const card = document.getElementById('participanteResultCard');
         
@@ -989,7 +996,10 @@
         setModoKiosko(currentModoKiosko);
 
         const gifBanner = document.getElementById('kioskoGifBanner');
-        if (gifBanner) gifBanner.style.display = 'flex';
+        if (gifBanner) {
+            gifBanner.style.setProperty('display', 'flex', 'important');
+            gifBanner.classList.remove('oculto-kiosko');
+        }
 
         const input = document.getElementById('kioskoInputCodigo');
         if (input) {
