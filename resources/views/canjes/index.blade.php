@@ -577,7 +577,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 seleccionarParticipante(foundId);
             } else if (q.length >= 2) {
                 clearTimeout(debounceTimer);
-                buscarInput.dispatchEvent(new Event('input'));
+                fetch('{{ route("eventos.canjes.buscar", $evento) }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                    body: JSON.stringify({ q })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.length === 1) {
+                        // Una sola coincidencia (ej. su teléfono): abrirla directo
+                        seleccionarParticipante(data[0].ID);
+                    } else {
+                        // Varias o ninguna: mostrar la lista como al escribir
+                        buscarInput.dispatchEvent(new Event('input'));
+                    }
+                });
             }
         }
     });
